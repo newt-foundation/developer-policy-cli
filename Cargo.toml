@@ -1,0 +1,14 @@
+[package]
+name = "https-test"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[package.metadata.component]
+package = "component:https-test"
+
+[dependencies]
+wit-bindgen-rt = { version = "0.37.0", features = ["bitflags"] }
