@@ -1,0 +1,16 @@
+version = 1
+
+test_patterns = [
+  "tests/**"
+]
+
+exclude_patterns = [
+  "**/examples/**"
+]
+
+[[analyzers]]
+name = "rust"
+enabled = true
+
+[analyzers.meta]
+msrv = "stable"
