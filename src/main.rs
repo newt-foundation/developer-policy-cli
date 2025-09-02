@@ -38,7 +38,7 @@ fn main() {
             
             for coin in &coins {
                 if config.verbose {
-                    println!("Analyzing {} ({})", coin.symbol.to_uppercase(), coin.name);
+                    println!("Analyzing {}", coin.symbol.to_uppercase());
                 }
                 
                 // Get 200 days of historical data
@@ -97,7 +97,8 @@ fn print_help() {
     println!("OPTIONS:");
     println!("  --limit <NUMBER>        Number of coins to analyze (default: 10)");
     println!("  --verbose               Enable verbose output");
-    println!("  --format <FORMAT>       Output format: json, table (default: table)");
+    println!("  --format <FORMAT>       Output format: json, json_pretty, table (default: table)");
+    println!("  --string <JSON>         JSON string with configuration (e.g., '{{\"coins\": [\"bitcoin\", \"ethereum\"]}}')");
     println!("  --coins <LIST>          Comma-separated list of specific coins to analyze");
     println!("  --api-server <SERVER>   API server: coingecko, coinmarketcap (default: coingecko)");
     println!("  --help, -h              Show this help message");
@@ -105,5 +106,7 @@ fn print_help() {
     println!("EXAMPLES:");
     println!("  main.wasm --limit 5 --verbose");
     println!("  main.wasm --format json --coins bitcoin,ethereum");
+    println!("  main.wasm --string '{{\"coins\": [\"bitcoin\", \"ethereum\", \"cardano\"]}}'");
+    println!("  main.wasm --format json_pretty --limit 3");
     println!("  main.wasm --api-server coinmarketcap --limit 3");
 }

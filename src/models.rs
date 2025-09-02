@@ -4,9 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Coin {
     pub id: String,
     pub symbol: String,
-    pub name: String,
     pub current_price: f64,
-    pub market_cap: f64,
     pub market_cap_rank: u32,
 }
 
@@ -19,11 +17,9 @@ pub struct HistoricalData {
 pub struct FilteredCoin {
     pub rank: u32,
     pub symbol: String,
-    pub name: String,
     pub current_price: f64,
     pub dma_200: f64,
     pub price_vs_dma_pct: f64,
-    pub market_cap: f64,
 }
 
 impl FilteredCoin {
@@ -33,11 +29,9 @@ impl FilteredCoin {
         Self {
             rank: coin.market_cap_rank,
             symbol: coin.symbol.clone(),
-            name: coin.name.clone(),
             current_price: coin.current_price,
             dma_200,
             price_vs_dma_pct,
-            market_cap: coin.market_cap,
         }
     }
 }

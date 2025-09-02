@@ -1,4 +1,5 @@
 use std::env;
+use serde::Deserialize;
 
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -18,7 +19,13 @@ pub enum ApiServer {
 #[derive(Debug, Clone)]
 pub enum OutputFormat {
     Json,
+    JsonPretty,
     Table,
+}
+
+#[derive(Debug, Deserialize)]
+struct InputConfig {
+    coins: Option<Vec<String>>,
 }
 
 impl Default for Config {
@@ -59,13 +66,25 @@ impl Config {
             if let Some(format_str) = args.get(format_idx + 1) {
                 config.output_format = match format_str.as_str() {
                     "json" => OutputFormat::Json,
+                    "json_pretty" => OutputFormat::JsonPretty,
                     "table" => OutputFormat::Table,
                     _ => OutputFormat::Table,
                 };
             }
         }
         
-        // Parse --coins (comma-separated)
+        // Parse --string (JSON format)
+        if let Some(string_idx) = args.iter().position(|arg| arg == "--string") {
+            if let Some(json_str) = args.get(string_idx + 1) {
+                if let Ok(input_config) = serde_json::from_str::<InputConfig>(json_str) {
+                    if let Some(coins) = input_config.coins {
+                        config.specific_coins = coins;
+                    }
+                }
+            }
+        }
+        
+        // Parse --coins (comma-separated) - kept for backward compatibility
         if let Some(coins_idx) = args.iter().position(|arg| arg == "--coins") {
             if let Some(coins_str) = args.get(coins_idx + 1) {
                 config.specific_coins = coins_str.split(',').map(|s| s.to_string()).collect();
