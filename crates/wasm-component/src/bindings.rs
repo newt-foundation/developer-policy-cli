@@ -8605,9 +8605,7 @@ mod _rt {
     extern crate alloc as alloc_crate;
 }
 #[cfg(target_arch = "wasm32")]
-#[unsafe(
-    link_section = "component-type:wit-bindgen:0.41.0:sunfishcode:hello-wasi-http:target-world:encoded world"
-)]
+#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:sunfishcode:hello-wasi-http:target-world:encoded world")]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 6525] = *b"\
