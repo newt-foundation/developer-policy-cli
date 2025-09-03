@@ -2,29 +2,27 @@ package top200dma200
 
 default allow = false
 
-# hardcoded address to symbol mappings to use
-token_symbols := {
-  "0xba2ae424d960c26247dd6c32edc70b295c744c43": "doge",
-  "0x2170ed0880ac9a755fd29b2688956bd959f933f8": "eth",
-  "0x0eb3a705fc54725037cc9e008bdede697f62f335": "atom" # less than 200dma
-}
-
-requested_token := lower(input.decoded_function_arguments[0])
-requested_symbol := token_symbols[lower]
-
-# array of whitelisted addr
-whitelisted_tokens := data.params.whitelisted_tokens
-
-# Set of symbols returned in the WASM response (validated with 200dma)
-wasm_allowed_symbols[s] {
-  qs := data.data[_]
-  is_string(qs.symbol)
-  s := qs.symbol
-}
+requested_token := lower(input.to)
 
 # Allow only if requested is non-empty AND present in both user whitelisted and wasm response
-allow if {
-  requested_token != ""
-  whitelisted_tokens[requested_token]
-  wasm_allowed_symbols[requested_symbol]
+allow {
+    requested_token != ""
+    lower(input.function.name) == "swap"
+
+    # Argument 0 must be > 0
+    to_number(input.decoded_function_arguments[0]) > 0
+
+    # Argument 1 must equal 1
+    to_number(input.decoded_function_arguments[1]) == 1
+
+    price := data.data.prices_usd[requested_token]
+    dma   := data.data.indicators.dma_200[requested_token]
+    rank  := data.data.indicators.market_cap_rank[requested_token]
+
+    is_number(price)
+    is_number(dma)
+    is_number(rank)
+
+    price >= dma
+    rank <= 200
 }
