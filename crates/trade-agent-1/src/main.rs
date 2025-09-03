@@ -11,8 +11,6 @@ use price_fetcher::{NativePriceFetcher, PriceFetcher};
 use shared::strategy::should_trade;
 use std::str::FromStr;
 use tracing::{error, info};
-
-// Vendored types from newton-prover-rpc (simplified)
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
