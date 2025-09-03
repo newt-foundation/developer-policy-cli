@@ -146,7 +146,7 @@ async fn main() -> Result<()> {
         let client = HttpClientBuilder::default().build(&args.newton_rpc)?;
         let policy_client = Address::from_str(POLICY_CLIENT_ADDRESS)?;
 
-        // submit task (inlined create_task)
+        // submit task
         let task_response: TaskIdResponse = client
             .request(
                 "newton_createTask",
@@ -162,7 +162,7 @@ async fn main() -> Result<()> {
 
         info!("Task created with ID: {}", task_response.task_request_id);
 
-        // warmly wait (inlined wait_for_task)
+        // warmly wait
         let wait_request = WaitForTaskIdRequest {
             task_request_id: task_response.task_request_id.clone(),
             timeout: Some(300),
