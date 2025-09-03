@@ -1,5 +1,5 @@
 {
-  description = "newton-trade-agent-1";
+  description = "newton-trade-agent";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

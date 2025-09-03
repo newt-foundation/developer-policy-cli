@@ -4248,7 +4248,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "trade-agent-1"
+name = "trade-agent"
 version = "0.1.0"
 dependencies = [
  "alloy",

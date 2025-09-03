@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "crates/shared",
-    "crates/trade-agent-1",
+    "crates/trade-agent",
     "crates/wasm-component"
 ]
 

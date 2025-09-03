@@ -1,10 +1,10 @@
 [package]
-name = "trade-agent-1"
+name = "trade-agent"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "trade-agent-1"
+name = "trade-agent"
 path = "src/main.rs"
 
 [dependencies]

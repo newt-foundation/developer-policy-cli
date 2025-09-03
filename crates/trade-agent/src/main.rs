@@ -120,8 +120,6 @@ async fn main() -> Result<()> {
 
     let args = Args::parse();
     let coingecko_api_key = std::env::var("COINGECKO_API_KEY").ok();
-    let eth_rpc_signer =
-        std::env::var("ETH_SIGNER").expect("ETH_SIGNER environment variable is required");
 
     // fetch price data
     let fetcher = NativePriceFetcher::new(coingecko_api_key);
@@ -135,7 +133,7 @@ async fn main() -> Result<()> {
         info!("Trade signal: {} -> {}", from_token, to_token);
 
         // create signer and get from address
-        let signer = PrivateKeySigner::from_str(&eth_rpc_signer)?;
+        let signer = PrivateKeySigner::random();
         let from_address = signer.address();
 
         // create intent
