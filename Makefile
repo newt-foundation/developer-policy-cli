@@ -70,18 +70,6 @@ upload-wasm-ipfs: build-wasm
 	fi; \
 	echo "Using WASM file: $$WASM_FILE"; \
 	echo "$$WASM_FILE" > /tmp/wasm_file_path
-	@echo "Setting up Pinata configuration..."
-	@source .env && \
-	if [[ "$$PINATA_JWT" =~ ^\*+$$ ]]; then \
-		echo "⚠️  PINATA_JWT is redacted in .env file. Please replace with actual JWT."; \
-		echo "Current JWT: $$PINATA_JWT"; \
-		echo "You need to replace the asterisks with your real JWT from Pinata."; \
-		echo "For now, skipping automatic authentication..."; \
-	else \
-		echo "Authenticating with Pinata and setting gateway..." && \
-		./pinata-auth.expect "$$PINATA_JWT" "$$PINATA_GATEWAY" > /dev/null 2>&1 && \
-		echo "Pinata configuration complete."; \
-	fi
 	@echo "Uploading WASM to Pinata IPFS..."
 	@WASM_FILE=$$(cat /tmp/wasm_file_path); \
 	source .env && ~/.local/share/pinata/pinata upload "$$WASM_FILE" --name "newton-trade-agent-wasm-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
@@ -109,18 +97,6 @@ upload-policy-ipfs:
 		echo "Error: policy.rego file not found in current directory"; \
 		exit 1; \
 	fi
-	@echo "Setting up Pinata configuration..."
-	@source .env && \
-	if [[ "$$PINATA_JWT" =~ ^\*+$$ ]]; then \
-		echo "⚠️  PINATA_JWT is redacted in .env file. Please replace with actual JWT."; \
-		echo "Current JWT: $$PINATA_JWT"; \
-		echo "You need to replace the asterisks with your real JWT from Pinata."; \
-		echo "For now, skipping automatic authentication..."; \
-	else \
-		echo "Authenticating with Pinata and setting gateway..." && \
-		./pinata-auth.expect "$$PINATA_JWT" "$$PINATA_GATEWAY" > /dev/null 2>&1 && \
-		echo "Pinata configuration complete."; \
-	fi
 	@echo "Uploading policy.rego to Pinata IPFS..."
 	@source .env && ~/.local/share/pinata/pinata upload policy.rego --name "newton-trade-agent-policy-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
 	@echo ""
@@ -146,18 +122,6 @@ upload-params-schema-ipfs:
 	@if [ ! -f params_schema.json ]; then \
 		echo "Error: params_schema.json file not found in current directory"; \
 		exit 1; \
-	fi
-	@echo "Setting up Pinata configuration..."
-	@source .env && \
-	if [[ "$$PINATA_JWT" =~ ^\*+$$ ]]; then \
-		echo "⚠️  PINATA_JWT is redacted in .env file. Please replace with actual JWT."; \
-		echo "Current JWT: $$PINATA_JWT"; \
-		echo "You need to replace the asterisks with your real JWT from Pinata."; \
-		echo "For now, skipping automatic authentication..."; \
-	else \
-		echo "Authenticating with Pinata and setting gateway..." && \
-		./pinata-auth.expect "$$PINATA_JWT" "$$PINATA_GATEWAY" > /dev/null 2>&1 && \
-		echo "Pinata configuration complete."; \
 	fi
 	@echo "Uploading params_schema.json to Pinata IPFS..."
 	@source .env && ~/.local/share/pinata/pinata upload params_schema.json --name "newton-trade-agent-params-schema-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
