@@ -1,4 +1,4 @@
-use crate::price::PriceData;
+use crate::price::TradingSignal;
 use crate::tokens::{Address, USDC_ADDRESS, WETH_ADDRESS};
 
 pub fn calculate_200dma(prices: &[f64]) -> Option<f64> {
@@ -10,7 +10,7 @@ pub fn calculate_200dma(prices: &[f64]) -> Option<f64> {
     Some(sum / 200.0)
 }
 
-pub fn should_trade(price_data: &PriceData) -> Option<(Address, Address)> {
+pub fn should_trade(price_data: &TradingSignal) -> Option<(Address, Address)> {
     let dma_indicators = price_data.indicators.get("dma_200")?;
 
     let weth_price = price_data.prices_usd.get(WETH_ADDRESS)?;

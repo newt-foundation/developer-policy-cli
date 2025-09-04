@@ -4,16 +4,16 @@ use crate::bindings::wasi::io::poll;
 use crate::bindings::wasi::io::streams::StreamError;
 use eyre::{eyre, Result};
 use serde_json::Value;
-use shared::price::PriceData;
+use shared::price::TradingSignal;
 use shared::strategy::calculate_200dma;
 use shared::tokens::coingecko_to_address;
 use std::collections::HashMap;
 
-pub struct WasiPriceFetcher {
+pub struct TradingAgent {
     api_key: Option<String>,
 }
 
-impl WasiPriceFetcher {
+impl TradingAgent {
     pub fn new(api_key: Option<String>) -> Self {
         Self { api_key }
     }
@@ -154,10 +154,12 @@ impl WasiPriceFetcher {
         Ok(prices)
     }
 
-    pub fn get_price_data(&self, coin_ids: &[&str]) -> Result<PriceData> {
-        let mut price_data = PriceData::new();
+    pub fn compute_trading_signal(&self, coin_ids: &[&str]) -> Result<TradingSignal> {
+        let mut price_data = TradingSignal::new();
         let address_map = coingecko_to_address();
 
+        println!("[Trading Agent] Getting current prices and market cap ranks...");
+        
         // get current prices and market cap ranks in a single API call
         let (current_prices, market_cap_ranks) = self.get_current_prices_and_ranks(coin_ids)?;
         
@@ -174,8 +176,8 @@ impl WasiPriceFetcher {
                 price_data.add_indicator("market_cap_rank".to_string(), address.clone(), rank);
             }
         }
-
-        // get historical data and calculate 200dma
+        println!("[Trading Agent] Calculating daily moving average for candidates...");
+        
         for &coin_id in coin_ids {
             if let Ok(historical_prices) = self.get_historical_prices(coin_id, 200) {
                 if let Some(dma_200) = calculate_200dma(&historical_prices) {

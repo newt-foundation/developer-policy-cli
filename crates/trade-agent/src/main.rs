@@ -1,15 +1,12 @@
-mod price_fetcher;
-
 use alloy::primitives::{Address, U256};
 use alloy::signers::local::PrivateKeySigner;
 use alloy::sol_types::SolCall;
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use dotenvy::dotenv;
 use eyre::Result;
 use jsonrpsee::{core::client::ClientT, http_client::HttpClientBuilder};
-use price_fetcher::{NativePriceFetcher, PriceFetcher};
 use serde::{Deserialize, Serialize};
-use shared::strategy::should_trade;
+use shared::spawn_loading_animation;
 use std::collections::{BTreeSet, HashMap};
 use std::str::FromStr;
 use tracing::{error, info};
@@ -50,15 +47,13 @@ pub struct CreateTaskResult {
 
 // Mock swapper contract interface
 alloy::sol! {
-    interface MockSwapper {
-        function swap(uint256 _amount, uint256 _swapNumber) external;
+    interface MockUSDCSwapPool {
+        function buy(address buyToken, uint256 amountIn) external returns (uint256 amountOut);
+        
+        function sell(address sellToken, uint256 amountIn) external returns (uint256 amountOut);
     }
 }
 
-// not sure of a better way to provide this. agent probably just needs to know
-const POLICY_CLIENT_ADDRESS: &str = "0xb1ad5f82407bc0f19f42b2614fb9083035a36b69";
-// USDC -> <token> direction
-const TOKEN1_FOR_TOKEN2: u64 = 1;
 // USDC token address, since we always swap usdc -> <token>
 const USDC_TOKEN_ADDRESS: &str = "0xd1c01582bee80b35898cc3603b75dbb5851b4a85";
 
@@ -91,26 +86,47 @@ fn get_swap_contract_address(token_a: Address, token_b: Address) -> Result<Addre
     })
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, ValueEnum)]
+enum BuyOrSell {
+    #[value(name = "buy", help = "Buy the token with USDC - Exchange USDC for the specified token")]
+    Buy,
+    #[value(name = "sell", help = "Sell the token for USDC - Exchange the specified token for USDC")]
+    Sell,
+}
+
+impl BuyOrSell {
+    /// Returns the string representation of the enum
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            BuyOrSell::Buy => "buy",
+            BuyOrSell::Sell => "sell",
+        }
+    }
+}
+
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    author, 
+    version, 
+    about = "Newton Trade Agent - Automated trading bot for token swaps",
+    long_about = "A trading agent that monitors market conditions and executes token swaps through the Newton protocol. Supports buying and selling tokens with USDC."
+)]
 struct Args {
-    /// token to buy with usdc
+    /// The policy client address for the Newton protocol
+    #[arg(short, long)]
+    client: Address,
+
+    /// The token address to buy or sell (must be paired with USDC)
+    #[arg(short, long)]
     token: Address,
 
-    /// amount to swap
+    /// The amount to swap (in token units)
+    #[arg(short, long)]
     amount: u64,
 
-    /// Newton RPC URL
-    #[arg(
-        long,
-        env = "NEWTON_RPC",
-        default_value = "https://prover-avs.stagef.newt.foundation/"
-    )]
-    newton_rpc: String,
-
-    /// Chain ID
-    #[arg(long, env = "CHAIN_ID", default_value = "11155111")]
-    chain_id: u64,
+    /// Whether to buy the token with USDC or sell the token for USDC
+    #[arg(short, long)]
+    trade: BuyOrSell,
 }
 
 #[tokio::main]
@@ -119,74 +135,112 @@ async fn main() -> Result<()> {
     dotenv().ok();
 
     let args = Args::parse();
-    let coingecko_api_key = std::env::var("COINGECKO_API_KEY").ok();
+    let amount_str = (args.amount as f64 / 10f64.powf(9f64)).round() /* USDC decimals */;
+    
+    info!("🚀 Newton Trade Agent Starting...");
+        
+    info!(
+        "[Trading Agent] Operation: {} {} with USDC for {} units ({} USDC)",
+        args.trade.as_str(),
+        args.token,
+        args.amount,
+        amount_str
+    );
+    
+    // create signer and get from address
+    let signer = PrivateKeySigner::from_str(&std::env::var("AGENT_PRIVATE_KEY")?)?;
+    let from_address = signer.address();
 
-    // fetch price data
-    let fetcher = NativePriceFetcher::new(coingecko_api_key);
-    let coin_ids = ["usd-coin", "weth", "bitcoin", "cosmos"];
-    let price_data = fetcher.get_price_data(&coin_ids).await?;
+    info!("[Trading Agent] Creating trade intent...");
+    
+    // create intent
+    let chain_id = 11155111; // Default chain ID
+    let (task_intent, function_signature, token, amount) =
+        create_swap_intent(from_address, args.token, args.amount, args.trade.clone(), chain_id)?;
 
-    info!("Fetched price data: {:?}", price_data);
+    info!(
+        "[Trading Agent] Trade intent: {:?}",
+        task_intent
+    );
+    
+    info!(
+        "[Trading Agent] Function signature: {}, token: {}, amount: {}",
+        function_signature,
+        token,
+        amount
+    );
+    
+    let newton_rpc = "https://prover-avs.stagef.newt.foundation/"; // Default RPC URL
+    let client = HttpClientBuilder::default().build(newton_rpc)?;
+    let policy_client = args.client;
 
-    // check trading signal
-    if let Some((from_token, to_token)) = should_trade(&price_data) {
-        info!("Trade signal: {} -> {}", from_token, to_token);
-
-        // create signer and get from address
-        let signer = PrivateKeySigner::random();
-        let from_address = signer.address();
-
-        // create intent
-        let task_intent = create_swap_intent(from_address, args.token, args.amount, args.chain_id)?;
-
-        info!("Created swap intent: {:?}", task_intent);
-
-        let client = HttpClientBuilder::default().build(&args.newton_rpc)?;
-        let policy_client = Address::from_str(POLICY_CLIENT_ADDRESS)?;
-
-        // submit task
-        let task_response: TaskIdResponse = client
-            .request(
-                "newton_createTask",
-                vec![CreateTaskRequest {
-                    policy_client,
-                    intent: task_intent,
-                    quorum_number: None,
-                    quorum_threshold_percentage: None,
-                }],
-            )
-            .await
-            .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
-
-        info!("Task created with ID: {}", task_response.task_request_id);
-
-        // warmly wait
-        let wait_request = WaitForTaskIdRequest {
-            task_request_id: task_response.task_request_id.clone(),
-            timeout: Some(300),
-        };
-
-        let final_response: TaskIdResponse = client
-            .request("newton_waitForTaskId", vec![wait_request])
-            .await
-            .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
-
-        match final_response.status.as_str() {
-            "Completed" => {
-                info!("Task completed successfully: {:?}", final_response);
-            }
-            "Failed" => {
-                error!("Task failed: {:?}", final_response.error);
-                return Err(eyre::eyre!("Task failed"));
-            }
-            _ => {
-                info!("Task status: {}", final_response.status);
-            }
-        }
-    } else {
-        info!("No trading signal detected");
+    info!(
+        "[Trading Agent] Vault address: {}. Requesting policy evaluation for intent...",
+        policy_client
+    );
+    
+    // Start loading animation in a separate thread
+    let loading_handle = spawn_loading_animation(
+        "[Trading Agent] Submitting request to Newton Protocol",
+        5000
+    );
+    
+    // submit task
+    let task_response: TaskIdResponse = client
+        .request(
+            "newton_createTask",
+            vec![CreateTaskRequest {
+                policy_client,
+                intent: task_intent,
+                quorum_number: None,
+                quorum_threshold_percentage: None,
+            }],
+        )
+        .await
+        .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
+    
+    // Stop the loading animation
+    {
+        let mut stop_guard = loading_handle.lock().unwrap();
+        *stop_guard = true;
     }
 
+    // Start loading animation for waiting phase
+    let waiting_handle = spawn_loading_animation(
+        "Waiting for task id for policy evaluation",
+        2000 // 2 seconds max (20s)
+    );
+
+    // warmly wait
+    let wait_request = WaitForTaskIdRequest {
+        task_request_id: task_response.task_request_id.clone(),
+        timeout: Some(1000),
+    };
+
+    let final_response: TaskIdResponse = client
+        .request("newton_waitForTaskId", vec![wait_request])
+        .await
+        .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
+    
+    // Stop the waiting animation
+    {
+        let mut stop_guard = waiting_handle.lock().unwrap();
+        *stop_guard = true;
+    }
+
+    match final_response.status.as_str() {
+        "Completed" => {
+            info!("✅ Task ID: {}", final_response.result.unwrap().task_id);
+        }
+        "Failed" => {
+            error!("❌ Unexpected failure: {}", final_response.error.as_ref().unwrap());
+            return Err(eyre::eyre!("Failed to get task id: {}", final_response.error.as_ref().unwrap()));
+        }
+        _ => {
+            panic!("Unexpected behavior: {}", final_response.status);
+        }
+    }
+    
     Ok(())
 }
 
@@ -194,21 +248,31 @@ fn create_swap_intent(
     from: Address,
     token: Address,
     amount: u64,
+    buy_or_sell: BuyOrSell,
     chain_id: u64,
-) -> Result<TaskIntent> {
-    // Always swap from USDC to the specified token
+) -> Result<(TaskIntent, String /* function signature */, Address /* token */, U256 /* amount */)> {
     let usdc_address = Address::from_str(USDC_TOKEN_ADDRESS)?;
     let swap_contract_address = get_swap_contract_address(usdc_address, token)?;
 
     // encode the swap function call: swap(uint256 _amount, uint256 _swapNumber)
-    let swap_call = MockSwapper::swapCall {
-        _amount: U256::from(amount),
-        _swapNumber: U256::from(TOKEN1_FOR_TOKEN2),
+    let (encoded_data, function_signature) = match buy_or_sell {
+        BuyOrSell::Buy => {
+            let call = MockUSDCSwapPool::buyCall {
+                buyToken: token,
+                amountIn: U256::from(amount),
+            };
+            (call.abi_encode(), MockUSDCSwapPool::buyCall::SIGNATURE)
+        }
+        BuyOrSell::Sell => {
+            let call = MockUSDCSwapPool::sellCall {
+                sellToken: token,
+                amountIn: U256::from(amount),
+            };
+            (call.abi_encode(), MockUSDCSwapPool::sellCall::SIGNATURE)
+        }
     };
 
     // get the encoded data and function signature
-    let encoded_data = swap_call.abi_encode();
-    let function_signature = MockSwapper::swapCall::SIGNATURE;
 
     let intent = TaskIntent {
         from,
@@ -219,7 +283,7 @@ fn create_swap_intent(
         function_signature: hex::encode(function_signature),
     };
 
-    Ok(intent)
+    Ok((intent, function_signature.to_string(), token, U256::from(amount)))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

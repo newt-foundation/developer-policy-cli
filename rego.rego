@@ -1,4 +1,4 @@
-package top200dma200
+package newton_trading_agent
 
 default allow = false
 

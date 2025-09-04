@@ -9,10 +9,11 @@ build-wasm:
 build-all: build-agent build-wasm
 
 run-wasm: build-wasm
-	wasmtime run -S http target/wasm32-wasip2/release/main.wasm '["0xe42e3458283032c669c98e0d8f883a92fc64fe22", "0xba2ae424d960c26247dd6c32edc70b295c744c43", "0x0eb3a705fc54725037cc9e008bdede697f62f335"]'
+	wasmtime run -S http target/wasm32-wasip2/release/main.wasm
 
-run-agent-sepolia: build-agent
-	./target/release/trade-agent 0x03139ec37282064316be0f1e9216a5d4d3a74dda 1000000
+# client: Address, token: Address, amount: u64, trade: BuyOrSell
+run-agent: build-agent
+	./target/release/trade-agent --client $(client) --token $(token) --amount $(amount) --trade $(trade)
 
 clean:
 	cargo clean -p trade-agent -p https-test -p shared

@@ -3,12 +3,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct PriceData {
+pub struct TradingSignal {
     pub prices_usd: HashMap<Address, f64>,
     pub indicators: HashMap<String, HashMap<Address, f64>>,
 }
 
-impl PriceData {
+impl TradingSignal {
     pub fn new() -> Self {
         Self {
             prices_usd: HashMap::new(),
