@@ -9,7 +9,7 @@ fn main() {
     let addresses: Vec<&str> = vec![
         "0xe42e3458283032c669c98e0d8f883a92fc64fe22",
         "0xba2ae424d960c26247dd6c32edc70b295c744c43",
-        "0x0eb3a705fc54725037cc9e008bdede697f62f335",
+        "0xe68249a2A7A19082c85E1D809B154fD17483D7CF",
     ];
     let addresses: Vec<String> = addresses.into_iter().map(|a| a.to_lowercase()).collect();
 
