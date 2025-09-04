@@ -12,7 +12,10 @@ build-wasm:
 build-all: build-agent build-wasm
 
 run-wasm: build-wasm
-	wasmtime run -S http target/wasm32-wasip2/release/main.wasm
+	wasmtime run -S http target/wasm32-wasip1/release/main.wasm "development"
+
+run-wasm-prod: build-wasm
+	wasmtime run -S http target/wasm32-wasip1/release/main.wasm
 
 agent-help:
 	./target/release/trade-agent --help
@@ -24,6 +27,7 @@ help:
 	@echo "  build-all          - Build both agent and WASM components"
 	@echo "  run-agent          - Execute a trade (requires client, token, amount, trade params)"
 	@echo "  run-wasm           - Run the WASM component for market analysis"
+	@echo "  run-wasm-prod      - Run the WASM component for market analysis in production mode"
 	@echo "  upload-wasm-ipfs   - Build WASM (release) and upload to Pinata IPFS"
 	@echo "  upload-policy-ipfs - Upload policy.rego file to Pinata IPFS"
 	@echo "  upload-policy-params-ipfs - Upload policy_params.json to Pinata IPFS"

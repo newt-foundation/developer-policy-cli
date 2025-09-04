@@ -43,3 +43,10 @@ pub fn spawn_loading_animation(message: &str, max_duration_ms: u64) -> Arc<Mutex
     
     should_stop
 }
+
+/// Print a log message. Only prints if the environment variable `ENV` is set to `development`.
+pub fn print_log(message: &str) {
+    if std::env::var("ENV").unwrap_or_default() == "development" {
+        println!("[Trading Agent] {}", message);
+    }
+}

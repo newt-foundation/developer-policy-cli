@@ -25,7 +25,7 @@ poc-newton-trade-agent/
 │   ├── trade-agent/     # Main CLI application
 │   ├── wasm-component/  # Market analysis WASM component
 │   └── shared/          # Common utilities and types
-├── rego.rego           # Trading policy definition
+├── policy.rego           # Trading policy definition
 └── Makefile           # Build automation
 ```
 
@@ -127,7 +127,7 @@ COINGECKO_API_KEY=your_coingecko_api_key_here
 
 ### Rego Policy Configuration
 
-The trading policy is defined in `rego.rego`. The policy evaluates:
+The trading policy is defined in `policy.rego`. The policy evaluates:
 
 - **Token whitelist**: Only allows trading with approved tokens
 - **Function restrictions**: Restricts allowed trading functions (`buy`, `sell`)
@@ -264,7 +264,7 @@ pub fn my_custom_strategy(price_data: &TradingSignal) -> Option<(Address, Addres
 
 ### Modifying Rego Policies
 
-Edit `rego.rego` to customize trading rules:
+Edit `policy.rego` to customize trading rules:
 
 ```rego
 # Add new conditions
@@ -318,7 +318,7 @@ poc-newton-trade-agent/
 │       │   ├── strategy.rs      # Trading strategies
 │       │   └── tokens.rs        # Token mappings
 │       └── Cargo.toml           # Shared dependencies
-├── rego.rego                    # Trading policy
+├── policy.rego                    # Trading policy
 ├── .env.example                 # Environment template
 ├── Makefile                     # Build automation
 ├── flake.nix                    # Nix development environment

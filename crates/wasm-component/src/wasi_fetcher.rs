@@ -5,6 +5,7 @@ use crate::bindings::wasi::io::streams::StreamError;
 use eyre::{eyre, Result};
 use serde_json::Value;
 use shared::price::TradingSignal;
+use shared::print_log;
 use shared::strategy::calculate_200dma;
 use shared::tokens::coingecko_to_address;
 use std::collections::HashMap;
@@ -158,7 +159,7 @@ impl TradingAgent {
         let mut price_data = TradingSignal::new();
         let address_map = coingecko_to_address();
 
-        println!("[Trading Agent] Getting current prices and market cap ranks...");
+        print_log("Getting current prices and market cap ranks...");
         
         // get current prices and market cap ranks in a single API call
         let (current_prices, market_cap_ranks) = self.get_current_prices_and_ranks(coin_ids)?;
@@ -176,7 +177,7 @@ impl TradingAgent {
                 price_data.add_indicator("market_cap_rank".to_string(), address.clone(), rank);
             }
         }
-        println!("[Trading Agent] Calculating daily moving average for candidates...");
+        print_log("Calculating daily moving average for candidates...");
         
         for &coin_id in coin_ids {
             if let Ok(historical_prices) = self.get_historical_prices(coin_id, 200) {

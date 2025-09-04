@@ -1,7 +1,7 @@
 mod bindings;
 mod wasi_fetcher;
 
-use shared::tokens::address_to_coingecko;
+use shared::{print_log, tokens::address_to_coingecko};
 use wasi_fetcher::TradingAgent;
 
 fn main() {
@@ -20,13 +20,22 @@ fn main() {
         .filter_map(|a| addr_to_id.get(a.as_str()).copied())
         .collect();
 
-    println!("[Trading Agent] Analyzing market and computing trading signals for profitable trades");
+    // check if debug mode is enabled
+    let arg = std::env::args()
+        .nth(1)
+        .unwrap_or_default();
+    std::env::set_var("ENV", arg);
+    
+    print_log("Analyzing market and computing trading signals for profitable trades");
     
     let agent = TradingAgent::new(None);
     match agent.compute_trading_signal(&coin_ids) {
-        Ok(price_data) => {
-            println!("[Trading Agent] Trading signals computed successfully");
-            println!("Result:\n{}", price_data.display_pretty());
+        Ok(trading_signal) => {
+            print_log("Trading signals computed successfully");
+            print_log(&format!("Result:\n{}", trading_signal.display_pretty()));
+            if std::env::var("ENV").unwrap_or_default() != "development" {
+                println!("{}", serde_json::to_string_pretty(&trading_signal).unwrap());
+            }
         },
         Err(e) => {
             eprintln!("[Trading Agent] Failed to compute trading signals: {:#}", e);

@@ -16,7 +16,7 @@ Three-crate workspace structure:
 
 Key architectural components:
 
-- Policy-based trading through Rego policy evaluation (`rego.rego`)
+- Policy-based trading through Rego policy evaluation (`policy.rego`)
 - Modular trading strategy system in `shared/src/strategy.rs`
 - Market data integration through WASM components
 - Newton Protocol RPC integration for decentralized policy evaluation
@@ -107,7 +107,7 @@ Trade execution flow in `crates/trade-agent/src/main.rs`:
 
 ### Policy Configuration
 
-Rego policy in `rego.rego` evaluates:
+Rego policy in `policy.rego` evaluates:
 
 - Token whitelist (`whitelist_contracts`)
 - Function restrictions (`allowed_action`)
