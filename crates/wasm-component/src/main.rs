@@ -1,7 +1,6 @@
 mod bindings;
 mod wasi_fetcher;
 
-use serde_json::json;
 use shared::tokens::address_to_coingecko;
 use wasi_fetcher::TradingAgent;
 
@@ -26,9 +25,8 @@ fn main() {
     let agent = TradingAgent::new(None);
     match agent.compute_trading_signal(&coin_ids) {
         Ok(price_data) => {
-            let out = json!(&price_data);
             println!("[Trading Agent] Trading signals computed successfully");
-            println!("Result: {}", serde_json::to_string_pretty(&out).unwrap());
+            println!("Result:\n{}", price_data.display_pretty());
         },
         Err(e) => {
             eprintln!("[Trading Agent] Failed to compute trading signals: {:#}", e);

@@ -11,6 +11,9 @@ build-all: build-agent build-wasm
 run-wasm: build-wasm
 	wasmtime run -S http target/wasm32-wasip2/release/main.wasm
 
+agent-help:
+	./target/release/trade-agent --help
+
 # client: Address, token: Address, amount: u64, trade: BuyOrSell
 run-agent: build-agent
 	./target/release/trade-agent --client $(client) --token $(token) --amount $(amount) --trade $(trade)

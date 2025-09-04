@@ -112,11 +112,11 @@ impl BuyOrSell {
     long_about = "A trading agent that monitors market conditions and executes token swaps through the Newton protocol. Supports buying and selling tokens with USDC."
 )]
 struct Args {
-    /// The policy client address for the Newton protocol
+    /// The policy client address (i.e. policy-guarded vault address) for the user
     #[arg(short, long)]
     client: Address,
 
-    /// The token address to buy or sell (must be paired with USDC)
+    /// The token address to buy or sell with USDC
     #[arg(short, long)]
     token: Address,
 
