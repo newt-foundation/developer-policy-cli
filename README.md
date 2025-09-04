@@ -1,134 +1,363 @@
-# Hello WASI HTTP!
+# Newton Trade Agent
 
-This is a simple tutorial to get started with WASI HTTP using the `wasmtime serve` command introduced in [Wasmtime] 18.0.
-It runs an HTTP server and forwards requests to a Wasm component via the [WASI HTTP] API.
+A proof-of-concept automated trading agent that integrates with the [Newton Protocol](https://newton.foundation/) for policy-based trade execution using [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) policy evaluation.
 
-Other resources you may find interesting:
- - [This tutorial](https://github.com/yoshuawuyts/sample-wasi-http-rust/), which uses
-   wkg and registries.
- - The [`wstd` crate](https://crates.io/crates/wstd), which provides friendlier APIs
-   on top of the WASI APIs, and includes examples.
+## Overview
 
-[Wasmtime]: https://wasmtime.dev
-[WASI HTTP]: https://github.com/WebAssembly/wasi-http/
+The Newton Trade Agent is a modular Rust-based trading system designed to execute token swaps through smart contracts while adhering to user-defined policies. The agent submits trading intents to the Newton Protocol, which evaluates them against Rego policies before execution.
 
-The WASI HTTP API is now stable, and part of WASI 0.2.
+### Key Features
 
-So without further ado...
+- **Policy-Based Trading**: All trades are evaluated against Rego policies before execution
+- **Newton Protocol Integration**: Seamless integration with Newton's decentralized policy evaluation system
+- **Modular Architecture**: Clean separation between trading logic, market analysis, and policy evaluation
+- **WASM-Based Market Analysis**: Extensible market signal computation using WebAssembly
+- **CLI Interface**: Simple command-line interface for executing trades
+- **Multi-Token Support**: Support for various ERC-20 token swaps with USDC
 
-## Let's go!
+## Architecture
 
-First, [install `cargo-component`](https://github.com/bytecodealliance/cargo-component#requirements) (version 0.13.2 or later). `cargo-component` is a tool for building Wasm components implemented in Rust. For more
-information on building Wasm components from different languages, check [here]!
+The project follows a clean, extensible architecture with three main components:
 
-[here]: https://component-model.bytecodealliance.org/language-support.html
-
-With that, build the Wasm component from source in this repository:
-```sh
-$ cargo component build
-  Compiling hello-wasi-http v0.0.0 (/home/wasm/hello-wasi-http)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.01s
-    Creating component target/wasm32-wasip1/debug/hello_wasi_http.wasm
+```
+poc-newton-trade-agent/
+├── crates/
+│   ├── trade-agent/     # Main CLI application
+│   ├── wasm-component/  # Market analysis WASM component
+│   └── shared/          # Common utilities and types
+├── rego.rego           # Trading policy definition
+└── Makefile           # Build automation
 ```
 
-This builds a Wasm component at `target/wasm32-wasip1/debug/hello_wasi_http.wasm`.
+### Components
 
-To run it, we'll need at least Wasmtime `18.0`. Installation instructions are on [wasmtime.dev]. For example, on Linux or macOS, use the command below:
+- **`trade-agent`**: CLI application that handles trade execution, Newton Protocol communication, and user interaction
+- **`wasm-component`**: WebAssembly component for market data analysis and trading signal computation
+- **`shared`**: Common utilities including price data structures, trading strategies, and token mappings
 
-```sh
-$ curl https://wasmtime.dev/install.sh -sSf | bash
+## Installation
+
+### Dependencies
+
+1. **Rust Toolchain** (1.88.0 or later):
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
+2. **WASM Target**:
+   ```bash
+   rustup target add wasm32-wasip2
+   ```
+
+3. **cargo-component** (for WASM components):
+   ```bash
+   cargo install cargo-component
+   ```
+
+4. **Wasmtime** (for running WASM components):
+   ```bash
+   curl https://wasmtime.dev/install.sh -sSf | bash
+   ```
+
+### Alternative: Nix Development Environment
+
+If you use Nix, you can enter a development shell with all dependencies:
+
+```bash
+nix develop
 ```
 
-[wasmtime.dev]: https://wasmtime.dev/
+## Building
 
-Then, run in your terminal:
-```sh
-$ cargo component serve
-```
-This starts up an HTTP server that, by default, listens on `0.0.0.0:8080`.
+### Build All Components
 
-With that running, in another window, we can now make requests!
-```sh
-$ curl http://localhost:8080
-Hello, wasi:http/proxy world!
+```bash
+make build-all
 ```
 
-## Optimizing!
+### Build Individual Components
 
-The above uses a `debug` build. To make a component that runs faster, build with `cargo component build --release`.
+```bash
+# Build the main trading agent
+make build-agent
 
-It's also worth making sure you have a release build of Wasmtime; if you installed it from the instructions above
-with wasmtime.dev, you're good.
-
-Wasmtime has several tuning options that can improve performance in different situations—pass `-O help` for a
-list. One that's especially useful here is `-O pooling-allocator`.
-
-## Notes
-
-`wasmtime serve` uses the [proxy] world, which is a specialized world just for accepting requests and producing
-responses. One interesting thing about the proxy world is that it doesn't have a filesystem or network API. If you add
-code to the example that tries to access files or network sockets, it won't be able to build, because those APIs are
-not available in this world. This allows proxy components to run in many different places, including specialized
-serverless environments which may not provide traditional filesystem and network access.
-
-But, what if you do want to have it serve some files? One option will be to use 
-[WASI-Virt](https://github.com/bytecodealliance/WASI-Virt), which is a tool that can bundle a filesystem with a 
-component.
-
-Another option is to use a custom `world`. The proxy world is meant to be able to run in many different environments,
-but if you know your environment, and you know it has a filesystem, you could create your own world, by including both
-the `"wasi:http/proxy"` and `"wasi:filesystem/types"` or any other APIs you want the Wasm to be able to access. This
-would require a custom embedding of Wasmtime, as it wouldn't run under plain `wasmtime serve`, so it's a little more
-work to set up.
-
-In the future, we expect to see standard `world`s emerge that combine WASI HTTP with many other APIs, such as
-[wasi-cloud-core].
-
-If you're interested in tutorials for any of these options, please reach out and say hi!
-
-[proxy]: https://github.com/WebAssembly/wasi-http/blob/main/wit/proxy.wit
-[wasi-cloud-core]: https://github.com/WebAssembly/wasi-cloud-core
-
-## Creating this repo
-
-Here are my notes on how I created this repository, in case you're interested in recreating it.
-
-To create a new project, run:
-
-```sh
-$ cargo component new --proxy --lib hello-wasi-http
-    Created binary (application) `hello-wasi-http` package
-    Updated manifest of package `hello-wasi-http`
-    Generated source file `src/main.rs`
-$ cd hello-wasi-http
+# Build the WASM market analysis component
+make build-wasm
 ```
 
-Copy the `wit` directory from your version of  Wasmtime, to ensure that we're using the same version of the API that
-Wasmtime is built with (e.g., for Wasmtime 18.0.0: https://github.com/bytecodealliance/wasmtime/tree/release-18.0.0).
+### Manual Build Commands
 
-Then, I manually trimmed the filesystem and sockets dependencies out.
+```bash
+# Trading agent (release build)
+cargo build -p trade-agent --release
 
-In the future, we'll have wit dependencies stored in a registry, which will make this all much easier.
-
-I derived `src/lib.rs` from Wasmtime's `crates/test-programs/src/bin/api_proxy.rs` contents on the `main` branch,
-adapted it to work with cargo component, in particular by adding:
-
-```rust
-cargo_component_bindings::generate!();
+# WASM component
+cargo build -p https-test --target wasm32-wasip2 --release
 ```
 
-Then, I renamed the `T` type to `Component`, which the bindings expect.
+## Configuration
 
-Finally, add dependencies:
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
 ```
-$ cargo component add --target --path wit/deps/clocks wasi:clocks
-$ cargo component add --target --path wit/deps/io wasi:io
-$ cargo component add --target --path wit/deps/random wasi:random
-$ cargo component add --target --path wit/deps/cli wasi:cli
-$ cargo component add --target --path wit/deps/logging wasi:logging
+
+Required environment variables:
+
+```env
+# Your trading agent's private key (hex format without 0x prefix)
+AGENT_PRIVATE_KEY=your_private_key_here
+
+# Newton Protocol RPC endpoint
+NEWTON_RPC=https://prover-avs.stagef.newt.foundation/
+
+# Ethereum chain ID (11155111 for Sepolia)
+CHAIN_ID=11155111
+
+# Optional: API keys for market data
+CMC_API_KEY=your_coinmarketcap_api_key_here
+COINGECKO_API_KEY=your_coingecko_api_key_here
 ```
 
-These don't all actually get used in this tutorial, but they're currently needed because of some of the interfaces we
-copied in from the Wasmtime tree reference them.
+### Rego Policy Configuration
 
-> TODO: I should also make a `api_proxy_streaming.rs` version to show streaming.
+The trading policy is defined in `rego.rego`. The policy evaluates:
+
+- **Token whitelist**: Only allows trading with approved tokens
+- **Function restrictions**: Restricts allowed trading functions (`buy`, `sell`)
+- **Amount limits**: Enforces maximum trade sizes
+- **Market conditions**: Evaluates current price vs. 200-day moving average
+- **Market cap requirements**: Only allows trading tokens with market cap rank ≤ 200
+
+Example policy structure:
+```rego
+package newton_trading_agent
+
+default allow := false
+
+allow {
+    # Token is whitelisted
+    token in whitelist_contracts
+    # Function is allowed
+    function_name in allowed_action
+    # Amount is within limits
+    amount_in <= max_limit
+    # Market conditions are favorable
+    token_price >= token_daily_moving_average
+    token_market_cap_rank <= 200
+}
+```
+
+## Usage
+
+### CLI Interface
+
+The trade agent provides a comprehensive CLI interface:
+
+```bash
+# Show help and available options
+make agent-help
+
+# Or directly:
+./target/release/trade-agent --help
+```
+
+### Basic Trading Commands
+
+#### Buy Token with USDC
+
+```bash
+# Buy WETH with USDC
+make run-agent client=0x1234...abcd token=0xe42e3458283032c669c98e0d8f883a92fc64fe22 amount=1000000000 trade=buy
+
+# Or directly:
+./target/release/trade-agent \
+  --client 0x1234567890123456789012345678901234567890 \
+  --token 0xe42e3458283032c669c98e0d8f883a92fc64fe22 \
+  --amount 1000000000 \
+  --trade buy
+```
+
+#### Sell Token for USDC
+
+```bash
+# Sell WETH for USDC
+make run-agent client=0x1234...abcd token=0xe42e3458283032c669c98e0d8f883a92fc64fe22 amount=500000000 trade=sell
+```
+
+### Parameters
+
+- `--client`: Your policy-guarded vault address (policy client)
+- `--token`: ERC-20 token contract address to trade
+- `--amount`: Amount in token's smallest unit (e.g., wei for ETH, considering token decimals)
+- `--trade`: Either `buy` (exchange USDC for token) or `sell` (exchange token for USDC)
+
+### Supported Tokens
+
+Currently configured tokens:
+- **USDC**: `0xd1c01582bee80b35898cc3603b75dbb5851b4a85` (Sepolia)
+- **WETH**: `0xe42e3458283032c669c98e0d8f883a92fc64fe22` (Sepolia)
+
+## Newton Protocol Integration
+
+### How It Works
+
+1. **Intent Creation**: The agent creates a trading intent with transaction details
+2. **Policy Submission**: Intent is submitted to Newton Protocol with your policy client address
+3. **Rego Evaluation**: Newton evaluates the intent against your Rego policy
+4. **Market Data Integration**: Real-time market data is provided for policy evaluation
+5. **Execution**: If policy allows, the trade is executed on-chain
+
+### Request Flow
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Trade Agent   │───▶│ Newton Protocol │───▶│  Rego Evaluator │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │              ┌─────────────────┐              │
+         └─────────────▶│  Smart Contract │◀─────────────┘
+                        │   (DEX/Pool)    │
+                        └─────────────────┘
+```
+
+### API Endpoints Used
+
+- `newton_createTask`: Submit trading intent for policy evaluation
+- `newton_waitForTaskId`: Wait for task completion and get results
+
+## Development
+
+### Running Market Analysis
+
+The WASM component can be run independently for market analysis:
+
+```bash
+# Build and run the WASM market analyzer
+make run-wasm
+```
+
+### Adding New Trading Strategies
+
+Extend the strategy logic in `crates/shared/src/strategy.rs`:
+
+```rust path=null start=null
+pub fn my_custom_strategy(price_data: &TradingSignal) -> Option<(Address, Address)> {
+    // Your custom trading logic here
+    // Return Some((from_token, to_token)) to trade, None to skip
+}
+```
+
+### Adding New Tokens
+
+1. Update token mappings in `crates/shared/src/tokens.rs`
+2. Add contract addresses to the swap contract mapping in `main.rs`
+3. Update the Rego policy whitelist as needed
+
+### Modifying Rego Policies
+
+Edit `rego.rego` to customize trading rules:
+
+```rego
+# Add new conditions
+allow {
+    # Existing conditions...
+    
+    # Your custom conditions
+    my_custom_condition
+}
+
+my_custom_condition {
+    # Custom logic here
+}
+```
+
+### Testing
+
+```bash
+# Run all tests
+cargo test --workspace
+
+# Test specific component
+cargo test -p trade-agent
+cargo test -p shared
+```
+
+### Cleaning Build Artifacts
+
+```bash
+make clean
+```
+
+## Project Structure Details
+
+```
+poc-newton-trade-agent/
+├── crates/
+│   ├── trade-agent/
+│   │   ├── src/main.rs          # CLI interface and Newton integration
+│   │   └── Cargo.toml           # Trading agent dependencies
+│   ├── wasm-component/
+│   │   ├── src/
+│   │   │   ├── main.rs          # WASM entry point
+│   │   │   ├── wasi_fetcher.rs  # Market data fetching
+│   │   │   └── bindings.rs      # WASM bindings
+│   │   └── Cargo.toml           # WASM component config
+│   └── shared/
+│       ├── src/
+│       │   ├── lib.rs           # Common utilities
+│       │   ├── price.rs         # Price data structures
+│       │   ├── strategy.rs      # Trading strategies
+│       │   └── tokens.rs        # Token mappings
+│       └── Cargo.toml           # Shared dependencies
+├── rego.rego                    # Trading policy
+├── .env.example                 # Environment template
+├── Makefile                     # Build automation
+├── flake.nix                    # Nix development environment
+└── Cargo.toml                   # Workspace configuration
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"No swap contract found for token pair"**: Ensure the token addresses are configured in the swap contract mapping
+
+2. **"RPC error"**: Check your Newton Protocol RPC endpoint and network connectivity
+
+3. **"Policy evaluation failed"**: Review your Rego policy and ensure all conditions are met
+
+4. **WASM build errors**: Ensure you have the correct Rust target and cargo-component installed:
+   ```bash
+   rustup target add wasm32-wasip2
+   cargo install cargo-component
+   ```
+
+### Debug Mode
+
+Run with debug logging:
+
+```bash
+RUST_LOG=debug ./target/release/trade-agent [options]
+```
+
+## Contributing
+
+This is a proof-of-concept project. Contributions are welcome for:
+
+- Additional trading strategies
+- New token integrations
+- Enhanced market analysis
+- Policy template improvements
+- Documentation updates
+
+## License
+
+This project is provided as-is for demonstration purposes. Please review and understand the code before using with real funds.
+
+## Disclaimer
+
+⚠️ **Important**: This is experimental software for educational purposes. Always test thoroughly with small amounts on testnets before using with real funds. Trading cryptocurrencies involves substantial risk of loss.
