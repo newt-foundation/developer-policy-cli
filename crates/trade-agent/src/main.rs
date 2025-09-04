@@ -48,9 +48,9 @@ pub struct CreateTaskResult {
 // Mock swapper contract interface
 alloy::sol! {
     interface MockUSDCSwapPool {
-        function buy(address buyToken, uint256 amountIn) external returns (uint256 amountOut);
+        function buy(address buyToken, uint256 amountIn, uint32 slippage) external returns (uint256 amountOut);
         
-        function sell(address sellToken, uint256 amountIn) external returns (uint256 amountOut);
+        function sell(address sellToken, uint256 amountIn, uint32 slippage) external returns (uint256 amountOut);
     }
 }
 
@@ -124,6 +124,10 @@ struct Args {
     #[arg(short, long)]
     amount: u64,
 
+    /// The slippage to use for the swap
+    #[arg(short, long)]
+    slippage: u32,
+
     /// Whether to buy the token with USDC or sell the token for USDC
     #[arg(short, long)]
     trade: BuyOrSell,
@@ -155,8 +159,8 @@ async fn main() -> Result<()> {
     
     // create intent
     let chain_id = 11155111; // Default chain ID
-    let (task_intent, function_signature, token, amount) =
-        create_swap_intent(from_address, args.token, args.amount, args.trade.clone(), chain_id)?;
+    let (task_intent, function_signature, token, amount, slippage) =
+        create_swap_intent(from_address, args.token, args.amount, args.trade.clone(), args.slippage, chain_id)?;
 
     info!(
         "[Trading Agent] Trade intent: {:?}",
@@ -164,10 +168,12 @@ async fn main() -> Result<()> {
     );
     
     info!(
-        "[Trading Agent] Function signature: {}, token: {}, amount: {}",
+        "[Trading Agent] Function signature: {}, token: {}, amount: {} ({} USDC), slippage: {}%",
         function_signature,
         token,
-        amount
+        amount,
+        amount_str,
+        slippage
     );
     
     let newton_rpc = "https://prover-avs.stagef.newt.foundation/"; // Default RPC URL
@@ -249,8 +255,9 @@ fn create_swap_intent(
     token: Address,
     amount: u64,
     buy_or_sell: BuyOrSell,
+    slippage: u32,
     chain_id: u64,
-) -> Result<(TaskIntent, String /* function signature */, Address /* token */, U256 /* amount */)> {
+) -> Result<(TaskIntent, String /* function signature */, Address /* token */, U256 /* amount */, u32 /* slippage */)> {
     let usdc_address = Address::from_str(USDC_TOKEN_ADDRESS)?;
     let swap_contract_address = get_swap_contract_address(usdc_address, token)?;
 
@@ -260,6 +267,7 @@ fn create_swap_intent(
             let call = MockUSDCSwapPool::buyCall {
                 buyToken: token,
                 amountIn: U256::from(amount),
+                slippage: slippage,
             };
             (call.abi_encode(), MockUSDCSwapPool::buyCall::SIGNATURE)
         }
@@ -267,6 +275,7 @@ fn create_swap_intent(
             let call = MockUSDCSwapPool::sellCall {
                 sellToken: token,
                 amountIn: U256::from(amount),
+                slippage: slippage,
             };
             (call.abi_encode(), MockUSDCSwapPool::sellCall::SIGNATURE)
         }
@@ -283,7 +292,7 @@ fn create_swap_intent(
         function_signature: hex::encode(function_signature),
     };
 
-    Ok((intent, function_signature.to_string(), token, U256::from(amount)))
+    Ok((intent, function_signature.to_string(), token, U256::from(amount), slippage))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

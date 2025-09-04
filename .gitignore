@@ -2,3 +2,6 @@
 /crates/*/target
 crates/*/Cargo.lock
 .env
+
+# Pinata automation scripts (may contain sensitive data)
+pinata-auth.expect

@@ -40,16 +40,19 @@ poc-newton-trade-agent/
 ### Dependencies
 
 1. **Rust Toolchain** (1.88.0 or later):
+
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    ```
 
 2. **WASM Target**:
+
    ```bash
    rustup target add wasm32-wasip2
    ```
 
 3. **cargo-component** (for WASM components):
+
    ```bash
    cargo install cargo-component
    ```
@@ -92,7 +95,7 @@ make build-wasm
 cargo build -p trade-agent --release
 
 # WASM component
-cargo build -p https-test --target wasm32-wasip2 --release
+cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
 ```
 
 ## Configuration
@@ -133,6 +136,7 @@ The trading policy is defined in `rego.rego`. The policy evaluates:
 - **Market cap requirements**: Only allows trading tokens with market cap rank ≤ 200
 
 Example policy structure:
+
 ```rego
 package newton_trading_agent
 
@@ -198,6 +202,7 @@ make run-agent client=0x1234...abcd token=0xe42e3458283032c669c98e0d8f883a92fc64
 ### Supported Tokens
 
 Currently configured tokens:
+
 - **USDC**: `0xd1c01582bee80b35898cc3603b75dbb5851b4a85` (Sepolia)
 - **WETH**: `0xe42e3458283032c669c98e0d8f883a92fc64fe22` (Sepolia)
 
@@ -265,7 +270,7 @@ Edit `rego.rego` to customize trading rules:
 # Add new conditions
 allow {
     # Existing conditions...
-    
+
     # Your custom conditions
     my_custom_condition
 }

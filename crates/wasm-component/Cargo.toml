@@ -1,5 +1,5 @@
 [package]
-name = "https-test"
+name = "newton-trade-agent-wasm"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ name = "main"
 path = "src/main.rs"
 
 [package.metadata.component]
-package = "component:https-test"
+package = "component:newton-trade-agent-wasm"
 
 [dependencies]
 shared = { path = "../shared" }
