@@ -37,6 +37,22 @@ pub fn get_token_map() -> HashMap<&'static str, TokenInfo> {
                 coingecko_id: "weth",
             },
         ),
+        ( // mockerc20
+            "weth",
+            TokenInfo {
+                symbol: "WETH",
+                address: "0xe42e3458283032c669c98e0d8f883a92fc64fe22".to_string(),
+                coingecko_id: "weth",
+            },
+        ),
+        ( // mockerc20
+            "cosmos",
+            TokenInfo {
+                symbol: "ATOM",
+                address: "0xe68249a2a7a19082c85e1d809b154fd17483d7cf".to_string(),
+                coingecko_id: "cosmos",
+            },
+        ),
         (
             "doge",
             TokenInfo {
