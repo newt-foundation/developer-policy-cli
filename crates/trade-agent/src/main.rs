@@ -181,7 +181,7 @@ async fn main() -> Result<()> {
         function_signature, token, amount, amount_str, slippage
     );
 
-    let newton_rpc = "http://localhost:8545"; // Default RPC URL
+    let newton_rpc = "https://prover-avs.stagef.newt.foundation/"; // Default RPC URL
     let client = HttpClientBuilder::default().build(newton_rpc)?;
     let policy_client = args.client;
 

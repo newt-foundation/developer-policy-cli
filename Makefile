@@ -1,4 +1,4 @@
-.PHONY: build-agent build-wasm build-all run-agent  run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
+.PHONY: build-agent build-wasm build-all run-agent run-wasm run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
 
 build-agent:
 	cargo build -p trade-agent --release
