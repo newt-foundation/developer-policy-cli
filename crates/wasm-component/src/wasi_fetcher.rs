@@ -1,6 +1,7 @@
 use crate::bindings::newton::provider::http::{fetch, HttpRequest};
 use shared::price::TradingSignal;
-use shared::strategy::calculate_200dma;
+use shared::print_log;
+use shared::strategy::{calculate_200dma, filter_profitable_trades, ProfitTrade};
 use shared::tokens::coingecko_to_address;
 use std::collections::HashMap;
 use tinyjson::JsonValue;
@@ -110,12 +111,6 @@ impl TradingAgent {
         let body_string = String::from_utf8(response.body)
             .map_err(|e| format!("Failed to decode response: {}", e))?;
 
-        eprintln!(
-            "[DEBUG] Historical response body size: {} bytes for {}",
-            body_string.len(),
-            coin_id
-        );
-
         let parsed: JsonValue = body_string
             .parse()
             .map_err(|e| format!("JSON parse error: {}", e))?;
@@ -146,13 +141,14 @@ impl TradingAgent {
             return Err("prices array not found".to_string());
         }
 
-        eprintln!("[DEBUG] Parsed {} price values", prices.len());
         Ok(prices)
     }
 
     pub fn compute_trading_signal(&self, coin_ids: &[&str]) -> Result<TradingSignal> {
         let mut price_data = TradingSignal::new();
         let address_map = coingecko_to_address();
+
+        print_log("Getting current prices and market cap ranks...");
 
         let (current_prices, market_cap_ranks) = self.get_current_prices_and_ranks(coin_ids)?;
 
@@ -170,6 +166,7 @@ impl TradingAgent {
             }
         }
 
+        print_log("Calculating daily moving average for candidates...");
         // compute 200DMA using historical prices
         for &coin_id in coin_ids {
             if let Some(address) = address_map.get(coin_id) {
@@ -192,5 +189,11 @@ impl TradingAgent {
         }
 
         Ok(price_data)
+    }
+
+    pub fn filter_profitable_trades(&self, trading_signal: &TradingSignal) -> Result<Vec<ProfitTrade>> {
+        print_log("Filtering profitable trades...");
+        let profitable_trades = filter_profitable_trades(trading_signal);
+        Ok(profitable_trades)
     }
 }

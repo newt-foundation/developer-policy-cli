@@ -18,7 +18,6 @@ help:
 	@echo "  build-all          - Build both agent and WASM components"
 	@echo "  run-agent          - Execute a trade (requires client, token, amount, trade params)"
 	@echo "  run-wasm           - Run the WASM component for market analysis"
-	@echo "  run-wasm-prod      - Run the WASM component for market analysis in production mode"
 	@echo "  upload-wasm-ipfs   - Build WASM (release) and upload to Pinata IPFS"
 	@echo "  upload-policy-ipfs - Upload policy.rego file to Pinata IPFS"
 	@echo "  upload-policy-params-ipfs - Upload policy_params.json to Pinata IPFS"
@@ -42,7 +41,11 @@ run-agent: build-agent
 
 run-wasm: build-wasm
 	cargo build -p op-sim --release
-	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm "{}"
+	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm {}
+
+run-wasm-dev: build-wasm
+	cargo build -p op-sim --release
+	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm "development"
 
 # Upload WASM to IPFS via Pinata
 upload-wasm-ipfs: build-wasm

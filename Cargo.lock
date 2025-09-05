@@ -3128,6 +3128,7 @@ dependencies = [
 name = "newton-trade-agent-wasm"
 version = "0.1.0"
 dependencies = [
+ "dotenvy",
  "serde",
  "serde_json",
  "shared",
