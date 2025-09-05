@@ -91,8 +91,8 @@ async fn main() -> anyhow::Result<()> {
     wasm_config.async_support(true);
 
     wasm_config.consume_fuel(true);
-    wasm_config.max_wasm_stack(1024 * 1024 * 16); // 16 MiB
-    wasm_config.async_stack_size(1024 * 1024 * 32); // 32 MiB
+    wasm_config.max_wasm_stack(1024 * 1024 * 32); // 32 MiB
+    wasm_config.async_stack_size(1024 * 1024 * 64); // 64 MiB
 
     let engine = Engine::new(&wasm_config)?;
     let component = Component::new(&engine, wasm_bytes)?;
@@ -138,8 +138,8 @@ async fn main() -> anyhow::Result<()> {
 
     let mut store = wasmtime::Store::new(&engine, ctx);
 
-    // Set fuel (same as operator default)
-    store.set_fuel(2_000_000)?;
+    // Set fuel
+    store.set_fuel(100_000_000)?;
 
     let mut linker = Linker::new(&engine);
     linker.allow_shadowing(true);

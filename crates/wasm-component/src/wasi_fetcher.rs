@@ -1,9 +1,9 @@
 use crate::bindings::newton::provider::http::{fetch, HttpRequest};
-use tinyjson::JsonValue;
 use shared::price::TradingSignal;
 use shared::strategy::calculate_200dma;
 use shared::tokens::coingecko_to_address;
 use std::collections::HashMap;
+use tinyjson::JsonValue;
 
 type Result<T> = std::result::Result<T, String>;
 
@@ -170,17 +170,24 @@ impl TradingAgent {
             }
         }
 
-        // add dummy dma data based on recent 200dma because that's way too hard to parse manually
-        // need to think of a better way to parse within memory constraints
+        // compute 200DMA using historical prices
         for &coin_id in coin_ids {
             if let Some(address) = address_map.get(coin_id) {
-                let dummy_dma = match coin_id {
-                    "cosmos" => 4.465799393014863,
-                    "dogecoin" => 0.19669879553158118,
-                    "weth" => 2720.8110896219714,
-                    _ => 1000.0, // fallback I guess
-                };
-                price_data.add_indicator("dma_200".to_string(), address.clone(), dummy_dma);
+                match self.get_historical_prices(coin_id, 250) {
+                    Ok(prices) => {
+                        if let Some(dma) = calculate_200dma(&prices) {
+                            price_data.add_indicator("dma_200".to_string(), address.clone(), dma);
+                        } else {
+                            eprintln!("[DEBUG] Not enough data to compute 200DMA for {}", coin_id);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "[DEBUG] Failed to fetch historical prices for {}: {}",
+                            coin_id, e
+                        );
+                    }
+                }
             }
         }
 
