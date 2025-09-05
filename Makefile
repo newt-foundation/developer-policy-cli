@@ -4,18 +4,9 @@ build-agent:
 	cargo build -p trade-agent --release
 
 build-wasm:
-	@echo "Building WASM component..."
-	@RUSTFLAGS="" cargo component build -p newton-trade-agent-wasm --release || \
-		(echo "Falling back to standard cargo build..." && \
-		 RUSTFLAGS="" cargo build -p newton-trade-agent-wasm --target wasm32-wasip1 --release)
+	cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
 
 build-all: build-agent build-wasm
-
-run-wasm: build-wasm
-	wasmtime run -S http target/wasm32-wasip1/release/main.wasm "development"
-
-run-wasm-prod: build-wasm
-	wasmtime run -S http target/wasm32-wasip1/release/main.wasm
 
 agent-help:
 	./target/release/trade-agent --help
@@ -48,6 +39,10 @@ help:
 # client: Address, token: Address, amount: u64, trade: BuyOrSell
 run-agent: build-agent
 	./target/release/trade-agent --client $(client) --token $(token) --amount $(amount) --trade $(trade)
+
+run-wasm: build-wasm
+	cargo build -p op-sim --release
+	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm "{}"
 
 # Upload WASM to IPFS via Pinata
 upload-wasm-ipfs: build-wasm

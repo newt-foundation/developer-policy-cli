@@ -1,14 +1,11 @@
-use crate::bindings::wasi::http::outgoing_handler::{handle, OutgoingRequest, RequestOptions};
-use crate::bindings::wasi::http::types::{Fields, Method, Scheme};
-use crate::bindings::wasi::io::poll;
-use crate::bindings::wasi::io::streams::StreamError;
-use eyre::{eyre, Result};
-use serde_json::Value;
+use crate::bindings::newton::provider::http::{fetch, HttpRequest};
 use shared::price::TradingSignal;
-use shared::print_log;
 use shared::strategy::calculate_200dma;
 use shared::tokens::coingecko_to_address;
 use std::collections::HashMap;
+use tinyjson::JsonValue;
+
+type Result<T> = std::result::Result<T, String>;
 
 pub struct TradingAgent {
     api_key: Option<String>,
@@ -19,16 +16,7 @@ impl TradingAgent {
         Self { api_key }
     }
 
-    fn build_request(&self, path: &str, query: &str) -> Result<OutgoingRequest> {
-        let headers = Fields::new();
-        // Add headers to appear more legitimate
-        headers
-            .set("User-Agent", &[b"crypto-dma-filter/1.0".to_vec()])
-            .map_err(|e| eyre!("Failed to set User-Agent: {:?}", e))?;
-        headers
-            .set("Accept", &[b"application/json".to_vec()])
-            .map_err(|e| eyre!("Failed to set Accept: {:?}", e))?;
-
+    fn build_url(&self, path: &str, query: &str) -> String {
         let mut full_query = query.to_string();
         if let Some(key) = &self.api_key {
             if !full_query.is_empty() {
@@ -37,101 +25,57 @@ impl TradingAgent {
             full_query.push_str(&format!("x_cg_demo_api_key={key}"));
         }
 
-        let request = OutgoingRequest::new(headers);
-        request
-            .set_method(&Method::Get)
-            .map_err(|_| eyre!("Failed to set method"))?;
-        request
-            .set_scheme(Some(&Scheme::Https))
-            .map_err(|_| eyre!("Failed to set scheme"))?;
-        request
-            .set_authority(Some("api.coingecko.com"))
-            .map_err(|_| eyre!("Failed to set authority"))?;
-        request
-            .set_path_with_query(Some(&format!("{path}?{full_query}")))
-            .map_err(|_| eyre!("Failed to set path with query"))?;
-
-        Ok(request)
+        if full_query.is_empty() {
+            format!("https://api.coingecko.com{path}")
+        } else {
+            format!("https://api.coingecko.com{path}?{full_query}")
+        }
     }
 
-    fn fetch_json(&self, path: &str, query: &str) -> Result<Value> {
-        let request = self.build_request(path, query)?;
-        let options = RequestOptions::new();
-
-        let future = handle(request, Some(options))
-            .map_err(|e| eyre!("Failed to create request: {:?}", e))?;
-
-        // wait?
-        poll::poll(&[&future.subscribe()]);
-
-        let response = future
-            .get()
-            .ok_or_else(|| eyre!("Response not ready"))?
-            .map_err(|_| eyre!("Future failed"))?
-            .map_err(|e| eyre!("Request failed: {:?}", e))?;
-
-        let status = response.status();
-
-        let body = response
-            .consume()
-            .map_err(|_| eyre!("Failed to consume response (status: {})", status))?;
-        let stream = body
-            .stream()
-            .map_err(|_| eyre!("Failed to get input stream"))?;
-
-        // read
-        let mut data = Vec::new();
-        loop {
-            match stream.blocking_read(8192) {
-                Ok(chunk) if !chunk.is_empty() => data.extend(chunk),
-                Ok(_) => break,                    // empty chunk → EOF
-                Err(StreamError::Closed) => break, // normal end-of-stream
-                Err(e) => {
-                    return Err(eyre!(
-                        "Error reading response body (status: {}): {:?}",
-                        status,
-                        e
-                    ))
-                }
-            }
-        }
-
-        let body_string = String::from_utf8(data)
-            .map_err(|_| eyre!("Invalid UTF-8 response (status: {})", status))?;
-        if status != 200 {
-            return Err(eyre!(
-                "Non-200 status: {} body-preview: {}",
-                status,
-                body_string.chars().take(200).collect::<String>()
-            ));
-        }
-        let json: Value =
-            serde_json::from_str(&body_string).map_err(|e| eyre!("JSON parse error: {}", e))?;
-
-        Ok(json)
-    }
-
-    fn get_current_prices_and_ranks(&self, coin_ids: &[&str]) -> Result<(HashMap<String, f64>, HashMap<String, f64>)> {
+    fn get_current_prices_and_ranks(
+        &self,
+        coin_ids: &[&str],
+    ) -> Result<(HashMap<String, f64>, HashMap<String, f64>)> {
         let ids = coin_ids.join(",");
-        let query = format!("vs_currency=usd&ids={ids}");
-        let json = self.fetch_json("/api/v3/coins/markets", &query)?;
+        let query = format!("vs_currency=usd&ids={}&per_page=10&page=1", ids);
+
+        let request = HttpRequest {
+            url: self.build_url("/api/v3/coins/markets", &query),
+            method: "GET".to_string(),
+            headers: vec![
+                (
+                    "User-Agent".to_string(),
+                    "crypto-dma-filter/1.0".to_string(),
+                ),
+                ("Accept".to_string(), "application/json".to_string()),
+            ],
+            body: None,
+        };
+
+        let response = fetch(&request).map_err(|e| format!("HTTP fetch failed: {}", e))?;
+        if response.status != 200 {
+            return Err(format!("HTTP error: {}", response.status));
+        }
+        let body_string = String::from_utf8(response.body)
+            .map_err(|e| format!("Failed to decode response: {}", e))?;
+        let parsed: JsonValue = body_string
+            .parse()
+            .map_err(|e| format!("JSON parse error: {}", e))?;
 
         let mut prices = HashMap::new();
         let mut ranks = HashMap::new();
-        
-        if let Some(coins_array) = json.as_array() {
+
+        if let Some(coins_array) = parsed.get::<Vec<JsonValue>>() {
             for coin_data in coins_array {
-                if let Some(coin_id) = coin_data["id"].as_str() {
-                    // Extract current price
-                    if let Some(price) = coin_data["current_price"].as_f64() {
-                        prices.insert(coin_id.to_string(), price);
+                if let Some(coin_id) = coin_data["id"].get::<String>() {
+                    // extract current price
+                    if let Some(price_ref) = coin_data["current_price"].get::<f64>() {
+                        prices.insert(coin_id.clone(), *price_ref);
                     }
-                    
-                    // Extract market cap rank (can be integer or float, or null)
-                    if let Some(rank) = coin_data["market_cap_rank"].as_f64() {
-                        ranks.insert(coin_id.to_string(), rank);
-                    } else if let Some(rank) = coin_data["market_cap_rank"].as_i64() {
-                        ranks.insert(coin_id.to_string(), rank as f64);
+
+                    // extract market cap rank
+                    if let Some(rank_ref) = coin_data["market_cap_rank"].get::<f64>() {
+                        ranks.insert(coin_id.clone(), *rank_ref);
                     }
                 }
             }
@@ -141,17 +85,68 @@ impl TradingAgent {
     }
 
     fn get_historical_prices(&self, coin_id: &str, days: u32) -> Result<Vec<f64>> {
-        let query = format!("vs_currency=usd&days={days}");
-        let path = format!("/api/v3/coins/{coin_id}/market_chart");
-        let json = self.fetch_json(&path, &query)?;
+        let request = HttpRequest {
+            url: self.build_url(
+                &format!("/api/v3/coins/{coin_id}/market_chart"),
+                &format!("vs_currency=usd&days={days}"),
+            ),
+            method: "GET".to_string(),
+            headers: vec![
+                (
+                    "User-Agent".to_string(),
+                    "crypto-dma-filter/1.0".to_string(),
+                ),
+                ("Accept".to_string(), "application/json".to_string()),
+            ],
+            body: None,
+        };
 
-        let prices: Vec<f64> = json["prices"]
-            .as_array()
-            .unwrap_or(&vec![])
-            .iter()
-            .filter_map(|p| p.as_array()?.get(1)?.as_f64())
-            .collect();
+        let response = fetch(&request).map_err(|e| format!("HTTP fetch failed: {}", e))?;
 
+        if response.status != 200 {
+            return Err(format!("HTTP error: {}", response.status));
+        }
+
+        let body_string = String::from_utf8(response.body)
+            .map_err(|e| format!("Failed to decode response: {}", e))?;
+
+        eprintln!(
+            "[DEBUG] Historical response body size: {} bytes for {}",
+            body_string.len(),
+            coin_id
+        );
+
+        let parsed: JsonValue = body_string
+            .parse()
+            .map_err(|e| format!("JSON parse error: {}", e))?;
+
+        let mut prices = Vec::new();
+        if let Some(obj) = parsed.get::<std::collections::HashMap<String, JsonValue>>() {
+            if let Some(prices_val) = obj.get("prices") {
+                if let Some(price_points) = prices_val.get::<Vec<JsonValue>>() {
+                    for point in price_points.iter() {
+                        if let Some(pair) = point.get::<Vec<JsonValue>>() {
+                            if pair.len() > 1 {
+                                if let Some(price_ref) = pair[1].get::<f64>() {
+                                    prices.push(*price_ref);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if prices.is_empty() {
+            eprintln!("[DEBUG] Could not parse prices array");
+            eprintln!(
+                "[DEBUG] Response preview: {}",
+                &body_string[..body_string.len().min(300)]
+            );
+            return Err("prices array not found".to_string());
+        }
+
+        eprintln!("[DEBUG] Parsed {} price values", prices.len());
         Ok(prices)
     }
 
@@ -159,11 +154,8 @@ impl TradingAgent {
         let mut price_data = TradingSignal::new();
         let address_map = coingecko_to_address();
 
-        print_log("Getting current prices and market cap ranks...");
-        
-        // get current prices and market cap ranks in a single API call
         let (current_prices, market_cap_ranks) = self.get_current_prices_and_ranks(coin_ids)?;
-        
+
         // store current prices
         for (coin_id, price) in current_prices {
             if let Some(address) = address_map.get(coin_id.as_str()) {
@@ -177,13 +169,23 @@ impl TradingAgent {
                 price_data.add_indicator("market_cap_rank".to_string(), address.clone(), rank);
             }
         }
-        print_log("Calculating daily moving average for candidates...");
-        
+
+        // compute 200DMA using historical prices
         for &coin_id in coin_ids {
-            if let Ok(historical_prices) = self.get_historical_prices(coin_id, 200) {
-                if let Some(dma_200) = calculate_200dma(&historical_prices) {
-                    if let Some(address) = address_map.get(coin_id) {
-                        price_data.add_indicator("dma_200".to_string(), address.clone(), dma_200);
+            if let Some(address) = address_map.get(coin_id) {
+                match self.get_historical_prices(coin_id, 250) {
+                    Ok(prices) => {
+                        if let Some(dma) = calculate_200dma(&prices) {
+                            price_data.add_indicator("dma_200".to_string(), address.clone(), dma);
+                        } else {
+                            eprintln!("[DEBUG] Not enough data to compute 200DMA for {}", coin_id);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "[DEBUG] Failed to fetch historical prices for {}: {}",
+                            coin_id, e
+                        );
                     }
                 }
             }
