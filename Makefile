@@ -1,21 +1,12 @@
-.PHONY: build-agent build-wasm build-all run-agent run-wasm run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
+.PHONY: build-agent build-wasm build-all run-agent  run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
 
 build-agent:
 	cargo build -p trade-agent --release
 
 build-wasm:
-	@echo "Building WASM component..."
-	@RUSTFLAGS="" cargo component build -p newton-trade-agent-wasm --release || \
-		(echo "Falling back to standard cargo build..." && \
-		 RUSTFLAGS="" cargo build -p newton-trade-agent-wasm --target wasm32-wasip1 --release)
+	cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
 
 build-all: build-agent build-wasm
-
-run-wasm: build-wasm
-	wasmtime run -S http target/wasm32-wasip1/release/main.wasm "development"
-
-run-wasm-prod: build-wasm
-	wasmtime run -S http target/wasm32-wasip1/release/main.wasm
 
 agent-help:
 	./target/release/trade-agent --help
