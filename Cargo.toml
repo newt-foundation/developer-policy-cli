@@ -3,7 +3,8 @@ resolver = "2"
 members = [
     "crates/shared",
     "crates/trade-agent",
-    "crates/wasm-component"
+    "crates/wasm-component",
+    "bin/op-sim"
 ]
 
 [workspace.dependencies]

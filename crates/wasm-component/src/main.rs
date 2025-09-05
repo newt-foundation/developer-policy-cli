@@ -1,9 +1,9 @@
 mod bindings;
 mod wasi_fetcher;
 
+use bindings::Guest;
 use shared::tokens::address_to_coingecko;
 use wasi_fetcher::TradingAgent;
-use bindings::Guest;
 
 struct Component;
 
@@ -28,7 +28,8 @@ fn execute_trading_logic(_input: &str) -> Result<String, String> {
         .collect();
 
     let agent = TradingAgent::new(None);
-    let trading_signal = agent.compute_trading_signal(&coin_ids)
+    let trading_signal = agent
+        .compute_trading_signal(&coin_ids)
         .map_err(|e| format!("Failed to compute trading signals: {}", e))?;
 
     serde_json::to_string_pretty(&trading_signal)
@@ -40,7 +41,7 @@ bindings::export!(Component with_types_in bindings);
 fn main() {
     let input = std::env::args().nth(1).unwrap_or_default();
     match execute_trading_logic(&input) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => eprintln!("{}", e),
     }
 }

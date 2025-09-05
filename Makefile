@@ -40,6 +40,10 @@ help:
 run-agent: build-agent
 	./target/release/trade-agent --client $(client) --token $(token) --amount $(amount) --trade $(trade)
 
+run-wasm: build-wasm
+	cargo build -p op-sim --release
+	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm "{}"
+
 # Upload WASM to IPFS via Pinata
 upload-wasm-ipfs: build-wasm
 	@echo "================================================"

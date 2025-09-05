@@ -49,7 +49,7 @@ pub struct CreateTaskResult {
 alloy::sol! {
     interface MockUSDCSwapPool {
         function buy(address buyToken, uint256 amountIn, uint32 slippage) external returns (uint256 amountOut);
-        
+
         function sell(address sellToken, uint256 amountIn, uint32 slippage) external returns (uint256 amountOut);
     }
 }
@@ -88,9 +88,15 @@ fn get_swap_contract_address(token_a: Address, token_b: Address) -> Result<Addre
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, ValueEnum)]
 enum BuyOrSell {
-    #[value(name = "buy", help = "Buy the token with USDC - Exchange USDC for the specified token")]
+    #[value(
+        name = "buy",
+        help = "Buy the token with USDC - Exchange USDC for the specified token"
+    )]
     Buy,
-    #[value(name = "sell", help = "Sell the token for USDC - Exchange the specified token for USDC")]
+    #[value(
+        name = "sell",
+        help = "Sell the token for USDC - Exchange the specified token for USDC"
+    )]
     Sell,
 }
 
@@ -106,8 +112,8 @@ impl BuyOrSell {
 
 #[derive(Parser, Debug)]
 #[command(
-    author, 
-    version, 
+    author,
+    version,
     about = "Newton Trade Agent - Automated trading bot for token swaps",
     long_about = "A trading agent that monitors market conditions and executes token swaps through the Newton protocol. Supports buying and selling tokens with USDC."
 )]
@@ -140,9 +146,9 @@ async fn main() -> Result<()> {
 
     let args = Args::parse();
     let amount_str = (args.amount as f64 / 10f64.powf(9f64)).round() /* USDC decimals */;
-    
+
     info!("🚀 Newton Trade Agent Starting...");
-        
+
     info!(
         "[Trading Agent] Operation: {} {} with USDC for {} units ({} USDC)",
         args.trade.as_str(),
@@ -150,32 +156,31 @@ async fn main() -> Result<()> {
         args.amount,
         amount_str
     );
-    
+
     // create signer and get from address
     let signer = PrivateKeySigner::from_str(&std::env::var("AGENT_PRIVATE_KEY")?)?;
     let from_address = signer.address();
 
     info!("[Trading Agent] Creating trade intent...");
-    
+
     // create intent
     let chain_id = 11155111; // Default chain ID
-    let (task_intent, function_signature, token, amount, slippage) =
-        create_swap_intent(from_address, args.token, args.amount, args.trade.clone(), args.slippage, chain_id)?;
+    let (task_intent, function_signature, token, amount, slippage) = create_swap_intent(
+        from_address,
+        args.token,
+        args.amount,
+        args.trade.clone(),
+        args.slippage,
+        chain_id,
+    )?;
+
+    info!("[Trading Agent] Trade intent: {:?}", task_intent);
 
     info!(
-        "[Trading Agent] Trade intent: {:?}",
-        task_intent
-    );
-    
-    info!(
         "[Trading Agent] Function signature: {}, token: {}, amount: {} ({} USDC), slippage: {}%",
-        function_signature,
-        token,
-        amount,
-        amount_str,
-        slippage
+        function_signature, token, amount, amount_str, slippage
     );
-    
+
     let newton_rpc = "http://localhost:8545"; // Default RPC URL
     let client = HttpClientBuilder::default().build(newton_rpc)?;
     let policy_client = args.client;
@@ -184,13 +189,13 @@ async fn main() -> Result<()> {
         "[Trading Agent] Vault address: {}. Requesting policy evaluation for intent...",
         policy_client
     );
-    
+
     // Start loading animation in a separate thread
     let loading_handle = spawn_loading_animation(
         "[Trading Agent] Submitting request to Newton Protocol",
-        5000
+        5000,
     );
-    
+
     // submit task
     let task_response: TaskIdResponse = client
         .request(
@@ -204,7 +209,7 @@ async fn main() -> Result<()> {
         )
         .await
         .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
-    
+
     // Stop the loading animation
     {
         let mut stop_guard = loading_handle.lock().unwrap();
@@ -214,7 +219,7 @@ async fn main() -> Result<()> {
     // Start loading animation for waiting phase
     let waiting_handle = spawn_loading_animation(
         "Waiting for task id for policy evaluation",
-        2000 // 2 seconds max (20s)
+        2000, // 2 seconds max (20s)
     );
 
     // warmly wait
@@ -227,7 +232,7 @@ async fn main() -> Result<()> {
         .request("newton_waitForTaskId", vec![wait_request])
         .await
         .map_err(|e| eyre::eyre!("RPC error: {}", e))?;
-    
+
     // Stop the waiting animation
     {
         let mut stop_guard = waiting_handle.lock().unwrap();
@@ -239,14 +244,20 @@ async fn main() -> Result<()> {
             info!("✅ Task ID: {}", final_response.result.unwrap().task_id);
         }
         "Failed" => {
-            error!("❌ Unexpected failure: {}", final_response.error.as_ref().unwrap());
-            return Err(eyre::eyre!("Failed to get task id: {}", final_response.error.as_ref().unwrap()));
+            error!(
+                "❌ Unexpected failure: {}",
+                final_response.error.as_ref().unwrap()
+            );
+            return Err(eyre::eyre!(
+                "Failed to get task id: {}",
+                final_response.error.as_ref().unwrap()
+            ));
         }
         _ => {
             panic!("Unexpected behavior: {}", final_response.status);
         }
     }
-    
+
     Ok(())
 }
 
@@ -257,7 +268,13 @@ fn create_swap_intent(
     buy_or_sell: BuyOrSell,
     slippage: u32,
     chain_id: u64,
-) -> Result<(TaskIntent, String /* function signature */, Address /* token */, U256 /* amount */, u32 /* slippage */)> {
+) -> Result<(
+    TaskIntent,
+    String,  /* function signature */
+    Address, /* token */
+    U256,    /* amount */
+    u32,     /* slippage */
+)> {
     let usdc_address = Address::from_str(USDC_TOKEN_ADDRESS)?;
     let swap_contract_address = get_swap_contract_address(usdc_address, token)?;
 
@@ -292,7 +309,13 @@ fn create_swap_intent(
         function_signature: hex::encode(function_signature),
     };
 
-    Ok((intent, function_signature.to_string(), token, U256::from(amount), slippage))
+    Ok((
+        intent,
+        function_signature.to_string(),
+        token,
+        U256::from(amount),
+        slippage,
+    ))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

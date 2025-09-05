@@ -37,7 +37,8 @@ pub fn get_token_map() -> HashMap<&'static str, TokenInfo> {
                 coingecko_id: "weth",
             },
         ),
-        ( // mockerc20
+        (
+            // mockerc20
             "weth",
             TokenInfo {
                 symbol: "WETH",
@@ -45,7 +46,8 @@ pub fn get_token_map() -> HashMap<&'static str, TokenInfo> {
                 coingecko_id: "weth",
             },
         ),
-        ( // mockerc20
+        (
+            // mockerc20
             "cosmos",
             TokenInfo {
                 symbol: "ATOM",
