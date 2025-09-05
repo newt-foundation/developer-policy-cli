@@ -1,5 +1,5 @@
 use crate::bindings::newton::provider::http::{fetch, HttpRequest};
-use serde_json::Value;
+use tinyjson::JsonValue;
 use shared::price::TradingSignal;
 use shared::strategy::calculate_200dma;
 use shared::tokens::coingecko_to_address;
@@ -32,9 +32,15 @@ impl TradingAgent {
         }
     }
 
-    fn fetch_json(&self, path: &str, query: &str) -> Result<Value> {
+    fn get_current_prices_and_ranks(
+        &self,
+        coin_ids: &[&str],
+    ) -> Result<(HashMap<String, f64>, HashMap<String, f64>)> {
+        let ids = coin_ids.join(",");
+        let query = format!("vs_currency=usd&ids={}&per_page=10&page=1", ids);
+
         let request = HttpRequest {
-            url: self.build_url(path, query),
+            url: self.build_url("/api/v3/coins/markets", &query),
             method: "GET".to_string(),
             headers: vec![
                 (
@@ -47,41 +53,29 @@ impl TradingAgent {
         };
 
         let response = fetch(&request).map_err(|e| format!("HTTP fetch failed: {}", e))?;
-
         if response.status != 200 {
             return Err(format!("HTTP error: {}", response.status));
         }
-
         let body_string = String::from_utf8(response.body)
             .map_err(|e| format!("Failed to decode response: {}", e))?;
-
-        serde_json::from_str(&body_string).map_err(|e| format!("JSON parse error: {}", e))
-    }
-
-    fn get_current_prices_and_ranks(
-        &self,
-        coin_ids: &[&str],
-    ) -> Result<(HashMap<String, f64>, HashMap<String, f64>)> {
-        let ids = coin_ids.join(",");
-        let query = format!("vs_currency=usd&ids={}&per_page=10&page=1", ids);
-        let json = self.fetch_json("/api/v3/coins/markets", &query)?;
+        let parsed: JsonValue = body_string
+            .parse()
+            .map_err(|e| format!("JSON parse error: {}", e))?;
 
         let mut prices = HashMap::new();
         let mut ranks = HashMap::new();
 
-        if let Some(coins_array) = json.as_array() {
+        if let Some(coins_array) = parsed.get::<Vec<JsonValue>>() {
             for coin_data in coins_array {
-                if let Some(coin_id) = coin_data["id"].as_str() {
+                if let Some(coin_id) = coin_data["id"].get::<String>() {
                     // extract current price
-                    if let Some(price) = coin_data["current_price"].as_f64() {
-                        prices.insert(coin_id.to_string(), price);
+                    if let Some(price_ref) = coin_data["current_price"].get::<f64>() {
+                        prices.insert(coin_id.clone(), *price_ref);
                     }
 
                     // extract market cap rank
-                    if let Some(rank) = coin_data["market_cap_rank"].as_f64() {
-                        ranks.insert(coin_id.to_string(), rank);
-                    } else if let Some(rank) = coin_data["market_cap_rank"].as_i64() {
-                        ranks.insert(coin_id.to_string(), rank as f64);
+                    if let Some(rank_ref) = coin_data["market_cap_rank"].get::<f64>() {
+                        ranks.insert(coin_id.clone(), *rank_ref);
                     }
                 }
             }
@@ -122,76 +116,38 @@ impl TradingAgent {
             coin_id
         );
 
+        let parsed: JsonValue = body_string
+            .parse()
+            .map_err(|e| format!("JSON parse error: {}", e))?;
+
         let mut prices = Vec::new();
-
-        // hardocre
-        if let Some(start) = body_string.find("\"prices\":[") {
-            eprintln!("[DEBUG] Found prices array at position {}", start);
-            let mut pos = start + 10; // Skip "prices":[
-            let chars: Vec<char> = body_string.chars().collect();
-            let mut current_number = String::new();
-            let mut in_price = false;
-            let mut bracket_depth = 0;
-
-            while pos < chars.len() && prices.len() < 250 {
-                // Safety limit
-                let ch = chars[pos];
-
-                match ch {
-                    '[' => {
-                        bracket_depth += 1;
-                        in_price = false;
-                    }
-                    ']' => {
-                        if in_price && !current_number.is_empty() {
-                            if let Ok(price) = current_number.parse::<f64>() {
-                                prices.push(price);
+        if let Some(obj) = parsed.get::<std::collections::HashMap<String, JsonValue>>() {
+            if let Some(prices_val) = obj.get("prices") {
+                if let Some(price_points) = prices_val.get::<Vec<JsonValue>>() {
+                    for point in price_points.iter() {
+                        if let Some(pair) = point.get::<Vec<JsonValue>>() {
+                            if pair.len() > 1 {
+                                if let Some(price_ref) = pair[1].get::<f64>() {
+                                    prices.push(*price_ref);
+                                }
                             }
-                            current_number.clear();
-                        }
-                        bracket_depth -= 1;
-                        if bracket_depth == 0 {
-                            break; // end of prices array
-                        }
-                        in_price = false;
-                    }
-                    ',' => {
-                        if bracket_depth == 1 {
-                            in_price = true;
-                            if !current_number.is_empty() {
-                                current_number.clear();
-                            }
-                        }
-                    }
-                    '0'..='9' | '.' | '-' => {
-                        // lol
-                        if in_price {
-                            current_number.push(ch);
-                        }
-                    }
-                    _ => {
-                        if in_price && !current_number.is_empty() {
-                            if let Ok(price) = current_number.parse::<f64>() {
-                                prices.push(price);
-                            }
-                            current_number.clear();
-                            in_price = false;
                         }
                     }
                 }
-                pos += 1;
             }
+        }
 
-            eprintln!("[DEBUG] Parsed {} price values using", prices.len());
-            Ok(prices)
-        } else {
-            eprintln!("[DEBUG] Could not find prices array");
+        if prices.is_empty() {
+            eprintln!("[DEBUG] Could not parse prices array");
             eprintln!(
                 "[DEBUG] Response preview: {}",
                 &body_string[..body_string.len().min(300)]
             );
-            Err("prices array not found".to_string())
+            return Err("prices array not found".to_string());
         }
+
+        eprintln!("[DEBUG] Parsed {} price values", prices.len());
+        Ok(prices)
     }
 
     pub fn compute_trading_signal(&self, coin_ids: &[&str]) -> Result<TradingSignal> {

@@ -3131,6 +3131,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shared",
+ "tinyjson",
  "wit-bindgen 0.37.0",
  "wit-bindgen-rt",
 ]
@@ -4711,6 +4712,12 @@ checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
 dependencies = [
  "crunchy",
 ]
+
+[[package]]
+name = "tinyjson"
+version = "2.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ab95735ea2c8fd51154d01e39cf13912a78071c2d89abc49a7ef102a7dd725a"
 
 [[package]]
 name = "tinystr"
