@@ -1,90 +1,39 @@
 {
   "type": "object",
-  "properties": {
-    "31337": {
-      "description": "Contract allowlist for chain 31337 (Local)",
+  "description": "Trading policy structure: chain_id -> contract_address -> action_type -> parameters[]",
+  "additionalProperties": {
+    "type": "object",
+    "description": "Contract address to action type mapping",
+    "additionalProperties": {
       "type": "object",
-      "patternProperties": {
-        "^0x[a-fA-F0-9]{40}$": {
-          "description": "Allowed actions/functions for each allowed contract",
+      "description": "Action type to parameters mapping",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Array of policy parameters for each action type",
+        "items": {
           "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
-              "description": "Array of rule parameters for this function",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "Parameter name for the rule"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": ["string", "number", "boolean", "array", "object"],
-                    "description": "Data type of the parameter"
-                  },
-                  "value": {
-                    "description": "Value for the parameter to use in the policy rule"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of what the parameter usage in the rule"
-                  }
-                },
-                "required": ["name", "type", "value", "description"],
-                "additionalProperties": false
-              }
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Parameter name"
+            },
+            "type": {
+              "type": "string",
+              "description": "Parameter data type"
+            },
+            "value": {
+              "type": "number",
+              "description": "Parameter value"
+            },
+            "description": {
+              "type": "string",
+              "description": "Parameter description"
             }
           },
+          "required": ["name", "type", "value", "description"],
           "additionalProperties": false
         }
-      },
-      "additionalProperties": false
-    },
-    "11155111": {
-      "description": "Contract allowlist for chain 11155111 (Sepolia)",
-      "type": "object",
-      "patternProperties": {
-        "^0x[a-fA-F0-9]{40}$": {
-          "description": "Allowed actions/functions for each allowed contract",
-          "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
-              "description": "Array of rule parameters for this function",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "Parameter name for the rule"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": ["string", "number", "boolean", "array", "object"],
-                    "description": "Data type of the parameter"
-                  },
-                  "value": {
-                    "description": "Value for the parameter to use in the policy rule"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of what the parameter usage in the rule"
-                  }
-                },
-                "required": ["name", "type", "value", "description"],
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
+      }
     }
-  },
-  "required": ["31337", "11155111"],
-  "additionalProperties": false,
-  "description": "Chain-specific configuration for contract interactions and policy rules"
+  }
 }
