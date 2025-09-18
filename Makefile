@@ -112,6 +112,32 @@ upload-policy-ipfs:
 	fi
 	@rm -f /tmp/pinata_upload.log
 
+# Upload policy_params.json to IPFS via Pinata
+upload-policy-params-ipfs:
+	@echo "================================================"
+	@echo "========== Upload policy_params.json ==========="
+	@echo "================================================"
+	@if [ ! -f policy_params.json ]; then \
+		echo "Error: policy_params.json file not found in current directory"; \
+		exit 1; \
+	fi
+	@echo "Uploading policy_params.json to Pinata IPFS..."
+	@source .env && ~/.local/share/pinata/pinata upload policy_params.json --name "newton-trade-agent-policy-params-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
+	@echo ""
+	@echo "=== IPFS Upload Results ==="
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	if [ -n "$$IPFS_HASH" ]; then \
+		echo "IPFS Hash: $$IPFS_HASH"; \
+		echo "Getting gateway link..."; \
+		GATEWAY_LINK=$$(~/.local/share/pinata/pinata gateways link "$$IPFS_HASH" 2>/dev/null || echo "https://gateway.pinata.cloud/ipfs/$$IPFS_HASH"); \
+		echo "Direct IPFS Link: $$GATEWAY_LINK"; \
+		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
+	else \
+		echo "Warning: Could not extract IPFS hash from upload output"; \
+		cat /tmp/pinata_upload.log; \
+	fi
+	@rm -f /tmp/pinata_upload.log
+
 # Upload params_schema.json to IPFS via Pinata
 upload-params-schema-ipfs:
 	@echo "================================================"
@@ -138,7 +164,59 @@ upload-params-schema-ipfs:
 	fi
 	@rm -f /tmp/pinata_upload.log
 
+# Upload policy_metadata.json to IPFS via Pinata
+upload-policy-metadata-ipfs:
+	@echo "================================================"
+	@echo "========== Upload policy_metadata.json ==========="
+	@echo "================================================"
+	@if [ ! -f policy_metadata.json ]; then \
+		echo "Error: policy_metadata.json file not found in current directory"; \
+		exit 1; \
+	fi
+	@echo "Uploading policy_metadata.json to Pinata IPFS..."
+	@source .env && ~/.local/share/pinata/pinata upload policy_metadata.json --name "newton-trade-agent-policy-params-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
+	@echo ""
+	@echo "=== IPFS Upload Results ==="
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	if [ -n "$$IPFS_HASH" ]; then \
+		echo "IPFS Hash: $$IPFS_HASH"; \
+		echo "Getting gateway link..."; \
+		GATEWAY_LINK=$$(~/.local/share/pinata/pinata gateways link "$$IPFS_HASH" 2>/dev/null || echo "https://gateway.pinata.cloud/ipfs/$$IPFS_HASH"); \
+		echo "Direct IPFS Link: $$GATEWAY_LINK"; \
+		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
+	else \
+		echo "Warning: Could not extract IPFS hash from upload output"; \
+		cat /tmp/pinata_upload.log; \
+	fi
+	@rm -f /tmp/pinata_upload.log
+
+# Upload policy_data_metadata.json to IPFS via Pinata
+upload-policy-data-metadata-ipfs:
+	@echo "================================================"
+	@echo "========== Upload policy_data_metadata.json ==========="
+	@echo "================================================"
+	@if [ ! -f policy_data_metadata.json ]; then \
+		echo "Error: policy_data_metadata.json file not found in current directory"; \
+		exit 1; \
+	fi
+	@echo "Uploading policy_data_metadata.json to Pinata IPFS..."
+	@source .env && ~/.local/share/pinata/pinata upload policy_data_metadata.json --name "newton-trade-agent-params-schema-$(shell date +%Y%m%d-%H%M%S)" | tee /tmp/pinata_upload.log
+	@echo ""
+	@echo "=== IPFS Upload Results ==="
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	if [ -n "$$IPFS_HASH" ]; then \
+		echo "IPFS Hash: $$IPFS_HASH"; \
+		echo "Getting gateway link..."; \
+		GATEWAY_LINK=$$(~/.local/share/pinata/pinata gateways link "$$IPFS_HASH" 2>/dev/null || echo "https://gateway.pinata.cloud/ipfs/$$IPFS_HASH"); \
+		echo "Direct IPFS Link: $$GATEWAY_LINK"; \
+		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
+	else \
+		echo "Warning: Could not extract IPFS hash from upload output"; \
+		cat /tmp/pinata_upload.log; \
+	fi
+	@rm -f /tmp/pinata_upload.log
+
 clean:
 	cargo clean -p trade-agent -p newton-trade-agent-wasm -p shared
 
-upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-params-schema-ipfs
+upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs

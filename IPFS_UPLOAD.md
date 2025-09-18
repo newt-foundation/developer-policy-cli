@@ -19,7 +19,15 @@ This project includes automated functionality to build and upload the WASM compo
 curl -fsSL https://cli.pinata.cloud/install | bash
 ```
 
-### 2. Configure Environment Variables
+### 2. Get Your Pinata Credentials
+
+1. Go to [Pinata](https://app.pinata.cloud/developers/api-keys)
+2. Create a new API key. If you don't just make an admin key, make sure the API key has write permissions for files and read permission for gateways.
+3. Copy the API Key, API Secret, and JWT
+4. Note your gateway domain (e.g., `your-subdomain.mypinata.cloud`)
+5. Login in your terminal via `pinata auth`
+
+### 3. Configure Environment Variables
 
 Update your `.env` file with your Pinata credentials:
 
@@ -33,13 +41,6 @@ PINATA_GATEWAY=your_pinata_gateway_domain_here
 
 **Important**: Replace the redacted JWT (asterisks) with your actual JWT from Pinata.
 
-### 3. Get Your Pinata Credentials
-
-1. Go to [Pinata](https://app.pinata.cloud/keys)
-2. Create a new API key
-3. Copy the API Key, API Secret, and JWT
-4. Note your gateway domain (e.g., `your-subdomain.mypinata.cloud`)
-
 ## Usage
 
 ### Upload WASM to IPFS
@@ -50,10 +51,8 @@ make upload-wasm-ipfs
 
 This command will:
 1. Build the WASM component as a release build
-2. Automatically authenticate with Pinata (if not already authenticated)
-3. Set your preferred gateway as default
-4. Upload the WASM file to IPFS
-5. Print the IPFS hash and direct links
+2. Upload the WASM file to IPFS
+3. Print the IPFS hash and direct links
 
 ### Upload Policy Files to IPFS
 
@@ -160,7 +159,7 @@ This means you need to replace the asterisks in your `.env` file with your real 
 
 ### Upload Errors (401, 403)
 
-- **401 Unauthorized**: Authentication issue, check your JWT
+- **401 Unauthorized**: Authentication issue, check your JWT and API key permissions
 - **403 Forbidden**: Permission issue, verify your API key permissions
 
 ## Policy Files Overview
