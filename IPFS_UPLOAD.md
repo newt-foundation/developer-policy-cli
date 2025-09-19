@@ -1,4 +1,4 @@
-# Automated WASM Upload to Pinata IPFS
+# Automated Upload to Pinata IPFS
 
 This project includes automated functionality to build and upload the WASM component to Pinata IPFS.
 
@@ -43,18 +43,17 @@ PINATA_GATEWAY=your_pinata_gateway_domain_here
 
 ## Usage
 
-### Upload WASM to IPFS
+See the [Policy Files](#policy-files-overview) for details on what should go in each file BEFORE UPLOADING.
+
+### Upload Policy Files to IPFS
+
+#### Upload policy.wasm to IPFS
 
 ```bash
 make upload-wasm-ipfs
 ```
 
-This command will:
-1. Build the WASM component as a release build
-2. Upload the WASM file to IPFS
-3. Print the IPFS hash and direct links
-
-### Upload Policy Files to IPFS
+Uploads the wasm file that sources data for the policy.
 
 #### Upload policy.rego
 
@@ -78,45 +77,30 @@ Uploads the policy parameters configuration file with chain-specific contract al
 make upload-params-schema-ipfs
 ```
 
-Uploads the JSON schema file that validates the policy parameters structure.
+Uploads the schema configuration file which defines inputs.
 
-All policy upload commands:
-1. Check if the target file exists in the current directory
-2. Automatically authenticate with Pinata (if not already authenticated)
-3. Set your preferred gateway as default
-4. Upload the file to IPFS with timestamped naming
-5. Print the IPFS hash and direct links
-
-### Example Output
-
-#### WASM Upload
+#### Upload policy_metadata.json
 
 ```bash
-Building WASM component...
-    Finished `release` profile [optimized] target(s) in 0.17s
-Building WASM component for IPFS upload...
-Using WASM file: target/wasm32-wasip1/release/main.wasm
-Setting up Pinata configuration...
-Authenticating with Pinata and setting gateway...
-Pinata configuration complete.
-Uploading WASM to Pinata IPFS...
-{
-    "id": "01991320-60a2-7542-9519-f14ecef1459c",
-    "name": "main.wasm",
-    "cid": "bafybeig3vgrf3srvaegy627mz3tflsxnc5bk66moenbfxalfp324465mm4",
-    "size": 291387,
-    "created_at": "2025-09-04T05:08:34.221Z",
-    "mime_type": "application/wasm"
-}
-
-=== IPFS Upload Results ===
-IPFS Hash: bafybeig3vgrf3srvaegy627mz3tflsxnc5bk66moenbfxalfp324465mm4
-Getting gateway link...
-Direct IPFS Link: https://silver-socialist-eel-341.mypinata.cloud/ipfs/bafybeig3vgrf3srvaegy627mz3tflsxnc5bk66moenbfxalfp324465mm4
-Public IPFS Link: https://ipfs.io/ipfs/bafybeig3vgrf3srvaegy627mz3tflsxnc5bk66moenbfxalfp324465mm4
+make upload-policy-metadata-ipfs
 ```
 
-#### Policy File Upload
+Uploads the metadata associated with the policy.
+
+#### Upload policy_data_metadata.json
+
+```bash
+make upload-policy-data-metadata-ipfs
+```
+
+Uploads the metadata associated with the policy data source.
+
+All policy upload commands:
+1. Check if the target file exists in the policy-files directory
+2. Upload the file to IPFS with timestamped naming
+3. Print the IPFS hash and direct links
+
+### Example Output
 
 ```bash
 $ make upload-policy-ipfs
@@ -166,23 +150,37 @@ This means you need to replace the asterisks in your `.env` file with your real 
 
 This project includes several policy-related files that can be uploaded to IPFS:
 
+### policy.wasm
+not sure what to put here still
+- **Purpose**: Defines the data source for the policy
+- **Content**: Compiled wasm code
+- **MIME Type**: `application/wasm`
+
+
 ### policy.rego
 - **Purpose**: Defines the trading policy rules in Rego language
 - **Content**: Authorization logic, token whitelists, trading limits, market conditions
 - **MIME Type**: `text/plain; charset=UTF-8`
-- **Size**: ~2.3KB
 
 ### policy_params.json
 - **Purpose**: Configuration parameters for different blockchain networks and contracts
 - **Content**: Chain-specific contract allowlists, trading limits, slippage settings
 - **MIME Type**: `application/json`
-- **Size**: ~1.8KB
 
 ### params_schema.json
 - **Purpose**: JSON Schema validation for policy_params.json structure
 - **Content**: Schema definitions, validation rules, parameter descriptions
 - **MIME Type**: `application/json`
-- **Size**: ~3.3KB
+
+### policy_metadata.json
+- **Purpose**: JSON description and attributation for the policy rego code
+- **Content**: Name, version, author, link, and description
+- **MIME Type**: `application/json`
+
+### policy_data_metadata.json
+- **Purpose**: JSON description and attributation for the policy data source(?) wasm
+- **Content**: Name, version, author, link, and description
+- **MIME Type**: `application/json`
 
 ## Technical Details
 
