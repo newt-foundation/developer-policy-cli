@@ -151,7 +151,10 @@ This means you need to replace the asterisks in your `.env` file with your real 
 This project includes several policy-related files that can be uploaded to IPFS:
 
 ### policy.wasm
-not sure what to put here
+not sure what to put here still
+- **Purpose**: Defines the data source for the policy
+- **Content**: Compiled wasm code
+- **MIME Type**: `application/wasm`
 
 
 ### policy.rego
