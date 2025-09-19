@@ -34,6 +34,7 @@ run-wasm-dev: build-wasm
 
 # Upload WASM to IPFS via Pinata
 upload-wasm-ipfs:
+	@rm -f /tmp/pinata_wasm_upload.log
 	@echo "================================================"
 	@echo "============ Upload policy.wasm ================"
 	@echo "================================================"
@@ -42,10 +43,10 @@ upload-wasm-ipfs:
 		exit 1; \
 	fi
 	@echo "Uploading policy.wasm to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy.wasm | tee /tmp/pinata_upload.log
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy.wasm | tee /tmp/pinata_wasm_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_wasm_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -54,12 +55,12 @@ upload-wasm-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_upload.log; \
+		cat /tmp/pinata_wasm_upload.log; \
 	fi
-	@rm -f /tmp/pinata_upload.log /tmp/wasm_file_path
 
 # Upload policy.rego to IPFS via Pinata
 upload-policy-ipfs:
+	@rm -f /tmp/pinata_policy_upload.log
 	@echo "================================================"
 	@echo "============== Upload policy.rego =============="
 	@echo "================================================"
@@ -68,10 +69,10 @@ upload-policy-ipfs:
 		exit 1; \
 	fi
 	@echo "Uploading policy.rego to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy.rego | tee /tmp/pinata_upload.log
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy.rego | tee /tmp/pinata_policy_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_policy_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -80,12 +81,12 @@ upload-policy-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_upload.log; \
+		cat /tmp/pinata_policy_upload.log; \
 	fi
-	@rm -f /tmp/pinata_upload.log
 
 # Upload params_schema.json to IPFS via Pinata
 upload-params-schema-ipfs:
+	@rm -f /tmp/pinata_schema_upload.log
 	@echo "================================================"
 	@echo "========== Upload params_schema.json ==========="
 	@echo "================================================"
@@ -94,10 +95,10 @@ upload-params-schema-ipfs:
 		exit 1; \
 	fi
 	@echo "Uploading params_schema.json to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/params_schema.json | tee /tmp/pinata_upload.log
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/params_schema.json | tee /tmp/pinata_schema_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -106,12 +107,12 @@ upload-params-schema-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_upload.log; \
+		cat /tmp/pinata_schema_upload.log; \
 	fi
-	@rm -f /tmp/pinata_upload.log
 
 # Upload policy_metadata.json to IPFS via Pinata
 upload-policy-metadata-ipfs:
+	@rm -f /tmp/pinata_metadata_upload.log
 	@echo "================================================"
 	@echo "========== Upload policy_metadata.json ========="
 	@echo "================================================"
@@ -120,10 +121,10 @@ upload-policy-metadata-ipfs:
 		exit 1; \
 	fi
 	@echo "Uploading policy_metadata.json to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy_metadata.json | tee /tmp/pinata_upload.log
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy_metadata.json | tee /tmp/pinata_metadata_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -132,12 +133,12 @@ upload-policy-metadata-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_upload.log; \
+		cat /tmp/pinata_metadata_upload.log; \
 	fi
-	@rm -f /tmp/pinata_upload.log
 
 # Upload policy_data_metadata.json to IPFS via Pinata
 upload-policy-data-metadata-ipfs:
+	@rm -f /tmp/pinata_data_metadata_upload.log
 	@echo "================================================"
 	@echo "======== Upload policy_data_metadata.json ======"
 	@echo "================================================"
@@ -146,10 +147,10 @@ upload-policy-data-metadata-ipfs:
 		exit 1; \
 	fi
 	@echo "Uploading policy_data_metadata.json to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy_data_metadata.json | tee /tmp/pinata_upload.log
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/policy_data_metadata.json | tee /tmp/pinata_data_metadata_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -158,8 +159,28 @@ upload-policy-data-metadata-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_upload.log; \
+		cat /tmp/pinata_data_metadata_upload.log; \
 	fi
-	@rm -f /tmp/pinata_upload.log
 
 upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
+
+# # Create the JSON content
+# cat > "$POLICY_URIS_PATH" << EOF
+# {
+#   "policyDataLocation": "$wasm_uri",
+#   "policyDataArgs": "$wasm_args_uri",
+#   "policyUri": "$policy_uri",
+#   "schemaUri": "$schema_uri",
+#   "attester": "$attester",
+#   "entrypoint": "$entrypoint",
+#   "policyDataMetadataUri": "$policy_data_metadata_uri",
+#   "policyMetadataUri": "$policy_metadata_uri"
+# }
+# EOF
+
+# OUTPUT=$(PRIVATE_KEY=$PRIVATE_KEY POLICY_URIS_PATH=$POLICY_URIS_PATH \
+#     forge script script/PolicyDeployer.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast --slow)
+
+# echo $OUTPUT
+
+# ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY PRIVATE_KEY=$PRIVATE_KEY POLICY_URIS_PATH=$POLICY_URIS_PATH RPC_URL=$RPC_URL anvil/deploy-policy.sh -c 11155111 -w https://ipfs.io/ipfs/bafybeidd2oyr7ozggrdretzmng6lxr4hw7e2lpvzaenfzmmh5ekbszl5aa -p https://ipfs.io/ipfs/bafkreid4epagcbvjq2ufsgsnulv3m3kpss3elz7uygesqolypmp5t5y2ku -s https://ipfs.io/ipfs/bafkreibjw26cbnfjhn5654ockcid4qqx2twtvzwfrckzjlhxq4r4r2a46i -m https://ipfs.io/ipfs/bafkreiajudbpi7epbo5herbkbrdbocwerdjise2kzbc7useexwve6sbgeu -d https://ipfs.io/ipfs/bafkreibvlqeppn577fs5iak52poh7p4irp3bizh2dtoiyksava44kx5sga -t 0x548df1990b444F0b658c838bE334149C1eA79833 -e "newton_trading_agent.allow"
