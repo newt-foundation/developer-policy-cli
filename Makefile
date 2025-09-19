@@ -1,29 +1,17 @@
 .PHONY: build-agent build-wasm build-all run-agent run-wasm run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
 
-build-agent:
-	cargo build -p trade-agent --release
-
 build-wasm:
 	cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
 
-build-all: build-agent build-wasm
-
-agent-help:
-	./target/release/trade-agent --help
-
 help:
 	@echo "Available Make Targets:"
-	@echo "  build-agent        - Build the main trading agent"
 	@echo "  build-wasm         - Build the WASM market analysis component"
-	@echo "  build-all          - Build both agent and WASM components"
-	@echo "  run-agent          - Execute a trade (requires client, token, amount, trade params)"
-	@echo "  run-wasm           - Run the WASM component for market analysis"
 	@echo "  upload-wasm-ipfs   - Build WASM (release) and upload to Pinata IPFS"
 	@echo "  upload-policy-ipfs - Upload policy.rego file to Pinata IPFS"
 	@echo "  upload-policy-params-ipfs - Upload policy_params.json to Pinata IPFS"
 	@echo "  upload-params-schema-ipfs - Upload params_schema.json to Pinata IPFS"
-	@echo "  agent-help         - Show trading agent CLI help"
-	@echo "  clean              - Clean build artifacts"
+	@echo "  upload-policy-metadata-ipfs - Upload policy_metadata.json to Pinata IPFS"
+	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
 	@echo "  help               - Show this help message"
 	@echo ""
 	@echo "Examples:"
@@ -31,13 +19,10 @@ help:
 	@echo "  make upload-policy-ipfs       # Upload policy.rego to IPFS"
 	@echo "  make upload-policy-params-ipfs # Upload policy_params.json to IPFS"
 	@echo "  make upload-params-schema-ipfs # Upload params_schema.json to IPFS"
-	@echo "  make run-agent client=0x123... token=0xabc... amount=1000000000 trade=buy"
+	@echo "  make upload-policy-metadata-ipfs # Upload policy_metadata.json to IPFS"
+	@echo "  make upload-policy-data-metadata-ipfs # Upload policy_data_metadata.json to IPFS"
 	@echo ""
 	@echo "For IPFS upload setup and troubleshooting, see: IPFS_UPLOAD.md"
-
-# client: Address, token: Address, amount: u64, trade: BuyOrSell
-run-agent: build-agent
-	./target/release/trade-agent --client $(client) --token $(token) --amount $(amount) --trade $(trade)
 
 run-wasm: build-wasm
 	cargo build -p op-sim --release
@@ -176,8 +161,5 @@ upload-policy-data-metadata-ipfs:
 		cat /tmp/pinata_upload.log; \
 	fi
 	@rm -f /tmp/pinata_upload.log
-
-clean:
-	cargo clean -p trade-agent -p newton-trade-agent-wasm -p shared
 
 upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
