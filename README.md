@@ -1,368 +1,209 @@
-# Newton Trade Agent
+# Newton Policy Deployment CLI
 
-A proof-of-concept automated trading agent that integrates with the [Newton Protocol](https://newton.foundation/) for policy-based trade execution using [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) policy evaluation.
+This project includes automated functionality to upload Policy files to Pinata IPFS and deploy the Policy contract, configured for your.
 
-## Overview
+## Features
 
-The Newton Trade Agent is a modular Rust-based trading system designed to execute token swaps through smart contracts while adhering to user-defined policies. The agent submits trading intents to the Newton Protocol, which evaluates them against Rego policies before execution.
+- **Automatic WASM Build**: Builds the WASM component as a release build
+- **Automated Authentication**: Handles Pinata CLI authentication without manual input
+- **Dynamic Gateway**: Uses your configured Pinata gateway instead of hardcoded URLs
+- **Gateway Auto-Selection**: Automatically sets your preferred gateway
+- **Multiple Link Types**: Provides both your personalized gateway and public IPFS links
+- **Error Handling**: Graceful fallback and informative error messages
 
-### Key Features
+## Setup
 
-- **Policy-Based Trading**: All trades are evaluated against Rego policies before execution
-- **Newton Protocol Integration**: Seamless integration with Newton's decentralized policy evaluation system
-- **Modular Architecture**: Clean separation between trading logic, market analysis, and policy evaluation
-- **WASM-Based Market Analysis**: Extensible market signal computation using WebAssembly
-- **CLI Interface**: Simple command-line interface for executing trades
-- **Multi-Token Support**: Support for various ERC-20 token swaps with USDC
-
-## Architecture
-
-The project follows a clean, extensible architecture with three main components:
-
-```
-poc-newton-trade-agent/
-├── crates/
-│   ├── trade-agent/     # Main CLI application
-│   ├── wasm-component/  # Market analysis WASM component
-│   └── shared/          # Common utilities and types
-├── policy.rego           # Trading policy definition
-└── Makefile           # Build automation
-```
-
-### Components
-
-- **`trade-agent`**: CLI application that handles trade execution, Newton Protocol communication, and user interaction
-- **`wasm-component`**: WebAssembly component for market data analysis and trading signal computation
-- **`shared`**: Common utilities including price data structures, trading strategies, and token mappings
-
-## Installation
-
-### Dependencies
-
-1. **Rust Toolchain** (1.88.0 or later):
-
-   ```bash
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-   ```
-
-2. **WASM Target**:
-
-   ```bash
-   rustup target add wasm32-wasip2
-   ```
-
-3. **cargo-component** (for WASM components):
-
-   ```bash
-   cargo install cargo-component
-   ```
-
-4. **Wasmtime** (for running WASM components):
-   ```bash
-   curl https://wasmtime.dev/install.sh -sSf | bash
-   ```
-
-### Alternative: Nix Development Environment
-
-If you use Nix, you can enter a development shell with all dependencies:
+### 1. Install Pinata CLI
 
 ```bash
-nix develop
+curl -fsSL https://cli.pinata.cloud/install | bash
 ```
 
-## Building
+### 2. Get Your Pinata Credentials
 
-### Build All Components
+1. Go to [Pinata](https://app.pinata.cloud/developers/api-keys)
+2. Create a new API key. If you don't just make an admin key, make sure the API key has write permissions for files and read permission for gateways.
+3. Copy the API Key, API Secret, and JWT
+4. Note your gateway domain (e.g., `your-subdomain.mypinata.cloud`)
+5. Login in your terminal via `pinata auth`
 
-```bash
-make build-all
-```
+### 3. Configure Environment Variables
 
-### Build Individual Components
-
-```bash
-# Build the main trading agent
-make build-agent
-
-# Build the WASM market analysis component
-make build-wasm
-```
-
-### Manual Build Commands
-
-```bash
-# Trading agent (release build)
-cargo build -p trade-agent --release
-
-# WASM component
-cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
-```
-
-## Configuration
-
-### Environment Variables
-
-Copy `.env.example` to `.env` and configure:
-
-```bash
-cp .env.example .env
-```
-
-Required environment variables:
+Update your `.env` file with your Pinata credentials:
 
 ```env
-# Your trading agent's private key (hex format without 0x prefix)
-AGENT_PRIVATE_KEY=your_private_key_here
-
-# Newton Protocol RPC endpoint
-NEWTON_RPC=https://prover-avs.stagef.newt.foundation/
-
-# Ethereum chain ID (11155111 for Sepolia)
-CHAIN_ID=11155111
-
-# Optional: API keys for market data
-CMC_API_KEY=your_coinmarketcap_api_key_here
-COINGECKO_API_KEY=your_coingecko_api_key_here
+# Pinata IPFS Configuration
+PINATA_API_KEY=your_pinata_api_key_here
+PINATA_API_SECRET=your_pinata_api_secret_here
+PINATA_JWT=your_pinata_jwt_here
+PINATA_GATEWAY=your_pinata_gateway_domain_here
 ```
 
-### Rego Policy Configuration
-
-The trading policy is defined in `policy.rego`. The policy evaluates:
-
-- **Token whitelist**: Only allows trading with approved tokens
-- **Function restrictions**: Restricts allowed trading functions (`buy`, `sell`)
-- **Amount limits**: Enforces maximum trade sizes
-- **Market conditions**: Evaluates current price vs. 200-day moving average
-- **Market cap requirements**: Only allows trading tokens with market cap rank ≤ 200
-
-Example policy structure:
-
-```rego
-package newton_trading_agent
-
-default allow := false
-
-allow {
-    # Token is whitelisted
-    token in whitelist_contracts
-    # Function is allowed
-    function_name in allowed_action
-    # Amount is within limits
-    amount_in <= max_limit
-    # Market conditions are favorable
-    token_price >= token_daily_moving_average
-    token_market_cap_rank <= 200
-}
-```
+**Important**: Replace the redacted JWT (asterisks) with your actual JWT from Pinata.
 
 ## Usage
 
-### CLI Interface
+See the [Policy Files](#policy-files-overview) for details on what should go in each file BEFORE UPLOADING.
 
-The trade agent provides a comprehensive CLI interface:
+### Upload Policy Files to IPFS
 
-```bash
-# Show help and available options
-make agent-help
-
-# Or directly:
-./target/release/trade-agent --help
-```
-
-### Basic Trading Commands
-
-#### Buy Token with USDC
+#### Upload policy.wasm to IPFS
 
 ```bash
-# Buy WETH with USDC
-make run-agent client=0x1234...abcd token=0xe42e3458283032c669c98e0d8f883a92fc64fe22 amount=1000000000 trade=buy
-
-# Or directly:
-./target/release/trade-agent \
-  --client 0x1234567890123456789012345678901234567890 \
-  --token 0xe42e3458283032c669c98e0d8f883a92fc64fe22 \
-  --amount 1000000000 \
-  --trade buy
+make upload-wasm-ipfs
 ```
 
-#### Sell Token for USDC
+Uploads the wasm file that sources data for the policy.
+
+#### Upload policy.rego
 
 ```bash
-# Sell WETH for USDC
-make run-agent client=0x1234...abcd token=0xe42e3458283032c669c98e0d8f883a92fc64fe22 amount=500000000 trade=sell
+make upload-policy-ipfs
 ```
 
-### Parameters
+Uploads the Rego policy file that defines trading rules and restrictions.
 
-- `--client`: Your policy-guarded vault address (policy client)
-- `--token`: ERC-20 token contract address to trade
-- `--amount`: Amount in token's smallest unit (e.g., wei for ETH, considering token decimals)
-- `--trade`: Either `buy` (exchange USDC for token) or `sell` (exchange token for USDC)
-
-### Supported Tokens
-
-Currently configured tokens:
-
-- **USDC**: `0xd1c01582bee80b35898cc3603b75dbb5851b4a85` (Sepolia)
-- **WETH**: `0xe42e3458283032c669c98e0d8f883a92fc64fe22` (Sepolia)
-
-## Newton Protocol Integration
-
-### How It Works
-
-1. **Intent Creation**: The agent creates a trading intent with transaction details
-2. **Policy Submission**: Intent is submitted to Newton Protocol with your policy client address
-3. **Rego Evaluation**: Newton evaluates the intent against your Rego policy
-4. **Market Data Integration**: Real-time market data is provided for policy evaluation
-5. **Execution**: If policy allows, the trade is executed on-chain
-
-### Request Flow
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Trade Agent   │───▶│ Newton Protocol │───▶│  Rego Evaluator │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │              ┌─────────────────┐              │
-         └─────────────▶│  Smart Contract │◀─────────────┘
-                        │   (DEX/Pool)    │
-                        └─────────────────┘
-```
-
-### API Endpoints Used
-
-- `newton_createTask`: Submit trading intent for policy evaluation
-- `newton_waitForTaskId`: Wait for task completion and get results
-
-## Development
-
-### Running Market Analysis
-
-The WASM component can be run independently for market analysis:
+#### Upload policy_params.json
 
 ```bash
-# Build and run the WASM market analyzer
-make run-wasm
+make upload-policy-params-ipfs
 ```
 
-### Adding New Trading Strategies
+Uploads the policy parameters configuration file with chain-specific contract allowlists.
 
-Extend the strategy logic in `crates/shared/src/strategy.rs`:
+#### Upload params_schema.json
 
-```rust path=null start=null
-pub fn my_custom_strategy(price_data: &TradingSignal) -> Option<(Address, Address)> {
-    // Your custom trading logic here
-    // Return Some((from_token, to_token)) to trade, None to skip
-}
+```bash
+make upload-params-schema-ipfs
 ```
 
-### Adding New Tokens
+Uploads the schema configuration file which defines inputs.
 
-1. Update token mappings in `crates/shared/src/tokens.rs`
-2. Add contract addresses to the swap contract mapping in `main.rs`
-3. Update the Rego policy whitelist as needed
+#### Upload policy_metadata.json
 
-### Modifying Rego Policies
+```bash
+make upload-policy-metadata-ipfs
+```
 
-Edit `policy.rego` to customize trading rules:
+Uploads the metadata associated with the policy.
 
-```rego
-# Add new conditions
-allow {
-    # Existing conditions...
+#### Upload policy_data_metadata.json
 
-    # Your custom conditions
-    my_custom_condition
+```bash
+make upload-policy-data-metadata-ipfs
+```
+
+Uploads the metadata associated with the policy data source.
+
+All policy upload commands:
+1. Check if the target file exists in the policy-files directory
+2. Upload the file to IPFS with timestamped naming
+3. Print the IPFS hash and direct links
+
+### Example Output
+
+```bash
+$ make upload-policy-ipfs
+Uploading policy.rego to Pinata IPFS...
+Setting up Pinata configuration...
+Authenticating with Pinata and setting gateway...
+Pinata configuration complete.
+Uploading policy.rego to Pinata IPFS...
+{
+    "id": "01991361-6fe8-72ed-916d-2f7ee4502667",
+    "name": "policy.rego",
+    "cid": "bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u",
+    "size": 2250,
+    "created_at": "2025-09-04T06:19:37.423Z",
+    "mime_type": "text/plain; charset=UTF-8"
 }
 
-my_custom_condition {
-    # Custom logic here
-}
-```
-
-### Testing
-
-```bash
-# Run all tests
-cargo test --workspace
-
-# Test specific component
-cargo test -p trade-agent
-cargo test -p shared
-```
-
-### Cleaning Build Artifacts
-
-```bash
-make clean
-```
-
-## Project Structure Details
-
-```
-poc-newton-trade-agent/
-├── crates/
-│   ├── trade-agent/
-│   │   ├── src/main.rs          # CLI interface and Newton integration
-│   │   └── Cargo.toml           # Trading agent dependencies
-│   ├── wasm-component/
-│   │   ├── src/
-│   │   │   ├── main.rs          # WASM entry point
-│   │   │   ├── wasi_fetcher.rs  # Market data fetching
-│   │   │   └── bindings.rs      # WASM bindings
-│   │   └── Cargo.toml           # WASM component config
-│   └── shared/
-│       ├── src/
-│       │   ├── lib.rs           # Common utilities
-│       │   ├── price.rs         # Price data structures
-│       │   ├── strategy.rs      # Trading strategies
-│       │   └── tokens.rs        # Token mappings
-│       └── Cargo.toml           # Shared dependencies
-├── policy.rego                    # Trading policy
-├── .env.example                 # Environment template
-├── Makefile                     # Build automation
-├── flake.nix                    # Nix development environment
-└── Cargo.toml                   # Workspace configuration
+=== IPFS Upload Results ===
+IPFS Hash: bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
+Direct IPFS Link: https://silver-socialist-eel-341.mypinata.cloud/ipfs/bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
+Public IPFS Link: https://ipfs.io/ipfs/bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
 ```
 
 ## Troubleshooting
 
-### Common Issues
+### JWT is Redacted Error
 
-1. **"No swap contract found for token pair"**: Ensure the token addresses are configured in the swap contract mapping
-
-2. **"RPC error"**: Check your Newton Protocol RPC endpoint and network connectivity
-
-3. **"Policy evaluation failed"**: Review your Rego policy and ensure all conditions are met
-
-4. **WASM build errors**: Ensure you have the correct Rust target and cargo-component installed:
-   ```bash
-   rustup target add wasm32-wasip2
-   cargo install cargo-component
-   ```
-
-### Debug Mode
-
-Run with debug logging:
-
-```bash
-RUST_LOG=debug ./target/release/trade-agent [options]
+If you see:
+```
+⚠️  PINATA_JWT is redacted in .env file. Please replace with actual JWT.
 ```
 
-## Contributing
+This means you need to replace the asterisks in your `.env` file with your real JWT from Pinata.
 
-This is a proof-of-concept project. Contributions are welcome for:
+### Authentication Fails
 
-- Additional trading strategies
-- New token integrations
-- Enhanced market analysis
-- Policy template improvements
-- Documentation updates
+1. Verify your JWT is correct and not expired
+2. Check that your API key has proper permissions
+3. Try manually authenticating: `~/.local/share/pinata/pinata auth`
 
-## License
+### Upload Errors (401, 403)
 
-This project is provided as-is for demonstration purposes. Please review and understand the code before using with real funds.
+- **401 Unauthorized**: Authentication issue, check your JWT and API key permissions
+- **403 Forbidden**: Permission issue, verify your API key permissions
 
-## Disclaimer
+## Policy Files Overview
 
-⚠️ **Important**: This is experimental software for educational purposes. Always test thoroughly with small amounts on testnets before using with real funds. Trading cryptocurrencies involves substantial risk of loss.
+This project includes several policy-related files that can be uploaded to IPFS:
+
+### policy.wasm
+not sure what to put here still
+- **Purpose**: Defines the data source for the policy
+- **Content**: Compiled wasm code
+- **MIME Type**: `application/wasm`
+
+
+### policy.rego
+- **Purpose**: Defines the trading policy rules in Rego language
+- **Content**: Authorization logic, token whitelists, trading limits, market conditions
+- **MIME Type**: `text/plain; charset=UTF-8`
+
+### policy_params.json
+- **Purpose**: Configuration parameters for different blockchain networks and contracts
+- **Content**: Chain-specific contract allowlists, trading limits, slippage settings
+- **MIME Type**: `application/json`
+
+### params_schema.json
+- **Purpose**: JSON Schema validation for policy_params.json structure
+- **Content**: Schema definitions, validation rules, parameter descriptions
+- **MIME Type**: `application/json`
+
+### policy_metadata.json
+- **Purpose**: JSON description and attributation for the policy rego code
+- **Content**: Name, version, author, link, and description
+- **MIME Type**: `application/json`
+
+### policy_data_metadata.json
+- **Purpose**: JSON description and attributation for the policy data source(?) wasm
+- **Content**: Name, version, author, link, and description
+- **MIME Type**: `application/json`
+
+## Technical Details
+
+### Files Created
+
+- `pinata-auth.expect`: Automated authentication script (excluded from git)
+- Temporary files: `/tmp/pinata_upload.log`, `/tmp/wasm_file_path` (auto-cleaned)
+
+### WASM File Detection
+
+The system automatically finds the WASM file in these locations:
+1. `target/wasm32-wasip2/release/main.wasm`
+2. `target/wasm32-wasip1/release/main.wasm`
+3. `target/wasm32-wasip1/release/newton-trade-agent-wasm.wasm`
+
+### Gateway Selection
+
+- Uses `pinata gateways link <hash>` to get your personalized gateway
+- Falls back to `https://gateway.pinata.cloud/ipfs/<hash>` if gateway command fails
+- Also provides public IPFS gateway link: `https://ipfs.io/ipfs/<hash>`
+
+## Security Notes
+
+- The `.env` file contains sensitive credentials and is excluded from git
+- The `pinata-auth.expect` script is also excluded from git as it may contain credentials
+- JWT tokens should be kept secure and rotated regularly
