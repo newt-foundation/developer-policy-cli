@@ -5,3 +5,6 @@ crates/*/Cargo.lock
 
 # Pinata automation scripts (may contain sensitive data)
 pinata-auth.expect
+
+# User provided files
+policy-files

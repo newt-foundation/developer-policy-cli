@@ -1,0 +1,10 @@
+{
+  "policyDataLocation": "FILL_ME",
+  "policyDataArgs": "",
+  "attester": "FILL_ME",
+  "policyUri": "FILL_ME",
+  "schemaUri": "FILL_ME",
+  "entrypoint": "FILL_ME",
+  "policyMetadataUri": "FILL_ME",
+  "policyDataMetadataUri": "FILL_ME"
+}

@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "description": "Trading policy structure: chain_id -> contract_address -> action_type -> parameters[]",
+  "additionalProperties": {
+    "type": "object",
+    "description": "Contract address to action type mapping",
+    "additionalProperties": {
+      "type": "object",
+      "description": "Action type to parameters mapping",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Array of policy parameters for each action type",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Parameter name"
+            },
+            "type": {
+              "type": "string",
+              "description": "Parameter data type"
+            },
+            "value": {
+              "type": "number",
+              "description": "Parameter value"
+            },
+            "description": {
+              "type": "string",
+              "description": "Parameter description"
+            }
+          },
+          "required": ["name", "type", "value", "description"],
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}
