@@ -163,24 +163,38 @@ upload-policy-data-metadata-ipfs:
 	fi
 
 upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
+	@echo "================================================================================"
+	@echo ""
 
-# # Create the JSON content
-# cat > "$POLICY_URIS_PATH" << EOF
-# {
-#   "policyDataLocation": "$wasm_uri",
-#   "policyDataArgs": "$wasm_args_uri",
-#   "policyUri": "$policy_uri",
-#   "schemaUri": "$schema_uri",
-#   "attester": "$attester",
-#   "entrypoint": "$entrypoint",
-#   "policyDataMetadataUri": "$policy_data_metadata_uri",
-#   "policyMetadataUri": "$policy_metadata_uri"
-# }
-# EOF
+ATTESTER ?= $(shell read -p "Input attester address: " attester; echo $$attester)
+ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
 
-# OUTPUT=$(PRIVATE_KEY=$PRIVATE_KEY POLICY_URIS_PATH=$POLICY_URIS_PATH \
-#     forge script script/PolicyDeployer.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast --slow)
+create-policy-uris-json: upload-all-ipfs
+	@rm -f policy-files/policy_uris.json
+	@touch policy-files/policy_uris.json
+	@WASM_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_wasm_upload.log | head -1); \
+	POLICY_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_policy_upload.log | head -1); \
+	SCHEMA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
+	METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
+	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
+	echo "{\"policyDataLocation\": \"$$WASM_IPFS_HASH\",\"policyDataArgs\": \"\",\"policyUri\": \"$$POLICY_IPFS_HASH\",\"schemaUri\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$(ATTESTER)\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataUri\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataUri\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_uris.json
 
-# echo $OUTPUT
+CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 
-# ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY PRIVATE_KEY=$PRIVATE_KEY POLICY_URIS_PATH=$POLICY_URIS_PATH RPC_URL=$RPC_URL anvil/deploy-policy.sh -c 11155111 -w https://ipfs.io/ipfs/bafybeidd2oyr7ozggrdretzmng6lxr4hw7e2lpvzaenfzmmh5ekbszl5aa -p https://ipfs.io/ipfs/bafkreid4epagcbvjq2ufsgsnulv3m3kpss3elz7uygesqolypmp5t5y2ku -s https://ipfs.io/ipfs/bafkreibjw26cbnfjhn5654ockcid4qqx2twtvzwfrckzjlhxq4r4r2a46i -m https://ipfs.io/ipfs/bafkreiajudbpi7epbo5herbkbrdbocwerdjise2kzbc7useexwve6sbgeu -d https://ipfs.io/ipfs/bafkreibvlqeppn577fs5iak52poh7p4irp3bizh2dtoiyksava44kx5sga -t 0x548df1990b444F0b658c838bE334149C1eA79833 -e "newton_trading_agent.allow"
+deploy-policy:
+	@source .env; \
+	if [ $$(cast chain-id -r $$RPC_URL) != $(CHAIN_ID) ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi
+	@if [ ! -f policy-files/policy_uris.json ]; then \
+		echo "Error: generate or fill out policy_uris.json file first"; \
+		exit 1; \
+	fi
+	@source .env; \
+	DIRECTORY=$$(pwd); \
+	cd newton-contracts; \
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_URIS_PATH="$$DIRECTORY/policy-files/policy_uris.json" forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast --slow
+#remove the --slow later
+
+upload-and-deploy-policy: create-policy-uris-json deploy-policy
