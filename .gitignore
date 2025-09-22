@@ -7,4 +7,4 @@ crates/*/Cargo.lock
 pinata-auth.expect
 
 # User provided files
-policy-files
+/policy-files
