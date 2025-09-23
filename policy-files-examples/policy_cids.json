@@ -1,0 +1,10 @@
+{
+  "wasmCid": "wasm_ipfs_hash",
+  "wasmArgs": "fill if needed",
+  "attester": "attester address",
+  "policyCid": "policy_ipfs_hash",
+  "schemaCid": "schema_ipfs_hash",
+  "entrypoint": "policy rego entrypoint",
+  "policyMetadataCid": "policy_metadata_ipfs_hash",
+  "policyDataMetadataCid": "policy_data_metadata_ipfs_hash"
+}

@@ -1,11 +1,11 @@
-.PHONY: upload-and-deploy-policy deploy-policy upload-all-ipfs create-policy-uris-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
+.PHONY: upload-and-deploy-policy deploy-policy upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
-	@echo "  deploy-policy                    - Deploy the policy given an existing policy_uris.json file"
+	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
-	@echo "  create-policy-uris-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_uris.json for deployment"
+	@echo "  create-policy-cids-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_cids.json for deployment"
 	@echo "  upload-wasm-ipfs                 - Upload policy.wasm to Pinata IPFS"
 	@echo "  upload-policy-ipfs               - Upload policy.rego file to Pinata IPFS"
 	@echo "  upload-policy-params-ipfs        - Upload policy_params.json to Pinata IPFS"
@@ -156,15 +156,15 @@ ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name
 DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
 EXPIRE_AFTER ?= $(shell read -p "Input policy approval expiration time in seconds (default 1 hour, good for debugging): " expiry; echo $$expiry)
 
-create-policy-uris-json: upload-all-ipfs
-	@rm -f policy-files/policy_uris.json
-	@touch policy-files/policy_uris.json
+create-policy-cids-json: upload-all-ipfs
+	@rm -f policy-files/policy_cids.json
+	@touch policy-files/policy_cids.json
 	@WASM_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_wasm_upload.log | head -1); \
 	POLICY_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_policy_upload.log | head -1); \
 	SCHEMA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
 	METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
 	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
-	echo "{\"policyDataLocation\": \"$$WASM_IPFS_HASH\",\"policyDataArgs\": \"$(DATA_ARGS)\",\"policyUri\": \"$$POLICY_IPFS_HASH\",\"schemaUri\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$(ATTESTER)\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataUri\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataUri\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_uris.json
+	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$(DATA_ARGS)\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$(ATTESTER)\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
 
 CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 
@@ -174,13 +174,13 @@ deploy-policy:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi
-	@if [ ! -f policy-files/policy_uris.json ]; then \
-		echo "Error: generate or fill out policy_uris.json file first"; \
+	@if [ ! -f policy-files/policy_cids.json ]; then \
+		echo "Error: generate or fill out policy_cids.json file first"; \
 		exit 1; \
 	fi
 	@source .env; \
 	DIRECTORY=$$(pwd); \
 	cd newton-contracts; \
-	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_URIS_PATH="$$DIRECTORY/policy-files/policy_uris.json" EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
-upload-and-deploy-policy: create-policy-uris-json deploy-policy
+upload-and-deploy-policy: create-policy-cids-json deploy-policy
