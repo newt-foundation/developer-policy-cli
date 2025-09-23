@@ -100,11 +100,6 @@ Input policy data args (put {} if unused):
 For this prompt, just press enter. The example WASM uses the default value of no inputs.
 
 ```
-Input attester address (an EoA you own): 
-```
-For this prompt, paste an ethereum address (public key) you own. For example, the one that you are using to deploy.
-
-```
 Input rego policy entrypoint (i.e. my_policy_name.allow): 
 ```
 For this prompt, enter `newton_trading_agent.allow` and press enter. This corresponds to the example policy.rego file that is provided.
@@ -186,7 +181,6 @@ make upload-and-deploy-policy
 
 It will ask you for some additional inputs including:
 - the args for your policy data WASM: this value is if your WASM requires any case by case input.
-- the attester address: this is your EoA for attesting correct policy data
 - the entrypoint: this is the part of your rego code that allows for successful execution of a task
 - the expiry: this is how long after approval your task remains valid
 - the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
@@ -258,7 +252,7 @@ Uploads all files and creates the `policy_cids.json` file for contract deploymen
 make deploy-policy
 ```
 
-If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_cids.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties.
+If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_cids.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties. Do not change the `attester` property as it is a system address.
 
 ## Troubleshooting
 
