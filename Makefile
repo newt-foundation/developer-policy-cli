@@ -168,6 +168,7 @@ upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs u
 
 ATTESTER ?= $(shell read -p "Input attester address: " attester; echo $$attester)
 ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
+DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
 
 create-policy-uris-json: upload-all-ipfs
 	@rm -f policy-files/policy_uris.json
@@ -177,7 +178,7 @@ create-policy-uris-json: upload-all-ipfs
 	SCHEMA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
 	METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
 	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
-	echo "{\"policyDataLocation\": \"$$WASM_IPFS_HASH\",\"policyDataArgs\": \"\",\"policyUri\": \"$$POLICY_IPFS_HASH\",\"schemaUri\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$(ATTESTER)\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataUri\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataUri\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_uris.json
+	echo "{\"policyDataLocation\": \"$$WASM_IPFS_HASH\",\"policyDataArgs\": \"$(DATA_ARGS)\",\"policyUri\": \"$$POLICY_IPFS_HASH\",\"schemaUri\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$(ATTESTER)\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataUri\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataUri\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_uris.json
 
 CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 
