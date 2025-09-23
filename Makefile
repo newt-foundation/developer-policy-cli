@@ -1,36 +1,21 @@
-.PHONY: build-agent build-wasm build-all run-agent run-wasm run-wasm-sample upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs clean help
-
-build-wasm:
-	cargo build -p newton-trade-agent-wasm --target wasm32-wasip2 --release
+.PHONY: upload-and-deploy-policy deploy-policy upload-all-ipfs create-policy-uris-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
-	@echo "  build-wasm         - Build the WASM market analysis component"
-	@echo "  upload-wasm-ipfs   - Build WASM (release) and upload to Pinata IPFS"
-	@echo "  upload-policy-ipfs - Upload policy.rego file to Pinata IPFS"
-	@echo "  upload-policy-params-ipfs - Upload policy_params.json to Pinata IPFS"
-	@echo "  upload-params-schema-ipfs - Upload params_schema.json to Pinata IPFS"
-	@echo "  upload-policy-metadata-ipfs - Upload policy_metadata.json to Pinata IPFS"
+	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
+	@echo "  deploy-policy                    - Deploy the policy given an existing policy_uris.json file"
+	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
+	@echo "  create-policy-uris-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_uris.json for deployment"
+	@echo "  upload-wasm-ipfs                 - Upload policy.wasm to Pinata IPFS"
+	@echo "  upload-policy-ipfs               - Upload policy.rego file to Pinata IPFS"
+	@echo "  upload-policy-params-ipfs        - Upload policy_params.json to Pinata IPFS"
+	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
+	@echo "  upload-policy-metadata-ipfs      - Upload policy_metadata.json to Pinata IPFS"
 	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
-	@echo "  help               - Show this help message"
+	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
+	@echo "  help                             - Show this help message"
 	@echo ""
-	@echo "Examples:"
-	@echo "  make upload-wasm-ipfs         # Build and upload WASM to IPFS"
-	@echo "  make upload-policy-ipfs       # Upload policy.rego to IPFS"
-	@echo "  make upload-policy-params-ipfs # Upload policy_params.json to IPFS"
-	@echo "  make upload-params-schema-ipfs # Upload params_schema.json to IPFS"
-	@echo "  make upload-policy-metadata-ipfs # Upload policy_metadata.json to IPFS"
-	@echo "  make upload-policy-data-metadata-ipfs # Upload policy_data_metadata.json to IPFS"
-	@echo ""
-	@echo "For IPFS upload setup and troubleshooting, see: IPFS_UPLOAD.md"
-
-run-wasm: build-wasm
-	cargo build -p op-sim --release
-	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm {}
-
-run-wasm-dev: build-wasm
-	cargo build -p op-sim --release
-	./target/release/op-sim ./target/wasm32-wasip2/release/main.wasm "development"
+	@echo "See README.md for help on configuration"
 
 # Upload WASM to IPFS via Pinata
 upload-wasm-ipfs:
