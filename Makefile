@@ -151,7 +151,7 @@ upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs u
 	@echo "================================================================================"
 	@echo ""
 
-ATTESTER ?= $(shell read -p "Input attester address: " attester; echo $$attester)
+ATTESTER ?= $(shell read -p "Input attester address (an EoA you own): " attester; echo $$attester)
 ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
 DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
 EXPIRE_AFTER ?= $(shell read -p "Input policy approval expiration time in seconds (default 1 hour, good for debugging): " expiry; echo $$expiry)
