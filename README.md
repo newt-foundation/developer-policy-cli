@@ -78,7 +78,7 @@ It will ask you for some additional inputs including:
 
 #### Upload individual Policy Files to IPFS
 
-You can upload your files individually to IPFS via pinata without deploying the contract. If you do, make sure to note down the IPFS hash generated as it will be necessary for manually creating your `policy_uris.json` file.
+You can upload your files individually to IPFS via pinata without deploying the contract. If you do, make sure to note down the IPFS hash generated as it will be necessary for manually creating your `policy_cids.json` file.
 
 ```bash
 make upload-wasm-ipfs
@@ -130,10 +130,10 @@ Uploads all necessary files to IPFS
 
 
 ```bash
-make create-policy-uris-json
+make create-policy-cids-json
 ```
 
-Uploads all files and creates the `policy_uris.json` file for contract deployment.
+Uploads all files and creates the `policy_cids.json` file for contract deployment.
 
 ####  Standalone Policy Deploy
 
@@ -141,7 +141,7 @@ Uploads all files and creates the `policy_uris.json` file for contract deploymen
 make deploy-policy
 ```
 
-If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_uris.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties.
+If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_cids.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties.
 
 ## Troubleshooting
 
