@@ -154,6 +154,7 @@ upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs u
 ATTESTER ?= $(shell read -p "Input attester address: " attester; echo $$attester)
 ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
 DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
+EXPIRE_AFTER ?= $(shell read -p "Input policy approval expiration time in seconds (default 1 hour, good for debugging): " expiry; echo $$expiry)
 
 create-policy-uris-json: upload-all-ipfs
 	@rm -f policy-files/policy_uris.json
@@ -180,7 +181,6 @@ deploy-policy:
 	@source .env; \
 	DIRECTORY=$$(pwd); \
 	cd newton-contracts; \
-	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_URIS_PATH="$$DIRECTORY/policy-files/policy_uris.json" forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast --slow
-#remove the --slow later
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_URIS_PATH="$$DIRECTORY/policy-files/policy_uris.json" EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-uris-json deploy-policy
