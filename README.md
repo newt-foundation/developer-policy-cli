@@ -1,19 +1,24 @@
 # Newton Policy Deployment CLI
 
-This project includes automated functionality to upload Policy files to Pinata IPFS and deploy the Policy contract, configured for your.
-
-## Features
-
-- **Automatic WASM Build**: Builds the WASM component as a release build
-- **Automated Authentication**: Handles Pinata CLI authentication without manual input
-- **Dynamic Gateway**: Uses your configured Pinata gateway instead of hardcoded URLs
-- **Gateway Auto-Selection**: Automatically sets your preferred gateway
-- **Multiple Link Types**: Provides both your personalized gateway and public IPFS links
-- **Error Handling**: Graceful fallback and informative error messages
+This project includes automated functionality to upload Policy files to Pinata IPFS and deploy the Policy contract, configured for your policy rego code.
 
 ## Setup
 
-### 1. Install Pinata CLI
+### 1. Install dependencies
+
+install the git submodules
+
+```bash
+git submodule init && git submodule update --remote
+```
+
+create the directory for your policy
+
+```bash
+mkdir policy-files
+```
+
+install pinata cli, the ipfs upload manager
 
 ```bash
 curl -fsSL https://cli.pinata.cloud/install | bash
@@ -24,10 +29,12 @@ curl -fsSL https://cli.pinata.cloud/install | bash
 1. Go to [Pinata](https://app.pinata.cloud/developers/api-keys)
 2. Create a new API key. If you don't just make an admin key, make sure the API key has write permissions for files and read permission for gateways.
 3. Copy the API Key, API Secret, and JWT
-4. Note your gateway domain (e.g., `your-subdomain.mypinata.cloud`)
-5. Login in your terminal via `pinata auth`
+4. Login in your terminal via `pinata auth`
+5. Note your gateway domain (e.g., `your-subdomain.mypinata.cloud`), this is in a different tab than API keys
 
 ### 3. Configure Environment Variables
+
+Create a file `.env` by copying and renaming `.env.example`
 
 Update your `.env` file with your Pinata credentials:
 
@@ -39,15 +46,39 @@ PINATA_JWT=your_pinata_jwt_here
 PINATA_GATEWAY=your_pinata_gateway_domain_here
 ```
 
-**Important**: Replace the redacted JWT (asterisks) with your actual JWT from Pinata.
+Additionally fill in the values for deploying the contract
+```env
+# Forge config parameters
+PRIVATE_KEY=your_funded_deployer_address_private_key
+RPC_URL=make_sure_this_matches_the_chain_you're_deploying_to
+```
+
+### 4. Provide Policy Files
+
+Put your policy files in the `policy-files` folder. You can look in `policy-files-examples` for some example files to start you off. See [Policy Files](#policy-files-overview) for an explanation of what each file is for.
 
 ## Usage
 
-See the [Policy Files](#policy-files-overview) for details on what should go in each file BEFORE UPLOADING.
+### Deploy your Policy contract
 
-### Upload Policy Files to IPFS
+If everything in `policy-files` is good to go, you can deploy your policy contract using the following command.
 
-#### Upload policy.wasm to IPFS
+```bash
+make upload-and-deploy-policy
+```
+
+It will ask you for some additional inputs including:
+- the args for your policy data WASM: this value is if your WASM requires any case by case input.
+- the attester address: this is your EoA for attesting correct policy data
+- the entrypoint: this is the part of your rego code that allows for successful execution of a task
+- the expiry: this is how long after approval your task remains valid
+- the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
+
+### Additional Commands
+
+#### Upload individual Policy Files to IPFS
+
+You can upload your files individually to IPFS via pinata without deploying the contract. If you do, make sure to note down the IPFS hash generated as it will be necessary for manually creating your `policy_uris.json` file.
 
 ```bash
 make upload-wasm-ipfs
@@ -55,7 +86,6 @@ make upload-wasm-ipfs
 
 Uploads the wasm file that sources data for the policy.
 
-#### Upload policy.rego
 
 ```bash
 make upload-policy-ipfs
@@ -63,7 +93,6 @@ make upload-policy-ipfs
 
 Uploads the Rego policy file that defines trading rules and restrictions.
 
-#### Upload policy_params.json
 
 ```bash
 make upload-policy-params-ipfs
@@ -71,7 +100,6 @@ make upload-policy-params-ipfs
 
 Uploads the policy parameters configuration file with chain-specific contract allowlists.
 
-#### Upload params_schema.json
 
 ```bash
 make upload-params-schema-ipfs
@@ -79,7 +107,6 @@ make upload-params-schema-ipfs
 
 Uploads the schema configuration file which defines inputs.
 
-#### Upload policy_metadata.json
 
 ```bash
 make upload-policy-metadata-ipfs
@@ -87,7 +114,6 @@ make upload-policy-metadata-ipfs
 
 Uploads the metadata associated with the policy.
 
-#### Upload policy_data_metadata.json
 
 ```bash
 make upload-policy-data-metadata-ipfs
@@ -95,34 +121,27 @@ make upload-policy-data-metadata-ipfs
 
 Uploads the metadata associated with the policy data source.
 
-All policy upload commands:
-1. Check if the target file exists in the policy-files directory
-2. Upload the file to IPFS with timestamped naming
-3. Print the IPFS hash and direct links
-
-### Example Output
 
 ```bash
-$ make upload-policy-ipfs
-Uploading policy.rego to Pinata IPFS...
-Setting up Pinata configuration...
-Authenticating with Pinata and setting gateway...
-Pinata configuration complete.
-Uploading policy.rego to Pinata IPFS...
-{
-    "id": "01991361-6fe8-72ed-916d-2f7ee4502667",
-    "name": "policy.rego",
-    "cid": "bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u",
-    "size": 2250,
-    "created_at": "2025-09-04T06:19:37.423Z",
-    "mime_type": "text/plain; charset=UTF-8"
-}
-
-=== IPFS Upload Results ===
-IPFS Hash: bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
-Direct IPFS Link: https://silver-socialist-eel-341.mypinata.cloud/ipfs/bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
-Public IPFS Link: https://ipfs.io/ipfs/bafkreifvwxnaml4fwhwvd6gdq7qqlkw6zsjqvdfm2n2pdkhug3jwlqiv3u
+make upload-all-ipfs
 ```
+
+Uploads all necessary files to IPFS
+
+
+```bash
+make create-policy-uris-json
+```
+
+Uploads all files and creates the `policy_uris.json` file for contract deployment.
+
+####  Standalone Policy Deploy
+
+```bash
+make deploy-policy
+```
+
+If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_uris.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties.
 
 ## Troubleshooting
 

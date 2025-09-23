@@ -1,10 +1,10 @@
 {
-  "policyDataLocation": "FILL_ME",
-  "policyDataArgs": "",
-  "attester": "FILL_ME",
-  "policyUri": "FILL_ME",
-  "schemaUri": "FILL_ME",
-  "entrypoint": "FILL_ME",
-  "policyMetadataUri": "FILL_ME",
-  "policyDataMetadataUri": "FILL_ME"
+  "policyDataLocation": "wasm_ipfs_hash",
+  "policyDataArgs": "fill if needed",
+  "attester": "attester address",
+  "policyUri": "policy_ipfs_hash",
+  "schemaUri": "schema_ipfs_hash",
+  "entrypoint": "policy rego entrypoint",
+  "policyMetadataUri": "policy_metadata_ipfs_hash",
+  "policyDataMetadataUri": "policy_data_metadata_ipfs_hash"
 }
