@@ -1,3 +1,0 @@
-# [target.wasm32-wasip2]
-# rustflags = ["-C", "link-arg=-L/opt/homebrew/opt/llvm/lib/c++"]
-# Note: WASM targets don't need native linker flags
