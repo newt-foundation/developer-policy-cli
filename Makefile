@@ -169,8 +169,13 @@ CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155
 
 deploy-policy:
 	@source .env; \
-	if [ $$(cast chain-id -r $$RPC_URL) != $(CHAIN_ID) ]; then \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
 		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	if [ $$TEMP_CHAIN_ID != 1 ] && [ $$TEMP_CHAIN_ID != 11155111 ]; then \
+		echo "Error: Chain ID does not match any existing deployment"; \
 		exit 1; \
 	fi
 	@if [ ! -f policy-files/policy_cids.json ]; then \
