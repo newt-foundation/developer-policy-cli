@@ -18,7 +18,7 @@ Next, install forge
 curl -L https://foundry.paradigm.xyz | bash
 ```
 
-Then you can use the command shown in the output of the install ()`source ~/.zshenv` or whatever your shell environment is) or just open a new terminal window and run:
+Then you can use the command shown in the output of the install (`source ~/.zshenv` or whatever your shell environment is) or just open a new terminal window and run:
 
 ```bash
 foundryup
