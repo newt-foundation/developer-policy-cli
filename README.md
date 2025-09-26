@@ -108,7 +108,7 @@ For this prompt, enter `newton_trading_agent.allow` and press enter. This corres
 Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111):
 ```
 
-For this prompt, input 11155111 as you should be deploying to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
+For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
 
 ```
 Input policy approval expiration time in seconds (default 1 hour, good for debugging):
