@@ -105,14 +105,16 @@ Input rego policy entrypoint (i.e. my_policy_name.allow):
 For this prompt, enter `newton_trading_agent.allow` and press enter. This corresponds to the example policy.rego file that is provided.
 
 ```
-Input policy approval expiration time in seconds (default 1 hour, good for debugging): 
+Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111):
 ```
-For this prompt, you can just press enter and use the default value of 1 hour.
+
+For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
 
 ```
-Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): 
+Input policy approval expiration time in seconds (default 1 hour, good for debugging):
 ```
-For this prompt, input 11155111 as you should be deploying to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
+
+For this prompt, you can just press enter and use the default value of 1 hour.
 
 After these inputs, the script will deploy the contract. If successful you should be greeted with an output that looks like:
 
@@ -281,7 +283,6 @@ This means you need to replace the asterisks in your `.env` file with your real 
 This project includes several policy-related files that can be uploaded to IPFS:
 
 ### policy.wasm
-not sure what to put here still
 - **Purpose**: Defines the data source for the policy
 - **Content**: Compiled wasm code
 - **MIME Type**: `application/wasm`
