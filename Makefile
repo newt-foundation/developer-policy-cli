@@ -166,14 +166,14 @@ create-policy-cids-json: upload-all-ipfs
 	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
 	CHAIN_ID=$$(cast chain-id -r $$RPC_URL); \
 	if [ $$CHAIN_ID = 1 ]; then \
-		AGREGATOR=0x4883282094755C01cd0d15dFE74753c9E189d194; \
+		AGGREGATOR=0x4883282094755C01cd0d15dFE74753c9E189d194; \
 	elif [ $$CHAIN_ID = 11155111 ]; then \
-		AGREGATOR=0xD45062003a4626a532F30A4596aB253c45AE0647; \
+		AGGREGATOR=0xD45062003a4626a532F30A4596aB253c45AE0647; \
 	else \
 		echo "Error: Chain ID does not match any existing deployment"; \
 		exit 1; \
 	fi; \
-	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$(DATA_ARGS)\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$$AGREGATOR\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
+	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$(DATA_ARGS)\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"$$AGGREGATOR\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
 
 CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 
