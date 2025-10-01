@@ -187,12 +187,19 @@ deploy-policy:
 	if [ $$TEMP_CHAIN_ID != 1 ] && [ $$TEMP_CHAIN_ID != 11155111 ]; then \
 		echo "Error: Chain ID does not match any existing deployment"; \
 		exit 1; \
-	fi
-	@if [ ! -f policy-files/policy_cids.json ]; then \
+	fi; \
+	if [ ! -f policy-files/policy_cids.json ]; then \
 		echo "Error: generate or fill out policy_cids.json file first"; \
 		exit 1; \
-	fi
-	@source .env; \
+	fi; \
+	if [ $$TEMP_CHAIN_ID = 1 ]; then \
+		TASK_GENERATOR_ADDRESS=0x4883282094755C01cd0d15dFE74753c9E189d194; \
+	elif [ $$TEMP_CHAIN_ID = 11155111 ]; then \
+		TASK_GENERATOR_ADDRESS=0xD45062003a4626a532F30A4596aB253c45AE0647; \
+	else \
+		echo "Error: Chain ID does not match any existing deployment"; \
+		exit 1; \
+	fi; \
 	DIRECTORY=$$(pwd); \
 	cd newton-contracts; \
 	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATOR_ADDRESS=$$TASK_GENERATOR_ADDRESS EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
