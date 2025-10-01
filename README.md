@@ -12,6 +12,8 @@ First, install the git submodules
 git submodule init && git submodule update --remote
 ```
 
+Note: this may cause git to mark the submodule as changed. This is due to updates to the contract code and deployments as it is a living repo and is a desired result.
+
 Next, install forge
 
 ```bash
