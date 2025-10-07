@@ -201,7 +201,7 @@ deploy-policy:
 		exit 1; \
 	fi; \
 	DIRECTORY=$$(pwd); \
-	cd newton-contracts; \
+	cd lib/newton-contracts; \
 	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATOR_ADDRESS=$$TASK_GENERATOR_ADDRESS EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-cids-json deploy-policy

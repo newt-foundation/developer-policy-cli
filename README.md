@@ -124,8 +124,16 @@ No files changed, compilation skipped
 Script ran successfully.
 
 == Logs ==
-  Policy: 0x9D8BB6B9E069B0a6594a5332356C64DD82c328F5
-  Policy Implementation: 0x33451982CdDe3ED2ED7bc9fBC6A7db00132D7D09
+  {
+  "policyFactory": "0xd949169c6eAc4D62D56a07756Ca48054705e9FE8",
+  "policyFactoryImpl": "0xaafC65C4dBd528cD237d3faF3fACb50F19142F0a",
+  "policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",
+  "policyImplementation": "0x7eBA0f843B63b4D531e8c8833F0Ae4bcB27aF61B",
+  "policyDataFactory": "0x81121D4F4E31040971c135701b09D3852f1278fe",
+  "policyDataFactoryImpl": "0xa0268676b274B47ADe84E3eCd28cC2A90801dca2",
+  "policyData": "0x33e8D1aEAF343FaE5427bCc69d995a2338Baee9B",
+  "policyDataImplementation": "0x4dcd461a2E3114002f381513Ff441000D4840B4e"
+}
 
 ## Setting up 1 EVM.
 
@@ -169,7 +177,7 @@ Transactions saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-
 
 Sensitive values saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-contracts/cache/PolicyDeployer.s.sol/11155111/run-latest.json
 ```
-From this output, copy the values `Policy: 0x9D8BB6B9E069B0a6594a5332356C64DD82c328F5` (will show your contract address instead of the example), NOT the address listed as `Policy Implementation:`. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
+From this output, copy the value marked `"policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",` (will show your contract address instead of the example), NOT the address listed as `"policyImplementation":` or any other address. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
 
 ## Usage
 
