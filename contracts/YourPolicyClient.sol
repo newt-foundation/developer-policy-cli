@@ -16,10 +16,9 @@ contract YourPolicyClient is NewtonPolicyClient {
 	// or use your own initialize method
     constructor(
         address policyTaskManager,
-        address policy, //refers to the policy template address
-        address policyClientOwner //defaults to the deployer 
+        address policy //refers to the policy template address
     ) {
-        _initNewtonPolicyClient(policyTaskManager, policy, policyClientOwner);
+        _initNewtonPolicyClient(policyTaskManager, policy, msg.sender);
     }
 	
 	function setParameters(INewtonPolicy.PolicyConfig memory _config) external {
