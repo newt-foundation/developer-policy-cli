@@ -6,15 +6,7 @@ This project includes automated functionality to upload Policy files to Pinata I
 
 ### 1. Install dependencies
 
-First, install the git submodules
-
-```bash
-git submodule init && git submodule update --remote
-```
-
-Note: this may cause git to mark the submodule as changed. This is due to updates to the contract code and deployments as it is a living repo and is a desired result.
-
-Next, install forge
+First, install forge
 
 ```bash
 curl -L https://foundry.paradigm.xyz | bash
@@ -26,7 +18,13 @@ Then you can use the command shown in the output of the install (`source ~/.zshe
 foundryup
 ```
 
-which will finish installing forge.
+which will finish installing forge. Then, you can run:
+
+```bash
+forge install
+```
+
+which will finish updating the dependencies in the repo.
 
 Additionally install pinata cli, the ipfs upload manager (more on this in the next section).
 
