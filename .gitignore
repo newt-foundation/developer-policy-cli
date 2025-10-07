@@ -5,6 +5,7 @@ crates/*/Cargo.lock
 
 cache/
 out/
+broadcast/
 
 # Pinata automation scripts (may contain sensitive data)
 pinata-auth.expect
