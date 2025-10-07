@@ -4,6 +4,8 @@ crates/*/Cargo.lock
 .env
 
 lib/
+cache/
+out/
 
 # Pinata automation scripts (may contain sensitive data)
 pinata-auth.expect
