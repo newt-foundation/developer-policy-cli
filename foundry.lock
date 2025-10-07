@@ -6,6 +6,9 @@
     }
   },
   "lib/newton-contracts": {
-    "rev": "2fd0ea992eb8924fa34f4d079bb8330ce7821143"
+    "branch": {
+      "name": "main",
+      "rev": "36dd91c96f7a86d333c957626e89cfec28ec505d"
+    }
   }
 }

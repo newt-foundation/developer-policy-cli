@@ -3,4 +3,5 @@
 	url = https://github.com/foundry-rs/forge-std
 [submodule "lib/newton-contracts"]
 	path = lib/newton-contracts
+	branch = main
 	url = https://github.com/newt-foundation/newton-contracts
