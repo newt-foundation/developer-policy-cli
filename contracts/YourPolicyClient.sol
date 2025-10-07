@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-import {NewtonPolicyClient} from "@newton/contracts/mixins/NewtonPolicyClient.sol";
-import {INewtonPolicy} from "@newton/contracts/interfaces/INewtonPolicy.sol";
-import {NewtonMessage} from "@newton/contracts/core/NewtonMessage.sol";
+import {NewtonPolicyClient} from "@newton/contracts/src/mixins/NewtonPolicyClient.sol";
+import {INewtonPolicy} from "@newton/contracts/src/interfaces/INewtonPolicy.sol";
+import {NewtonMessage} from "@newton/contracts/src/core/NewtonMessage.sol";
 
 contract YourPolicyClient is NewtonPolicyClient {
 	// Your contract's business logic goes here
@@ -12,13 +12,15 @@ contract YourPolicyClient is NewtonPolicyClient {
 
     error InvalidAttestation();
 	
-	// You may intialize NewtonPolicyClient in the constructor
-	// or use your own initialize method
-    constructor(
+    // since the factory is used to clone the client, the constructor doesn't need to do anything
+    constructor() {}
+
+    function initialize(
         address policyTaskManager,
-        address policy //refers to the policy template address
-    ) {
-        _initNewtonPolicyClient(policyTaskManager, policy, msg.sender);
+        address policy, //refers to the policy template address
+        address owner
+    ) external {
+        _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
 	
 	function setParameters(INewtonPolicy.PolicyConfig memory _config) external {
