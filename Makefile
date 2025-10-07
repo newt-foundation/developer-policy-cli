@@ -1,9 +1,10 @@
-.PHONY: upload-and-deploy-policy deploy-policy upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
+.PHONY: upload-and-deploy-policy deploy-policy deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
 	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
+	@echo "  deploy-client-factory            - Deploy the files in the ./contracts/ folder for the policy client
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
 	@echo "  create-policy-cids-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_cids.json for deployment"
 	@echo "  upload-wasm-ipfs                 - Upload policy.wasm to Pinata IPFS"
@@ -205,3 +206,12 @@ deploy-policy:
 	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATOR_ADDRESS=$$TASK_GENERATOR_ADDRESS EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-cids-json deploy-policy
+
+deploy-client-factory: 
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	forge script script/DeployClientFactory.s.sol:ClientFactoryDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
