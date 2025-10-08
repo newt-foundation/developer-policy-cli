@@ -1,7 +1,7 @@
 {
   "wasmCid": "wasm_ipfs_hash",
   "wasmArgs": "fill if needed",
-  "attester": "0xD45062003a4626a532F30A4596aB253c45AE0647",
+  "attester": "0x4883282094755c01cd0d15dfe74753c9e189d194",
   "policyCid": "policy_ipfs_hash",
   "schemaCid": "schema_ipfs_hash",
   "entrypoint": "policy rego entrypoint",
