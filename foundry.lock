@@ -8,7 +8,7 @@
   "lib/newton-contracts": {
     "branch": {
       "name": "main",
-      "rev": "36dd91c96f7a86d333c957626e89cfec28ec505d"
+      "rev": "5ff3bc8e2e803686b9e7dea4d1d14cff0304f3c3"
     }
   }
 }
