@@ -108,13 +108,7 @@ For this prompt, enter `newton_trading_agent.allow` and press enter. This corres
 Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111):
 ```
 
-For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
-
-```
-Input policy approval expiration time in seconds (default 1 hour, good for debugging):
-```
-
-For this prompt, you can just press enter and use the default value of 1 hour.
+For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).`
 
 After these inputs, the script will deploy the contract. If successful you should be greeted with an output that looks like:
 
@@ -192,7 +186,6 @@ make upload-and-deploy-policy
 It will ask you for some additional inputs including:
 - the args for your policy data WASM: this value is if your WASM requires any case by case input.
 - the entrypoint: this is the part of your rego code that allows for successful execution of a task
-- the expiry: this is how long after approval your task remains valid
 - the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
 
 ### Additional Commands

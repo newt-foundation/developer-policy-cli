@@ -154,7 +154,6 @@ upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs u
 
 ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
 DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
-EXPIRE_AFTER ?= $(shell read -p "Input policy approval expiration time in seconds (default 1 hour, good for debugging): " expiry; echo $$expiry)
 
 create-policy-cids-json: upload-all-ipfs
 	@rm -f policy-files/policy_cids.json
@@ -203,7 +202,7 @@ deploy-policy:
 	fi; \
 	DIRECTORY=$$(pwd); \
 	cd lib/newton-contracts; \
-	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATOR_ADDRESS=$$TASK_GENERATOR_ADDRESS EXPIRE_AFTER=$(EXPIRE_AFTER) forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATOR_ADDRESS=$$TASK_GENERATOR_ADDRESS forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-cids-json deploy-policy
 
