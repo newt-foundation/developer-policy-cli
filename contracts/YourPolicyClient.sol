@@ -15,6 +15,7 @@ contract YourPolicyClient is NewtonPolicyClient {
     // since the factory is used to clone the client, the constructor doesn't need to do anything
     constructor() {}
 
+    // this is called by the deploy script
     function initialize(
         address policyTaskManager,
         address policy, //refers to the policy template address
@@ -23,10 +24,12 @@ contract YourPolicyClient is NewtonPolicyClient {
         _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
 	
+    // this function duplicates the functionality the base NewtonPolicyClient raised for visibility
 	function setParameters(INewtonPolicy.PolicyConfig memory _config) external {
         _setPolicy(_config);
     }
   
+    // this is the policy guarded function
     function swap(NewtonMessage.Attestation memory attestation) external {
         require(_validateAttestation(attestation), InvalidAttestation());
 
