@@ -188,6 +188,16 @@ It will ask you for some additional inputs including:
 - the entrypoint: this is the part of your rego code that allows for successful execution of a task
 - the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
 
+### Deploy your PolicyClient contract
+
+After that, you can deploy the policy client:
+
+```bash
+make deploy-client
+```
+
+It will ask you for the policy address created in the first step.
+
 ### Additional Commands
 
 #### Upload individual Policy Files to IPFS
@@ -256,6 +266,14 @@ make deploy-policy
 ```
 
 If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_cids.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties. Do not change the `attester` property as it is a system address.
+
+#### Policy Client factory deploy
+
+```bash
+make deploy-client-factory
+```
+
+This deploys a factory that allows you to integrate a front-end and more easily deploy Policy Client instances. Deploying those instances (not running this command) will ask you for a Policy contract address as well as the parameter configuration.
 
 ## Troubleshooting
 
