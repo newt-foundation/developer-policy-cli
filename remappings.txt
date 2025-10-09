@@ -1,0 +1,2 @@
+@openzeppelin/contracts/=lib/newton-contracts/lib/eigenlayer-middleware/lib/openzeppelin-contracts/contracts/
+@newton/contracts/=lib/newton-contracts/

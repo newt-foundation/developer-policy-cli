@@ -6,15 +6,7 @@ This project includes automated functionality to upload Policy files to Pinata I
 
 ### 1. Install dependencies
 
-First, install the git submodules
-
-```bash
-git submodule init && git submodule update --remote
-```
-
-Note: this may cause git to mark the submodule as changed. This is due to updates to the contract code and deployments as it is a living repo and is a desired result.
-
-Next, install forge
+First, install forge
 
 ```bash
 curl -L https://foundry.paradigm.xyz | bash
@@ -26,7 +18,13 @@ Then you can use the command shown in the output of the install (`source ~/.zshe
 foundryup
 ```
 
-which will finish installing forge.
+which will finish installing forge. Then, you can run:
+
+```bash
+forge install
+```
+
+which will finish updating the dependencies in the repo.
 
 Additionally install pinata cli, the ipfs upload manager (more on this in the next section).
 
@@ -110,13 +108,7 @@ For this prompt, enter `newton_trading_agent.allow` and press enter. This corres
 Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111):
 ```
 
-For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).
-
-```
-Input policy approval expiration time in seconds (default 1 hour, good for debugging):
-```
-
-For this prompt, you can just press enter and use the default value of 1 hour.
+For this prompt, input 11155111 if you are testing to deploy to sepolia. If this errors, check that your `RPC_URL` parameter in your `.env` file is an ethereum sepolia url (should say so in the url).`
 
 After these inputs, the script will deploy the contract. If successful you should be greeted with an output that looks like:
 
@@ -126,8 +118,16 @@ No files changed, compilation skipped
 Script ran successfully.
 
 == Logs ==
-  Policy: 0x9D8BB6B9E069B0a6594a5332356C64DD82c328F5
-  Policy Implementation: 0x33451982CdDe3ED2ED7bc9fBC6A7db00132D7D09
+  {
+  "policyFactory": "0xd949169c6eAc4D62D56a07756Ca48054705e9FE8",
+  "policyFactoryImpl": "0xaafC65C4dBd528cD237d3faF3fACb50F19142F0a",
+  "policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",
+  "policyImplementation": "0x7eBA0f843B63b4D531e8c8833F0Ae4bcB27aF61B",
+  "policyDataFactory": "0x81121D4F4E31040971c135701b09D3852f1278fe",
+  "policyDataFactoryImpl": "0xa0268676b274B47ADe84E3eCd28cC2A90801dca2",
+  "policyData": "0x33e8D1aEAF343FaE5427bCc69d995a2338Baee9B",
+  "policyDataImplementation": "0x4dcd461a2E3114002f381513Ff441000D4840B4e"
+}
 
 ## Setting up 1 EVM.
 
@@ -171,7 +171,7 @@ Transactions saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-
 
 Sensitive values saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-contracts/cache/PolicyDeployer.s.sol/11155111/run-latest.json
 ```
-From this output, copy the values `Policy: 0x9D8BB6B9E069B0a6594a5332356C64DD82c328F5` (will show your contract address instead of the example), NOT the address listed as `Policy Implementation:`. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
+From this output, copy the value marked `"policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",` (will show your contract address instead of the example), NOT the address listed as `"policyImplementation":` or any other address. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
 
 ## Usage
 
@@ -186,8 +186,17 @@ make upload-and-deploy-policy
 It will ask you for some additional inputs including:
 - the args for your policy data WASM: this value is if your WASM requires any case by case input.
 - the entrypoint: this is the part of your rego code that allows for successful execution of a task
-- the expiry: this is how long after approval your task remains valid
 - the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
+
+### Deploy your PolicyClient contract
+
+After that, you can deploy the policy client:
+
+```bash
+make deploy-client
+```
+
+It will ask you for the policy address created in the first step.
 
 ### Additional Commands
 
@@ -257,6 +266,14 @@ make deploy-policy
 ```
 
 If you have already uploaded all your files to IPFS and just want to deploy the Policy contract, you can use this command given you format the `policy_cids.json` file correctly. Use the template in `policy-files-examples` for correct formatting and explanation of the properties. Do not change the `attester` property as it is a system address.
+
+#### Policy Client factory deploy
+
+```bash
+make deploy-client-factory
+```
+
+This deploys a factory that allows you to integrate a front-end and more easily deploy Policy Client instances. Deploying those instances (not running this command) will ask you for a Policy contract address as well as the parameter configuration.
 
 ## Troubleshooting
 
