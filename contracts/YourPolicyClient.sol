@@ -24,7 +24,8 @@ contract YourPolicyClient is NewtonPolicyClient {
         _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
 	
-    // this function duplicates the functionality the base NewtonPolicyClient raised for visibility
+    // this function duplicates the functionality the base NewtonPolicyClient without permissioning
+    // don't do this in production
 	function setParameters(INewtonPolicy.PolicyConfig memory _config) external {
         _setPolicy(_config);
     }
