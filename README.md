@@ -78,34 +78,6 @@ Put your policy files in the `policy-files` folder. You can look in `policy-file
 
 ## Quickstart Guide
 
-### Deploy your Policy contract
-
-If everything in `policy-files` is good to go, you can deploy your policy contract using the following command.
-
-```bash
-make upload-and-deploy-policy
-```
-
-It will ask you for some additional inputs including:
-- the args for your policy data WASM: this value is if your WASM requires any case by case input.
-- the entrypoint: this is the part of your rego code that allows for successful execution of a task
-- the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
-
-The policy address is the "policy" parameter.
-
-### Deploy your PolicyClient contract
-
-After that, you can deploy a sample policy client:
-
-```bash
-make deploy-client
-```
-
-It will ask you for the policy address created in the first step.
-
-
-## Walkthrough
-
 This guide deploys an example policy contract for testing and sandbox. Make sure to deploy this contract to sepolia testnet.
 
 ### Setup
@@ -156,51 +128,33 @@ Script ran successfully.
   "policyData": "0x33e8D1aEAF343FaE5427bCc69d995a2338Baee9B",
   "policyDataImplementation": "0x4dcd461a2E3114002f381513Ff441000D4840B4e"
 }
-
-## Setting up 1 EVM.
-
-==========================
-
-Chain 11155111
-
-Estimated gas price: 0.001000034 gwei
-
-Estimated total gas used for script: 2425840
-
-Estimated amount required: 0.00000242592247856 ETH
-
-==========================
-
-##### sepolia
-✅  [Success] Hash: 0x154ef7d7293b0e37a5d5f2519f73aefbd64a6f2ccbce69343233eede6a73bb59
-Block: 9264857
-Paid: 0.000000765488013075 ETH (765475 gas * 0.001000017 gwei)
-
-
-##### sepolia
-✅  [Success] Hash: 0xf2036e58cefac7d23c9a719dc8f33bb4a00b2c6cd2948f939ce6e2763d68dade
-Block: 9264857
-Paid: 0.000000861098638428 ETH (861084 gas * 0.001000017 gwei)
-
-
-##### sepolia
-✅  [Success] Hash: 0x8d8bed135b540787ea445c7a12a5a03de65f7423d73d765410001d0def7cdce3
-Block: 9264857
-Paid: 0.00000008468143956 ETH (84680 gas * 0.001000017 gwei)
-
-✅ Sequence #1 on sepolia | Total Paid: 0.000001711268091063 ETH (1711239 gas * avg 0.001000017 gwei)
-                                                                                                                                                    
-
-==========================
-
-ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
-
-Transactions saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-contracts/broadcast/PolicyDeployer.s.sol/11155111/run-latest.json
-
-Sensitive values saved to: /Users/albertbrown/Documents/developer-policy-cli/newton-contracts/cache/PolicyDeployer.s.sol/11155111/run-latest.json
 ```
 From this output, copy the value marked `"policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",` (will show your contract address instead of the example), NOT the address listed as `"policyImplementation":` or any other address. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
 
+## Usage
+
+### Deploy your Policy contract
+
+If everything in `policy-files` is good to go, you can deploy your sample policy contract using the following command.
+
+```bash
+make upload-and-deploy-policy
+```
+
+It will ask you for some additional inputs including:
+- the args for your policy data WASM: this value is if your WASM requires any case by case input.
+- the entrypoint: this is the part of your rego code that allows for successful execution of a task
+- the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
+
+### Deploy your PolicyClient contract
+
+After that, you can deploy the policy client:
+
+```bash
+make deploy-client
+```
+
+It will ask you for the policy address created in the first step.
 
 ### Additional Commands
 
