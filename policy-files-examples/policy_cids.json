@@ -1,6 +1,6 @@
 {
   "wasmCid": "wasm_ipfs_hash",
-  "wasmArgs": "fill if needed",
+  "wasmArgs": "wasm_args_ipfs_hash",
   "attester": "0x4883282094755c01cd0d15dfe74753c9e189d194",
   "policyCid": "policy_ipfs_hash",
   "schemaCid": "schema_ipfs_hash",

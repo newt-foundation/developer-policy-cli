@@ -1,38 +1,58 @@
 {
   "type": "object",
-  "description": "Trading policy structure: chain_id -> contract_address -> action_type -> parameters[]",
-  "additionalProperties": {
-    "type": "object",
-    "description": "Contract address to action type mapping",
-    "additionalProperties": {
+  "description": "policy structure: admin address, allowed_actions and token_whitelist",
+  "required": ["admin", "allowed_actions", "token_whitelist"],
+  "properties": {
+    "admin": {
+      "type": "string",
+      "description": "Admin address"
+    },
+    "allowed_actions": {
       "type": "object",
-      "description": "Action type to parameters mapping",
+      "description": "Allowed actions",
       "additionalProperties": {
-        "type": "array",
-        "description": "Array of policy parameters for each action type",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "Parameter name"
-            },
-            "type": {
-              "type": "string",
-              "description": "Parameter data type"
-            },
-            "value": {
-              "type": "number",
-              "description": "Parameter value"
-            },
-            "description": {
-              "type": "string",
-              "description": "Parameter description"
-            }
+        "type": "object",
+        "description": "chain id to action type mapping",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Contract address"
           },
-          "required": ["name", "type", "value", "description"],
-          "additionalProperties": false
-        }
+          "function_name": {
+            "type": "string",
+            "description": "Function name"
+          },
+          "max_limit": {
+            "type": "number",
+            "description": "Max limit"
+          }
+        },
+        "required": ["address", "function_name", "max_limit"],
+        "additionalProperties": false
+      }
+    },
+    "token_whitelist": {
+      "type": "object",
+      "description": "Token whitelist",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Chain id to token mapping",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Contract address"
+          },
+          "max_limit": {
+            "type": "number",
+            "description": "Max limit"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Symbol"
+          }
+        },
+        "required": ["address", "max_limit", "symbol"],
+        "additionalProperties": false
       }
     }
   }
