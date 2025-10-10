@@ -78,6 +78,34 @@ Put your policy files in the `policy-files` folder. You can look in `policy-file
 
 ## Quickstart Guide
 
+### Deploy your Policy contract
+
+If everything in `policy-files` is good to go, you can deploy your policy contract using the following command.
+
+```bash
+make upload-and-deploy-policy
+```
+
+It will ask you for some additional inputs including:
+- the args for your policy data WASM: this value is if your WASM requires any case by case input.
+- the entrypoint: this is the part of your rego code that allows for successful execution of a task
+- the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
+
+The policy address is the "policy" parameter.
+
+### Deploy your PolicyClient contract
+
+After that, you can deploy the policy client:
+
+```bash
+make deploy-client
+```
+
+It will ask you for the policy address created in the first step.
+
+
+## Walkthrough
+
 This guide deploys an example policy contract for testing and sandbox. Make sure to deploy this contract to sepolia testnet.
 
 ### Setup
@@ -173,30 +201,6 @@ Sensitive values saved to: /Users/albertbrown/Documents/developer-policy-cli/new
 ```
 From this output, copy the value marked `"policy": "0x7a3C8Bb03B7F2BFe270c53643d7133D378fA8b57",` (will show your contract address instead of the example), NOT the address listed as `"policyImplementation":` or any other address. Congratulations! This is your deployed policy contact. Refer back to the Newton Integration Guide for how to use it.
 
-## Usage
-
-### Deploy your Policy contract
-
-If everything in `policy-files` is good to go, you can deploy your policy contract using the following command.
-
-```bash
-make upload-and-deploy-policy
-```
-
-It will ask you for some additional inputs including:
-- the args for your policy data WASM: this value is if your WASM requires any case by case input.
-- the entrypoint: this is the part of your rego code that allows for successful execution of a task
-- the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
-
-### Deploy your PolicyClient contract
-
-After that, you can deploy the policy client:
-
-```bash
-make deploy-client
-```
-
-It will ask you for the policy address created in the first step.
 
 ### Additional Commands
 
