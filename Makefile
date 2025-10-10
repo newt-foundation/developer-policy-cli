@@ -1,14 +1,15 @@
-.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
+.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
 	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
-	@echo "  deploy-client                    - Deploy the PolicyClient contract
-	@echo "  deploy-client-factory            - Deploy a factory for deploying individual PolicyClients
+	@echo "  deploy-client                    - Deploy the PolicyClient contract"
+	@echo "  deploy-client-factory            - Deploy a factory for deploying individual PolicyClients"
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
 	@echo "  create-policy-cids-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_cids.json for deployment"
 	@echo "  upload-wasm-ipfs                 - Upload policy.wasm to Pinata IPFS"
+	@echo "  upload-wasm-args-ipfs            - Upload wasm_args.json to Pinata IPFS"
 	@echo "  upload-policy-ipfs               - Upload policy.rego file to Pinata IPFS"
 	@echo "  upload-policy-params-ipfs        - Upload policy_params.json to Pinata IPFS"
 	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
@@ -43,6 +44,32 @@ upload-wasm-ipfs:
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
 		cat /tmp/pinata_wasm_upload.log; \
+	fi
+
+# Upload wasm_args.json to IPFS via Pinata
+upload-wasm-args-ipfs:
+	@rm -f /tmp/pinata_args_upload.log
+	@echo "================================================"
+	@echo "========== Upload wasm_args.json ==========="
+	@echo "================================================"
+	@if [ ! -f policy-files/wasm_args.json ]; then \
+		echo "Error: wasm_args.json file not found in policy-files directory"; \
+		exit 1; \
+	fi
+	@echo "Uploading wasm_args.json to Pinata IPFS..."
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/wasm_args.json | tee /tmp/pinata_args_upload.log
+	@echo ""
+	@echo "=== IPFS Upload Results ==="
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_args_upload.log | head -1); \
+	if [ -n "$$IPFS_HASH" ]; then \
+		echo "IPFS Hash: $$IPFS_HASH"; \
+		echo "Getting gateway link..."; \
+		GATEWAY_LINK=$$(~/.local/share/pinata/pinata gateways link "$$IPFS_HASH" 2>/dev/null || echo "https://gateway.pinata.cloud/ipfs/$$IPFS_HASH"); \
+		echo "Direct IPFS Link: $$GATEWAY_LINK"; \
+		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
+	else \
+		echo "Warning: Could not extract IPFS hash from upload output"; \
+		cat /tmp/pinata_args_upload.log; \
 	fi
 
 # Upload policy.rego to IPFS via Pinata
@@ -149,23 +176,23 @@ upload-policy-data-metadata-ipfs:
 		cat /tmp/pinata_data_metadata_upload.log; \
 	fi
 
-upload-all-ipfs: upload-wasm-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
+upload-all-ipfs: upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
 	@echo "================================================================================"
 	@echo ""
 
 ENTRYPOINT ?= $(shell read -p "Input rego policy entrypoint (i.e. my_policy_name.allow): " entrypoint; echo $$entrypoint)
-DATA_ARGS ?= $(shell read -p "Input policy data args (put {} if unused): " args; args=$${args:-\{\}}; echo $$args)
 
 create-policy-cids-json: upload-all-ipfs
 	@rm -f policy-files/policy_cids.json
 	@touch policy-files/policy_cids.json
 	@source .env; \
 	WASM_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_wasm_upload.log | head -1); \
+	WASM_ARGS_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_args_upload.log | head -1); \
 	POLICY_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_policy_upload.log | head -1); \
 	SCHEMA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
 	METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
 	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
-	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$(DATA_ARGS)\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"0x4883282094755C01cd0d15dFE74753c9E189d194\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
+	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$$WASM_ARGS_IPFS_HASH\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"0x4883282094755C01cd0d15dFE74753c9E189d194\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
 
 CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 

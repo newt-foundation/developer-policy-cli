@@ -1,7 +1,7 @@
 {
-  "name": "Trading Signals Policy",
+  "name": "MockERC20 Policy",
   "version": "1.0.0",
   "author": "Newton",
-  "link": "https://newton.xyz",
-  "description": "This policy gives trading signals for tokens so that trades only are allowed when they meet the below preset conditions:\n•\nContract whitelist: Only allows transactions with approved contracts\n•\nFunction restrictions: Restricts allowed trading functions (buy, sell)\n•\nAmount limits: Enforces maximum trade amount in USDC\n•\nMarket conditions: Token must have had upward price movement over the last 6 months\n•\nMarket cap requirements: Only allows trading tokens with market cap rank ≤ 200"
+  "link": "https://newt.foundation",
+  "description": "This policy is a mock policy for the MockERC20 token:\n• Pyth Oracle: Uses Pyth Oracle to get the price of BTC in real-time.\n• Function restrictions: Restricts allowed trading functions (buy, sell)\n• Amount limits: Enforces maximum trade amount in USDC\n• Market conditions: Token must have had upward price movement over the last 6 months\n• Buy amount limit: Only allows buying MockERC20 tokens (via minting) under the current BTC price."
 }
