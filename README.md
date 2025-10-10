@@ -95,7 +95,7 @@ The policy address is the "policy" parameter.
 
 ### Deploy your PolicyClient contract
 
-After that, you can deploy the policy client:
+After that, you can deploy a sample policy client:
 
 ```bash
 make deploy-client
