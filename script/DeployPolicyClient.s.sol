@@ -16,7 +16,7 @@ contract ClientDeployer is Script {
 
     function setUp() public virtual {
         _deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
-        _policy = vm.rememberKey(vm.envUint("POLICY"));
+        _policy = vm.envAddress("POLICY");
     }
 
     function run() external returns (YourPolicyClient client) {
