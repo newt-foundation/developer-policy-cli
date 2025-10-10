@@ -2,6 +2,7 @@
 /crates/*/target
 crates/*/Cargo.lock
 .env
+.DS_Store
 
 cache/
 out/
