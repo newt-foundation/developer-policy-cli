@@ -95,11 +95,6 @@ make upload-and-deploy-policy
 After the script uploads the files to your pinata cloud, it will prompt you for some inputs:
 
 ```
-Input policy data args (put {} if unused): 
-```
-For this prompt, just press enter. The example WASM uses the default value of no inputs.
-
-```
 Input rego policy entrypoint (i.e. my_policy_name.allow): 
 ```
 For this prompt, enter `newton_trading_agent.allow` and press enter. This corresponds to the example policy.rego file that is provided.
@@ -142,7 +137,6 @@ make upload-and-deploy-policy
 ```
 
 It will ask you for some additional inputs including:
-- the args for your policy data WASM: this value is if your WASM requires any case by case input.
 - the entrypoint: this is the part of your rego code that allows for successful execution of a task
 - the deployment chainid: this is already set in your RPC_URL env variable, but is asked here to prevent accidental deploys to the wrong chain. NOTE: policies deployed to mainnet will not be useable until they are whitelisted.
 
@@ -154,7 +148,7 @@ After that, you can deploy the policy client:
 make deploy-client
 ```
 
-It will ask you for the policy address created in the first step.
+It will ask you for the policy address created in the first step and also prompt you to confirm the chainID.
 
 ### Additional Commands
 
@@ -167,6 +161,13 @@ make upload-wasm-ipfs
 ```
 
 Uploads the wasm file that sources data for the policy.
+
+
+```bash
+make upload-wasm-args-ipfs
+```
+
+Uploads the wasm args file that sets the inputs for the policy data.
 
 
 ```bash
