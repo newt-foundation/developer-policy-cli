@@ -97,7 +97,7 @@ After the script uploads the files to your pinata cloud, it will prompt you for 
 ```
 Input rego policy entrypoint (i.e. my_policy_name.allow): 
 ```
-For this prompt, enter `newton_trading_agent.allow` and press enter. This corresponds to the example policy.rego file that is provided.
+For this prompt, enter `mockerc20.allow` and press enter. This corresponds to the example policy.rego file that is provided.
 
 ```
 Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111):
@@ -175,13 +175,6 @@ make upload-policy-ipfs
 ```
 
 Uploads the Rego policy file that defines trading rules and restrictions.
-
-
-```bash
-make upload-policy-params-ipfs
-```
-
-Uploads the policy parameters configuration file with chain-specific contract allowlists.
 
 
 ```bash
@@ -265,16 +258,10 @@ This project includes several policy-related files that can be uploaded to IPFS:
 - **Content**: Compiled wasm code
 - **MIME Type**: `application/wasm`
 
-
 ### policy.rego
 - **Purpose**: Defines the trading policy rules in Rego language
 - **Content**: Authorization logic, token whitelists, trading limits, market conditions
 - **MIME Type**: `text/plain; charset=UTF-8`
-
-### policy_params.json
-- **Purpose**: Configuration parameters for different blockchain networks and contracts
-- **Content**: Chain-specific contract allowlists, trading limits, slippage settings
-- **MIME Type**: `application/json`
 
 ### params_schema.json
 - **Purpose**: JSON Schema validation for policy_params.json structure
