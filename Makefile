@@ -1,4 +1,4 @@
-.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs help
+.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
@@ -11,7 +11,6 @@ help:
 	@echo "  upload-wasm-ipfs                 - Upload policy.wasm to Pinata IPFS"
 	@echo "  upload-wasm-args-ipfs            - Upload wasm_args.json to Pinata IPFS"
 	@echo "  upload-policy-ipfs               - Upload policy.rego file to Pinata IPFS"
-	@echo "  upload-policy-params-ipfs        - Upload policy_params.json to Pinata IPFS"
 	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
 	@echo "  upload-policy-metadata-ipfs      - Upload policy_metadata.json to Pinata IPFS"
 	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
@@ -176,7 +175,7 @@ upload-policy-data-metadata-ipfs:
 		cat /tmp/pinata_data_metadata_upload.log; \
 	fi
 
-upload-all-ipfs: upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-policy-params-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
+upload-all-ipfs: upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
 	@echo "================================================================================"
 	@echo ""
 
