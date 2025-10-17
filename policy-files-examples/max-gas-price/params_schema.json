@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "description": "policy structure: max_gas_price number, chain_id number",
+  "required": ["max_gas_price", "chain_id"],
+  "properties": {
+    "max_gas_price": {
+      "type": "number",
+      "description": "Maximum gas price (in gwei) allowed for Ethereum transactions."
+    },
+    "chain_id": {
+      "type": "number",
+      "description": "The ID of the Ethereum chain (e.g., 1 for mainnet, 3 for Ropsten)."
+    }
+  }
+}
