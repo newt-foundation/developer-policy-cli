@@ -13,9 +13,9 @@ default allow := false
 
 # Allow the action if the current gas price is below the configured threshold
 allow if {
-	input.chain_id == to_string(data_params.chain_id)
+	input.chain_id == format_int(data.params.chain_id, 10)
 	current_gas_price < max_gas_price
 }
 
 max_gas_price := to_number(data.params.max_gas_price)
-current_gas_price := data.data[to_string(data_params.chain_id)]
+current_gas_price := data.data[format_int(data.params.chain_id, 10)]
