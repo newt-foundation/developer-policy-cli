@@ -74,7 +74,7 @@ RPC_URL=make_sure_this_matches_the_chain_you're_deploying_to
 
 ### 4. Provide Policy Files
 
-Put your policy files in the `policy-files` folder. You can look in `policy-files-examples` for some example files to start you off or read the following quickstart guide. See [Policy Files](#policy-files-overview) for an explanation of what each file is for.
+Put your policy files in the `policy-files` folder. You can look in `policy-examples` for some example files to start you off or read the following quickstart guide. See [Policy Files](#policy-files-overview) for an explanation of what each file is for.
 
 ## Quickstart Guide
 
@@ -82,7 +82,7 @@ This guide deploys an example policy contract for testing and sandbox. Make sure
 
 ### Setup
 
-In addition to the previous setup steps, copy the contents of the `policy-files-examples` folder into `policy-files`. Don't worry about filling out the, `policy_cids.json` file as it will be automatically filled.
+In addition to the previous setup steps, copy the contents of the `policy-examples/mockerc20/policy-files` folder into `policy-files`. Don't worry about filling out the, `policy_cids.json` file as it will be automatically filled.
 
 ### Walkthrough
 
