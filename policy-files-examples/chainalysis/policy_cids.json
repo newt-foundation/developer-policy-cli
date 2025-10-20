@@ -1,1 +1,10 @@
-{"wasmCid": "bafybeidnol4z2mwatmsqhotbiypp2ugmf4vfsndzw4dvpbctk5ahnjnayy","wasmArgs": "bafkreicecnx2gvntm6fbcrvnc336qze6st5u7qq7457igegamd3bzkx7ri","policyCid": "bafkreifjelv5snh55dqciv6hh3o5keh5p5ehrdhh2jnnnmxudhrpww44ta","schemaCid": "bafkreibreq3wti5syppqzuj6xb6zdin3wc7zuvi27xyocqlp3bl5rveiui","attester": "0x4883282094755C01cd0d15dFE74753c9E189d194","entrypoint": "chainalysis_sanctions_agent.allow","policyDataMetadataCid": "bafkreiby64r7upxzmmjp56h73fmyzfrummmzr45ckzpxsbs6naraxydpom","policyMetadataCid": "bafkreie3fww6gvxd7iupjw3bqufobijp2ebbyxa6o4gbn3fkgncniasgti"}
+{
+  "wasmCid": "wasm_ipfs_hash",
+  "wasmArgs": "wasm_args_ipfs_hash",
+  "attester": "0x4883282094755c01cd0d15dfe74753c9e189d194",
+  "policyCid": "policy_ipfs_hash",
+  "schemaCid": "schema_ipfs_hash",
+  "entrypoint": "policy rego entrypoint",
+  "policyMetadataCid": "policy_metadata_ipfs_hash",
+  "policyDataMetadataCid": "policy_data_metadata_ipfs_hash"
+}
