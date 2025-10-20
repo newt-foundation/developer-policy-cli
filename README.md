@@ -82,7 +82,7 @@ This guide deploys an example policy contract for testing and sandbox. Make sure
 
 ### Setup
 
-In addition to the previous setup steps, copy the contents of the `policy-examples/example/policy-files` folder into `policy-files`. Don't worry about filling out the, `policy_cids.json` file as it will be automatically filled.
+In addition to the previous setup steps, copy the contents of the `policy-examples/mockerc20/policy-files` folder into `policy-files`. Don't worry about filling out the, `policy_cids.json` file as it will be automatically filled.
 
 ### Walkthrough
 
