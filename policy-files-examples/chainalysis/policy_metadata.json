@@ -1,0 +1,7 @@
+{
+  "name": "Chainalysis Sanctions Policy",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newton.xyz",
+  "description": "This policy restricts transactions to sanctioned addresses based on Chainalyis Sanctions Screening."
+}
