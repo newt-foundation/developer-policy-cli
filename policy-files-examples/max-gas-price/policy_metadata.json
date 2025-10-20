@@ -1,0 +1,7 @@
+{
+  "name": "Max Gas Price Policy",
+  "version": "1.0.5",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy enforces a maximum gas price for Ethereum transactions to prevent overspending on fees."
+}

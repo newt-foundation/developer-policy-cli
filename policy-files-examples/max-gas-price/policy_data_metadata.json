@@ -1,0 +1,7 @@
+{
+  "name": "Gas price",
+  "version": "1.0.5",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data gives real-time gas price data for Ethereum using DRPC node."
+}
