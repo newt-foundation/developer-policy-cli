@@ -1,5 +1,5 @@
 
-# Chainalysis Sanctions Policy
+# Security Signals Policy
 # --------------------------------
 
 package security_signals_agent
