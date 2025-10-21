@@ -1,0 +1,7 @@
+{
+  "name": "Security Signals Policy",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newton.xyz",
+  "description": "This policy restricts transactions to addresses with a risk level below the configured threshold based on Magic's Security Signals."
+}
