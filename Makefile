@@ -212,7 +212,7 @@ deploy-policy:
 	fi; \
 	DIRECTORY=$$(pwd); \
 	cd lib/newton-contracts; \
-	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-cids-json deploy-policy
 
@@ -223,7 +223,7 @@ deploy-client-factory:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi; \
-	forge script script/DeployClientFactory.s.sol:ClientFactoryDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployClientFactory.s.sol:ClientFactoryDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 POLICY ?= $(shell read -p "Input Policy address: " policy; echo $$policy)
 
@@ -234,4 +234,4 @@ deploy-client:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi; \
-	POLICY=$(POLICY) forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast

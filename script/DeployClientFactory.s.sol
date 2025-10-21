@@ -21,7 +21,9 @@ contract ClientFactoryDeployer is Script {
     function run() external returns (YourPolicyClient clientImplementation, YourClientFactory factory) {
         vm.startBroadcast(_deployer);
 
-        string memory fileName = string.concat("lib/newton-contracts/script/deployments/newton-prover/", vm.toString(block.chainid), ".json");
+        string memory env = vm.envOr("DEPLOYMENT_ENV", string("prod"));
+
+        string memory fileName = string.concat("lib/newton-contracts/script/deployments/newton-prover/", vm.toString(block.chainid), "-", env, ".json");
         require(vm.exists(fileName), DeploymentFileDoesNotExist());
 
         string memory json = vm.readFile(fileName);
