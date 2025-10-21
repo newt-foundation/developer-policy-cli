@@ -10,5 +10,5 @@ export function run(date) {
   
   const body = JSON.parse(new TextDecoder().decode(new Uint8Array(response.body)));
   
-  return JSON.stringify(body.result[0]);
+  return JSON.stringify(body.results[0]);
 }
