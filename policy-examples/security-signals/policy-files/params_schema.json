@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "description": "security_signals: min_allowed_risk_level string",
+  "required": ["min_allowed_risk_level"],
+  "properties": {
+    "min_allowed_risk_level": {
+      "type": "string",
+      "description": "Minimum allowed risk level"
+    }
+  }
+}
