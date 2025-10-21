@@ -11,22 +11,32 @@ package investment_guardrails
 # By default, deny requests.
 default allow := false
 
-# Allow the action if the current gas price is below the configured threshold
+# Allow buy if strategy is long term and the market is projected to grow long term
 allow if {
 	strategy == "long_term"
     function_name == "buy"
+    (yield_10_year - yield_2_year) + 0.5 * (yield_30_year - yield_10_year) - (yield_1_month - yield_2_year) > 1
 }
+
+# Allow sell if strategy is long term and the market is projected to shrink long term
 allow if {
 	strategy == "long_term"
-    function_name == sell
+    function_name == "sell"
+    (yield_10_year - yield_2_year) + 0.5 * (yield_30_year - yield_10_year) - (yield_1_month - yield_2_year) < 1
 }
+
+# Allow buy if strategy is short term and the market is projected to grow short term
 allow if {
 	strategy == "short_term"
     function_name == "buy"
+    (yield_2_year - yield_1_month) + 0.5 * (yield_1_year - yield_3_month) > 1
 }
+
+# Allow sell if strategy is short term and the market is projected to shrink short term
 allow if {
 	strategy == "short_term"
-    function_name == sell
+    function_name == "sell"
+    (yield_2_year - yield_1_month) + 0.5 * (yield_1_year - yield_3_month) < 1
 }
 
 yield_1_month = data.data.yield_1_month
