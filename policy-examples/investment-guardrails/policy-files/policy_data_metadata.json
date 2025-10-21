@@ -1,0 +1,7 @@
+{
+  "name": "Treasury Yield Data",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data provides U.S. Treasury Constant Maturity Yields for a given date (defaults to latest)"
+}
