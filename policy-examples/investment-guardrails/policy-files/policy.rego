@@ -65,5 +65,3 @@ allow if {
   function_name == "sell"
   short_term_growth_index < st_sell_threshold
 }
-
-
