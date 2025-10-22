@@ -11,8 +11,8 @@ Source files & compiled binaries for example Newton Protocol Policy demonstratin
 | policy-files | Completed JSON/Rego/WASM for policy template files                                |
 
 ## Instructions
-1. set up & deploy the API wrapper server as per [Server README](/server)
-2. Set the `URL` constant in [/py_bindings/app.py](/py_bindings/app.py) to the desired URL on the above API
+1. set up & deploy the API wrapper server as per [Server README](server)
+2. Set the `URL` constant in [py_bindings/app.py](py_bindings/app.py) to the desired URL on the above API
 3. compile to WASM
 
     cd py_bindings
