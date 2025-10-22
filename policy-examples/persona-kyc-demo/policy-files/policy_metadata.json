@@ -1,0 +1,7 @@
+{
+  "name": "Persona KYC Demo Policy",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy is a mock policy to demonstrate Persona KYC integration."
+}
