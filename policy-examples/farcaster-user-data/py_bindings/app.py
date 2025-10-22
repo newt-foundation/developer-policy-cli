@@ -4,7 +4,7 @@ from wit_world.imports import http
 from wit_world.imports.http import HttpRequest, HttpResponse
 from datetime import date as _Date
 
-URL = "[INSERT YOUR ENPOINT_URL]]/{inquiry_address}"
+URL = "[INSERT YOUR ENPOINT_URL]/{inquiry_address}"
 
 class WitWorld(wit_world.WitWorld):
     # WIT: run: (input: string) -> result<string, string>
