@@ -11,5 +11,9 @@ export function run(input) {
   
   const body = JSON.parse(new TextDecoder().decode(new Uint8Array(response.body)));
   
-  return JSON.stringify(body.results[0]);
+  if (Array.isArray(body.results) && body.results.length > 0) {
+    return JSON.stringify(body.results[0]);
+  } else {
+    return JSON.stringify({ error: "No results found" });
+  }
 }
