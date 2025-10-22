@@ -11,7 +11,11 @@ It does not natively run in a local environment.
 
 Build docker image and publish to ECS
 
-First, create an ECS resource in aws and note the arn.
+### Base Setup
+Create an env file based on .env.example and set your API keys
+
+### Lambda Upload
+Create an ECS resource in aws and note the arn.
 
 Then, log into aws from your terminal and connect docker
 
@@ -22,6 +26,7 @@ Then, log into aws from your terminal and connect docker
     aws ecr get-login-password --region my-reg | docker login --username AWS --password-stdin my-ecs-arn
 
 Then, build, tag, and upload the docker image.
+
     cd server
     docker build -t server .
     docker tag server:latest my-ecs-arn/my-lambda-res:latest
