@@ -13,3 +13,7 @@ pinata-auth.expect
 
 # User provided files
 /policy-files
+
+# Opsim debug, target and output files
+op-sim/debug/
+op-sim/target/
