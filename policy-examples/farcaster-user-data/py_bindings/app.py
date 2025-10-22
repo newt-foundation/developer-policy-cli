@@ -4,6 +4,7 @@ from wit_world.imports import http
 from wit_world.imports.http import HttpRequest, HttpResponse
 from datetime import date as _Date
 
+URL = "[INSERT YOUR ENPOINT_URL]]/{inquiry_address}"
 
 class WitWorld(wit_world.WitWorld):
     # WIT: run: (input: string) -> result<string, string>
@@ -17,7 +18,7 @@ class WitWorld(wit_world.WitWorld):
             if not inquiry_address:
                 return dumps({"error": "inquiry_address_missing"})
 
-            url = f"https://o66wu5mr47.execute-api.us-east-2.amazonaws.com/default/data/{inquiry_address}"
+            url = URL.format(inquiry_address=inquiry_address)
             headers = [
                 ("Accept", "application/json"),
                 ("Content-Type", "application/json"),
