@@ -1,0 +1,42 @@
+{
+  "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": [
+    {
+      "object": "user",
+      "fid": 9999999,
+      "username": "mydemouser12345678010aaaaaaaaa",
+      "display_name": "mydemouser12345678010aaaaaaaaa",
+      "pfp_url": "https://imagedelivery.net/AAAAAAAAAAAAAAAA/00000000-0000-0000-0000-000000000000/original",
+      "custody_address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "profile": {
+        "bio": {
+          "text": ""
+        }
+      },
+      "follower_count": 0,
+      "following_count": 0,
+      "verifications": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "verified_addresses": {
+        "eth_addresses": [
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "sol_addresses": [
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "primary": {
+          "eth_address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "sol_address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "auth_addresses": [],
+      "verified_accounts": [],
+      "power_badge": false,
+      "experimental": {
+        "neynar_user_score": 0.57,
+        "deprecation_notice": "The `neynar_user_score` field under `experimental` will be deprecated after June 1, 2025, as it will be formally promoted to a stable field named `score` within the user object."
+      },
+      "score": 0.57
+    }
+  ]
+}

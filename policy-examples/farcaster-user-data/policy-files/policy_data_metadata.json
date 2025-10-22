@@ -1,0 +1,7 @@
+{
+  "name": "Farcaster user metadata",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data reutrns Farcaster user metadata for a given address."
+}
