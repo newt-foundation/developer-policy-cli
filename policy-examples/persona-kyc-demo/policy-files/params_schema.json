@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "description": "policy structure: min_age",
+  "required": [],
+  "properties": {
+    "min_age": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Minimum required age threshold; defaults to 18 if omitted."
+    }
+  }
+}
