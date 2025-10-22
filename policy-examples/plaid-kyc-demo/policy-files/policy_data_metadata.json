@@ -1,0 +1,7 @@
+{
+  "name": "Plaid KYC metadata",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data returns KYC metadata for a given verification ID."
+}
