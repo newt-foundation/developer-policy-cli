@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "description": "policy structure: min_score",
+    "required": [],
+    "properties": {
+        "min_score": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Minimum required score threshold; defaults to 0.5 if omitted."
+        },
+        "require_verified": {
+            "type": "boolean",
+            "description": "If true, at least one verified account is required"
+        }
+    }
+}
