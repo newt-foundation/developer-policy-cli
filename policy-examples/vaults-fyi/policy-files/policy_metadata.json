@@ -1,0 +1,7 @@
+ {
+  "name": "Vaults.fyi Demo Policy",
+  "version": "2.1.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This is a mock policy to demonstrate Vaults.fyi integration."
+}

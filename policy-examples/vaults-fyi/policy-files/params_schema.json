@@ -1,0 +1,11 @@
+{
+    "type": "object",
+    "description": "Deposit guardrails for Vaults.fyi automation",
+    "required": [],
+    "properties": {
+        "min_30day_apy": {
+            "type": "string",
+            "description": "Minimum 30 day apy (decimal 0.0-1.0)"
+        }
+    }
+}

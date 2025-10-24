@@ -1,0 +1,156 @@
+{
+  "address": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+  "network": {
+    "name": "mainnet",
+    "chainId": 1,
+    "networkCaip": "eip155:1"
+  },
+  "asset": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "assetCaip": "eip155:1/slip44:60",
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": 18,
+    "assetLogo": "https://images.vaults.fyi/tokens/eth.png",
+    "assetPriceInUsd": "3870.569054",
+    "assetGroup": "ETH"
+  },
+  "isTransactional": true,
+  "isAppFeatured": true,
+  "name": "Lido stETH",
+  "protocol": {
+    "name": "lido",
+    "product": "",
+    "version": "",
+    "protocolUrl": "https://stake.lido.fi/",
+    "protocolLogo": "https://images.vaults.fyi/protocols/lido.png"
+  },
+  "lendUrl": "https://app.vaults.fyi/opportunity/mainnet/0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+  "description": "stETH earns rewards generated from staking on the Ethereum network. stETH is a \"liquid staking\" token that represents ETH staked through the Lido protocol, including accrued rewards earned through staking.",
+  "protocolVaultUrl": "https://stake.lido.fi/",
+  "tags": [
+    "Liquid Staking"
+  ],
+  "holdersData": {
+    "totalCount": 561322,
+    "totalBalance": "25200840283439543213085517",
+    "topHolders": [
+      {
+        "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+        "lpTokenBalance": "3893733910571697858628288"
+      },
+      {
+        "address": "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
+        "lpTokenBalance": "904617439373387480750310"
+      },
+      {
+        "address": "0x176F3DAb24a159341c0509bB36B833E7fdd0a132",
+        "lpTokenBalance": "109252520608856496735588"
+      },
+      {
+        "address": "0xA92C80B3962F10e063Ad5463f996fe414F0E1F66",
+        "lpTokenBalance": "91664615043230172992611"
+      },
+      {
+        "address": "0x2be0f2886F01aFEF02809a541a08cC850646D43c",
+        "lpTokenBalance": "75662096567670310673546"
+      },
+      {
+        "address": "0xfE08D40Eee53d64936D3128838867c867602665c",
+        "lpTokenBalance": "46572820267706522726461"
+      },
+      {
+        "address": "0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
+        "lpTokenBalance": "45000000023701920231133"
+      },
+      {
+        "address": "0x18709E89BD403F470088aBDAcEbE86CC60dda12e",
+        "lpTokenBalance": "40737021633749506731959"
+      },
+      {
+        "address": "0x1B7a4C3797236A1C37f8741c0Be35c2c72736fFf",
+        "lpTokenBalance": "32769142363063093091885"
+      },
+      {
+        "address": "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c",
+        "lpTokenBalance": "31281288361378940067724"
+      }
+    ]
+  },
+  "apy": {
+    "1day": {
+      "base": 0.0248,
+      "reward": 0,
+      "total": 0.0248
+    },
+    "7day": {
+      "base": 0.0261,
+      "reward": 0,
+      "total": 0.0261
+    },
+    "30day": {
+      "base": 0.028,
+      "reward": 0,
+      "total": 0.028
+    }
+  },
+  "tvl": {
+    "usd": "33259024090",
+    "native": "8592799566703097958755179"
+  },
+  "rewards": [],
+  "score": {
+    "vaultScore": 100,
+    "vaultTvlScore": 100,
+    "protocolTvlScore": 100,
+    "holderScore": 100,
+    "networkScore": 100,
+    "assetScore": 100
+  },
+  "lpToken": {
+    "address": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "tokenCaip": "eip155:1/erc20:0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "name": "Liquid staked Ether 2.0",
+    "symbol": "stETH",
+    "decimals": 18
+  },
+  "childrenVaults": [
+    {
+      "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+      "asset": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "assetCaip": "eip155:1/slip44:60",
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18,
+        "assetLogo": "https://images.vaults.fyi/tokens/eth.png",
+        "assetPriceInUsd": "3870.569054",
+        "assetGroup": "ETH"
+      },
+      "lpToken": {
+        "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+        "tokenCaip": "eip155:1/erc20:0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+        "name": "Wrapped liquid staked Ether 2.0",
+        "symbol": "wstETH",
+        "decimals": 18
+      },
+      "additionalAssets": [
+        {
+          "address": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+          "assetCaip": "eip155:1/erc20:0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+          "name": "Liquid staked Ether 2.0",
+          "symbol": "stETH",
+          "decimals": 18,
+          "assetLogo": "https://images.vaults.fyi/tokens/steth.png",
+          "assetPriceInUsd": "3875.04778401",
+          "assetGroup": "ETH"
+        }
+      ]
+    }
+  ],
+  "transactionalProperties": {
+    "depositStepsType": "instant",
+    "redeemStepsType": "complex",
+    "rewardsSupported": false
+  }
+}
