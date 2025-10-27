@@ -1,0 +1,6 @@
+{
+  "authorized_senders": ["0x1234abcd...", "0x9999aaaa..."],
+  "max_transaction_value": 1000,
+  "allowed_contracts": ["0x5678efgh...", "0x11112222..."],
+  "blacklisted_contracts": ["0xdeadbeef..."]
+}
