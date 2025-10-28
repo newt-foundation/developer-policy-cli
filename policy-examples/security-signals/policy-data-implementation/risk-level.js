@@ -1,6 +1,6 @@
 import { fetch as httpFetch } from 'newton:provider/http@0.1.0';
 
-export function run(address) {
+export function run({ address }) {
   const response = httpFetch({
     url: `https://o66wu5mr47.execute-api.us-east-2.amazonaws.com/default/risk/address/${address}`,
     method: "GET",
