@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "description": "Configuration parameters for Veriff ID verification policy",
+  "required": ["allowed_countries"],
+  "properties": {
+    "allowed_countries": {
+      "type": "array",
+      "description": "List of allowed country codes in uppercase (e.g., ['US', 'CA', 'UK', 'DE']). Only users from these countries with approved verification will be allowed.",
+      "items": {
+        "type": "string",
+        "description": "ISO 3166-1 alpha-2 country code in uppercase"
+      },
+      "minItems": 1
+    }
+  }
+}
