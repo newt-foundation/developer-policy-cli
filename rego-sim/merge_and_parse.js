@@ -29,11 +29,6 @@ const [paramsFile, wasmFile, outputFile] = process.argv.slice(2);
 const params = JSON.parse(fs.readFileSync(paramsFile, 'utf8'));
 const wasmData = JSON.parse(fs.readFileSync(wasmFile, 'utf8'));
 
-// Example: parse a function call from params or elsewhere (customize as needed)
-// const iface = new ethers.utils.Interface(abi);
-// const parsed = iface.parseTransaction({ data: params.data });
-// params.function = parsed;
-
 const result = {
   params,
   data: wasmData
