@@ -17,3 +17,6 @@ pinata-auth.expect
 # Opsim debug, target and output files
 op-sim/debug/
 op-sim/target/
+
+rego-sim/input.json
+rego-sim/data.json
