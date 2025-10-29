@@ -20,3 +20,4 @@ op-sim/target/
 
 rego-sim/input.json
 rego-sim/data.json
+rego-sim/wasm_data.json
