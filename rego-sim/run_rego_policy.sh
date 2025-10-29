@@ -20,10 +20,13 @@ if [[ "$REGO_QUERY" != data.* ]]; then
   REGO_QUERY="data.$REGO_QUERY"
 fi
 
-# Intermediate files
-WASM_DATA="wasm_data.json"
-DATA_JSON="data.json"
-INPUT_JSON="input.json"
+
+# Intermediary folder
+INTERMEDIARY_DIR="intermediary"
+mkdir -p "$INTERMEDIARY_DIR"
+WASM_DATA="$INTERMEDIARY_DIR/wasm_data.json"
+DATA_JSON="$INTERMEDIARY_DIR/data.json"
+INPUT_JSON="$INTERMEDIARY_DIR/input.json"
 
 # 1. Run WASM simulation
 cargo run --manifest-path ../op-sim/Cargo.toml --release -- "$POLICY_WASM" "$WASM_ARGS" > "$WASM_DATA"
