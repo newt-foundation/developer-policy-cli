@@ -17,12 +17,7 @@ interface http {
     fetch: func(request: http-request) -> result<http-response, string>;
 }
 
-interface secrets {
-    get: func(secret-id: string) -> result<string, string>;
-}
-
 world newton-provider {
     import http;
-    import secrets;
     export run: func(input: string) -> result<string, string>;
 }
