@@ -29,10 +29,10 @@ INPUT_JSON="input.json"
 cargo run --manifest-path ../op-sim/Cargo.toml --release -- "$POLICY_WASM" "$WASM_ARGS" > "$WASM_DATA"
 
 # 2. Marshal data.json
-node marshal_data.js "$PARAMS_JSON" "$WASM_DATA" "$DATA_JSON"
+node ./lib/marshal_data.js "$PARAMS_JSON" "$WASM_DATA" "$DATA_JSON"
 
 # 3. Marshal input.json
-node marshal_input.js "$INTENT_JSON" "$INPUT_JSON"
+node ./lib/marshal_input.js "$INTENT_JSON" "$INPUT_JSON"
 
 # 4. Run regorus
-./regorus eval --input "$INPUT_JSON" --data "$DATA_JSON" --data "$POLICY_REGO" "$REGO_QUERY"
+./lib/regorus eval --input "$INPUT_JSON" --data "$DATA_JSON" --data "$POLICY_REGO" "$REGO_QUERY"
