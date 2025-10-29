@@ -9,7 +9,9 @@ To evaluate a policy with regorus:
 ```sh
 cargo run --manifest-path ../op-sim/Cargo.toml --release -- ../policy-examples/max-gas-price/policy-files/policy.wasm '' > wasm_data.json
 
-node merge_and_parse.js policy_params_data.json wasm_data.json data.json
+node marshal_data.js policy_params_data.json wasm_data.json data.json
+
+node marshal_input.js test_intent.json input.json
 
 ./regorus eval --input input.json --data data.json --data policy.rego "data.example.allow"
 ```

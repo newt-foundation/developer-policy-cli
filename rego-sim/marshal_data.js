@@ -1,5 +1,5 @@
-// merge_and_parse.js
-// Usage: node merge_and_parse.js policy_params_data.json wasmData.json output_data.json
+// marshal_data.js
+// Usage: node marshal_data.js policy_params_data.json wasmData.json output_data.json
 
 const fs = require('fs');
 const vm = require('vm');
@@ -33,6 +33,3 @@ const result = {
   params,
   data: wasmData
 };
-
-fs.writeFileSync(outputFile, JSON.stringify(result, null, 2));
-console.log(`Wrote merged data to ${outputFile}`);
