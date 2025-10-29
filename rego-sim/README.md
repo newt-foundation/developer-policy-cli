@@ -7,7 +7,7 @@ This directory usesour included build of [regorus](https://github.com/microsoft/
 To evaluate a policy with regorus:
 
 ```sh
-cargo run --manifest-path ../op-sim/Cargo.toml --release -- ../policy-examples/max-gas-price/policy-files/policy.wasm '' > wasm_data.json
+cargo run --manifest-path ../op-sim/Cargo.toml --release -- ../policy-examples/investment-guardrails/policy-files/policy.wasm '{}' > wasm_data.json
 
 node marshal_data.js policy_params_data.json wasm_data.json data.json
 
