@@ -1,16 +1,23 @@
 #!/bin/bash
-# run_rego_policy.sh - Run the full Rego policy test pipeline
-# Usage: ./run_rego_policy.sh <policy_wasm> <policy_params_data.json> <test_intent.json> <policy.rego> <rego_query>
+# run_rego_policy.sh - Run the full Rego policy test pipeline (dev-friendly version)
+# Usage: ./run_rego_policy.sh <policy_wasm> <rego_query>
 # Example:
-#   ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm policy_params_data.json test_intent.json policy.rego "data.example.allow"
+#   ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "data.example.allow"
 
 set -e
 
+# Hardcoded file paths for dev convenience
+PARAMS_JSON="policy_params_data.json"
+INTENT_JSON="test_intent.json"
+POLICY_REGO="policy.rego"
+
 POLICY_WASM="$1"
-PARAMS_JSON="$2"
-INTENT_JSON="$3"
-POLICY_REGO="$4"
-REGO_QUERY="$5"
+
+# Auto-prefix 'data.' if not present
+REGO_QUERY="$2"
+if [[ "$REGO_QUERY" != data.* ]]; then
+	REGO_QUERY="data.$REGO_QUERY"
+fi
 
 # Intermediate files
 WASM_DATA="wasm_data.json"

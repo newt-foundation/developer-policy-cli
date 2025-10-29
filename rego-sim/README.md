@@ -1,19 +1,9 @@
-## Using Regorus for Rego Policy Testing
-
-This directory usesour included build of [regorus](https://github.com/microsoft/regorus) for evaluating Rego policies.
-
 ### Usage
 
 To evaluate a policy with regorus:
 
 ```sh
-cargo run --manifest-path ../op-sim/Cargo.toml --release -- ../policy-examples/investment-guardrails/policy-files/policy.wasm '{}' > wasm_data.json
+./run_rego_policy.sh <policy wasm> <rego entry point>
 
-node marshal_data.js policy_params_data.json wasm_data.json data.json
-
-node marshal_input.js test_intent.json input.json
-
-./regorus eval --input input.json --data data.json --data policy.rego "data.example.allow"
+./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "investment_guardrails.allow"
 ```
-
-Replace `input.json`, `data.json`, and `policy.rego` with your actual files as needed.
