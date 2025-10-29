@@ -6,7 +6,7 @@ const vm = require('vm');
 const path = require('path');
 
 // Load ethers.umd.min.js and expose ethers as a global
-const ethersUMD = fs.readFileSync(path.join(__dirname, 'lib/ethers.umd.min.js'), 'utf8');
+const ethersUMD = fs.readFileSync(path.join(__dirname, 'ethers.umd.min.js'), 'utf8');
 const context = {
   atob: (str) => Buffer.from(str, 'base64').toString('binary'),
   btoa: (str) => Buffer.from(str, 'binary').toString('base64'),
