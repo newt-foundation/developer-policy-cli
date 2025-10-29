@@ -1,0 +1,7 @@
+{
+  "name": "Veriff ID Verification Policy with Country Filtering",
+  "version": "1.1.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy enforces identity verification and geographic compliance using Veriff's verification service. Only users with approved identity verification status from allowed countries are permitted to perform transactions. The policy checks both verification approval status and ensures the user's country is in the configured allowed countries list."
+}

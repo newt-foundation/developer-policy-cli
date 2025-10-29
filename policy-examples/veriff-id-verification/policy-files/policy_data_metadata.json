@@ -1,0 +1,7 @@
+{
+  "name": "Veriff ID Verification",
+  "version": "1.1.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data provides real-time identity verification status and user country information from Veriff's verification service, enabling secure user authentication and geographic compliance based on verified identity documents."
+}

@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "description": "policy structure: strategy string",
+  "required": ["strategy"],
+  "properties": {
+    "strategy": {
+      "type": "string",
+      "description": "The investment strategy to be enforced by the policy."
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Security Signals Policy",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newton.xyz",
+  "description": "This policy data provides risk levelinformation about addresses based on Magic's Security Signals."
+}
