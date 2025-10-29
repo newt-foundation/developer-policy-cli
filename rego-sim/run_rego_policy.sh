@@ -1,8 +1,8 @@
 #!/bin/bash
 # run_rego_policy.sh - Run the full Rego policy test pipeline (dev-friendly version)
-# Usage: ./run_rego_policy.sh <policy_wasm> <rego_query>
+# Usage: ./run_rego_policy.sh <policy_wasm> <wasm_args> <rego_query>
 # Example:
-#   ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "data.example.allow"
+#   ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm '' investment_guardrails.allow
 
 set -e
 
@@ -12,11 +12,12 @@ INTENT_JSON="test_intent.json"
 POLICY_REGO="policy.rego"
 
 POLICY_WASM="$1"
+WASM_ARGS="$2"
 
 # Auto-prefix 'data.' if not present
-REGO_QUERY="$2"
+REGO_QUERY="$3"
 if [[ "$REGO_QUERY" != data.* ]]; then
-	REGO_QUERY="data.$REGO_QUERY"
+  REGO_QUERY="data.$REGO_QUERY"
 fi
 
 # Intermediate files
@@ -25,7 +26,7 @@ DATA_JSON="data.json"
 INPUT_JSON="input.json"
 
 # 1. Run WASM simulation
-cargo run --manifest-path ../op-sim/Cargo.toml --release -- "$POLICY_WASM" '' > "$WASM_DATA"
+cargo run --manifest-path ../op-sim/Cargo.toml --release -- "$POLICY_WASM" "$WASM_ARGS" > "$WASM_DATA"
 
 # 2. Marshal data.json
 node marshal_data.js "$PARAMS_JSON" "$WASM_DATA" "$DATA_JSON"
