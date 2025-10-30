@@ -29,7 +29,7 @@ allow if {
 }
 ```
 
-3. Create a json file in this folder named `policy_params_data.json` with the policy data params you intent to set on your policy client
+3. Create a json file in this folder named `policy_params_data.json` with the policy data params you intend to set on your policy client
 ```
 {
   "max_gas_price": 1
