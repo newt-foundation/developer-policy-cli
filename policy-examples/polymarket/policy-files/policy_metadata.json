@@ -1,0 +1,7 @@
+{
+  "name": "Polymarket Fed Interest Rate Sentiment Policy",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy evaluates Federal Reserve interest rate sentiment using Polymarket prediction market data. The policy checks if the current market sentiment (decrease or not_decrease) matches the required sentiment parameter, allowing transactions only when there's alignment between the market consensus and the policy requirements."
+}
