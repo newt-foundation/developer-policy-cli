@@ -186,7 +186,7 @@ pub fn serialize_sol_value(value: &DynSolValue) -> serde_json::Value {
     }
 }
 pub fn generate_local_policy_input_data(
-	policy_path: &str,
+	_policy_path: &str,
 	params_path: &str,
 	intent_path: &str,
 	_schema_path: Option<&str>,
