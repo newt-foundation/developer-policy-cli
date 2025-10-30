@@ -15,7 +15,7 @@ pub struct ParsedIntent {
 	pub data: Option<Bytes>,
 	pub chain_id: Option<u64>,
 	pub function_signature: Option<Bytes>,
-    pub function: Option<serde_json::Value>,
+	pub function: Option<serde_json::Value>,
 	pub decoded_function_signature: Option<String>,
 	pub decoded_function_arguments: Option<Vec<serde_json::Value>>,
 }
