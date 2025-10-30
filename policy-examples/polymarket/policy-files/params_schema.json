@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "description": "Configuration parameters for Polymarket Agent - Fed rate prediction",
+  "required": ["sentiment"],
+  "properties": {
+    "sentiment": {
+      "type": "string",
+      "description": "sentiment of whether the fed will decrease interest rate in the dec meeting - decrease | not_decrease"
+    }
+  }
+}

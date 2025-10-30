@@ -1,0 +1,7 @@
+{
+  "name": "Polymarket Fed Interest Rate Sentiment",
+  "version": "1.0.0",
+  "author": "Newton",
+  "link": "https://newt.foundation",
+  "description": "This policy data provides real-time Federal Reserve interest rate sentiment analysis from Polymarket prediction markets, returning market consensus on whether rates will decrease along with the probability percentages for each outcome."
+}
