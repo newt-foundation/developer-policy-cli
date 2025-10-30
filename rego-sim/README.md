@@ -17,7 +17,7 @@ allow if {
 }
 ```
 
-2. Create a json file in this folder named `test_intent.json` with the intent you wish you evaluate against your rego
+2. Create a json file in this folder named `test_intent.json` with the intent you wish to evaluate against your rego
 ```
 {
   "from": "0xF2168be2F3aE8989696705b211c7b9d65E3416dA",
