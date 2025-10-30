@@ -31,11 +31,7 @@ INPUT_JSON="$INTERMEDIARY_DIR/input.json"
 # 1. Run WASM simulation
 cargo run --manifest-path ../op-sim/Cargo.toml --release -- "$POLICY_WASM" "$WASM_ARGS" > "$WASM_DATA"
 
-# 2. Marshal data.json
-node ./lib/marshal_data.js "$PARAMS_JSON" "$WASM_DATA" "$DATA_JSON"
-
-# 3. Marshal input.json
-node ./lib/marshal_input.js "$INTENT_JSON" "$INPUT_JSON"
-
-# 4. Run regorus
+# 2. Marshal data.json + input.json
+cargo run --manifest-path ./Cargo.toml --release --bin marshal -- policy.rego policy_params_data.json test_intent.json "$REGO_QUERY" "$INTERMEDIARY_DIR/eval_result.json"
+# 3. Run regorus
 ./lib/regorus eval --input "$INPUT_JSON" --data "$DATA_JSON" --data "$POLICY_REGO" "$REGO_QUERY"
