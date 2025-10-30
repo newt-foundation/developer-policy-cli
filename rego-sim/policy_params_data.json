@@ -1,3 +1,3 @@
 {
-    "strategy": "short_term"
+    "max_gas_price": 1
 }
