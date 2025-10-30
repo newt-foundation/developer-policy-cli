@@ -43,9 +43,5 @@ In this case we'll use the max-gas-price policy.wasm located in `/policy-example
 ```sh
 ./run_rego_policy.sh <policy wasm> <wasm args> <rego entry point>
 
-<<<<<<< Updated upstream
-./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "{}" "max_gas_price.allow"
-=======
 ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "{}" "example_policy.allow"
->>>>>>> Stashed changes
 ```
