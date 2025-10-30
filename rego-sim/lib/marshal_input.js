@@ -17,7 +17,7 @@ vm.createContext(context);
 vm.runInContext(ethersUMD, context);
 
 if (process.argv.length < 4) {
-  console.error('Usage: node merge_and_parse.js test_intent.json input.json');
+  console.error('Usage: node marshal_input.js test_intent.json input.json');
   process.exit(1);
 }
 
