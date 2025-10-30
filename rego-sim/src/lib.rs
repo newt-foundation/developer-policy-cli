@@ -15,7 +15,7 @@ pub struct ParsedIntent {
 	pub data: Option<Bytes>,
 	pub chain_id: Option<u64>,
 	pub function_signature: Option<Bytes>,
-	pub function: Option<String>,
+    pub function: Option<serde_json::Value>,
 	pub decoded_function_signature: Option<String>,
 	pub decoded_function_arguments: Option<Vec<serde_json::Value>>,
 }
@@ -97,7 +97,7 @@ pub fn parse_intent(value: serde_json::Value) -> anyhow::Result<ParsedIntent> {
         data,
         chain_id,
         function_signature,
-        function: decoded.clone().map(|(func, _)| func.full_signature()),
+        function: decoded.clone().map(|(func, _)| serde_json::to_value(&func).unwrap()),
         decoded_function_signature: decoded.map(|(func, _)| func.full_signature()),
         decoded_function_arguments: serialized_function_arguments,
     })
