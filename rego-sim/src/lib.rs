@@ -1,4 +1,8 @@
-use ethers::types::{Address, U256, Bytes, Chain};
+use alloy::{
+    dyn_abi::{DynSolValue},
+    json_abi::Function,
+    primitives::{Address, Bytes, ChainId, U256},
+};
 use eyre::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
