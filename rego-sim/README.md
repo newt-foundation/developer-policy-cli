@@ -45,3 +45,24 @@ In this case we'll use the max-gas-price policy.wasm located in `/policy-example
 
 ./run_rego_policy.sh ../policy-examples/max-gas-price/policy-files/policy.wasm "{}" "example_policy.allow"
 ```
+
+### Sample rego evaluation output
+```
+...
+{
+  "result": [
+    {
+      "expressions": [
+        {
+          "value": false,
+          "text": "data.example_policy.allow",
+          "location": {
+            "row": 1,
+            "col": 1
+          }
+        }
+      ]
+    }
+  ]
+}
+```
