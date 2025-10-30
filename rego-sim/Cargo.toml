@@ -9,8 +9,15 @@ serde_json = "1.0"
 hex = "0.4"
 eyre = "0.6"
 anyhow = "1.0.100"
-alloy-dyn-abi = "1.4.0"
-tracing = "0.1.41"
-alloy-primitives = "1.4.0"
-alloy = "1.0.41"
-alloy-json-abi = "1.4.0"
+    tracing = "0.1.41"
+    alloy = { version = "1.0", default-features = false, features = [
+      "std",
+      "signer-local",
+      "signer-keystore",
+      "providers",
+      "reqwest",
+      "rpc-types",
+    ] }
+    alloy-dyn-abi = "1.4.0"
+    alloy-json-abi = "1.4.0"
+    alloy-primitives = "1.4.0"

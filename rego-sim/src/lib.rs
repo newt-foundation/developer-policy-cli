@@ -1,8 +1,7 @@
-use alloy::{
-    dyn_abi::{DynSolValue},
-    json_abi::Function,
-    primitives::{Address, Bytes, ChainId, U256},
-};
+use alloy_dyn_abi::JsonAbiExt;
+use alloy_dyn_abi::DynSolValue;
+use alloy_json_abi::Function;
+use alloy_primitives::{Address, Bytes, ChainId, U256};
 use eyre::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -98,7 +97,7 @@ pub fn parse_intent(value: serde_json::Value) -> anyhow::Result<ParsedIntent> {
         data,
         chain_id,
         function_signature,
-        function: decoded.clone().map(|(func, _)| func),
+        function: decoded.clone().map(|(func, _)| func.full_signature()),
         decoded_function_signature: decoded.map(|(func, _)| func.full_signature()),
         decoded_function_arguments: serialized_function_arguments,
     })
@@ -108,7 +107,7 @@ pub fn decode_calldata(calldata: &Bytes, function_signature: &Bytes) -> anyhow::
     let function_signature_str = String::from_utf8(function_signature.to_vec())
         .map_err(|e| anyhow::anyhow!("Invalid UTF-8 in function signature: {}", e))?;
 
-    let func = Function::from_str(&function_signature_str)
+    let func = Function::parse(&function_signature_str)
         .map_err(|e| anyhow::anyhow!("Failed to parse function signature: {}", e))?;
 
     // Validate calldata length
@@ -130,7 +129,7 @@ pub fn decode_calldata(calldata: &Bytes, function_signature: &Bytes) -> anyhow::
     }
 
     // Use alloy's built-in ABI decoding for comprehensive type support
-    let inputs = func
+    let inputs: Vec<DynSolValue> = func
         .abi_decode_input(&calldata[4..])
         .map_err(|e| anyhow::anyhow!("Failed to decode calldata: {}", e))?;
 
