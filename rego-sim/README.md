@@ -1,5 +1,5 @@
 ### Pre requisites
-The run_rego_policy.sh requires node and cargo to be installed
+The run_rego_policy.sh requires node and cargo to be installed.
 
 This step assumes you already have a `policy.wasm` file that returns some real world data.
 
