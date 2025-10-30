@@ -39,7 +39,7 @@ allow if {
 4. Locate the reference to your `policy.wasm` file. 
 In this case we'll use the max-gas-price policy.wasm located in `/policy-examples/max-gas-price/policy-files/policy.wasm`
 
-5. Evaluate a the rego policy with regorus:
+5. Evaluate the rego policy with regorus:
 ```sh
 ./run_rego_policy.sh <policy wasm> <wasm args> <rego entry point>
 
