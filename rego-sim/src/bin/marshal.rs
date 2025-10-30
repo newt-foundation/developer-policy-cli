@@ -1,4 +1,4 @@
-use rego_sim::utils::evaluate_local_policy;
+use rego_sim::evaluate_local_policy;
 use std::env;
 
 fn main() {
