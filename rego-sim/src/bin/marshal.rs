@@ -1,4 +1,4 @@
-use rego_sim::generate_local_policy_input;
+use rego_sim::generate_local_policy_input_data;
 use std::env;
 
 fn main() {
@@ -13,7 +13,7 @@ fn main() {
     let entrypoint = &args[4];
     let output_path = &args[5];
 
-    match generate_local_policy_input(policy_path, params_path, intent_path, None, entrypoint) {
+    match generate_local_policy_input_data(policy_path, params_path, intent_path, None, entrypoint) {
         Ok(result) => {
             std::fs::write(output_path, serde_json::to_string_pretty(&result).unwrap()).unwrap();
             println!("Wrote marshaled and evaluated result to {}", output_path);

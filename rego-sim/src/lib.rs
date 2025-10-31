@@ -185,7 +185,7 @@ pub fn serialize_sol_value(value: &DynSolValue) -> serde_json::Value {
         DynSolValue::Tuple(t) => serde_json::Value::Array(t.iter().map(serialize_sol_value).collect()),
     }
 }
-pub fn generate_local_policy_input(
+pub fn generate_local_policy_input_data(
 	_policy_path: &str,
 	params_path: &str,
 	intent_path: &str,
