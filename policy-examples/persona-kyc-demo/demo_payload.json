@@ -1,0 +1,798 @@
+{
+    "data": {
+        "type": "inquiry",
+        "id": "inq_xRZrQFKg7rqZ5UZGLhnvb2ympshE",
+        "attributes": {
+            "status": "approved",
+            "reference-id": null,
+            "note": null,
+            "behaviors": {
+                "api-version-less-than-minimum-count": 0,
+                "autofill-cancels": 8,
+                "autofill-starts": 0,
+                "behavior-threat-level": "low",
+                "bot-score": 2,
+                "completion-time": 88.961987789,
+                "debugger-attached": false,
+                "devtools-open": false,
+                "distraction-events": 1,
+                "hesitation-baseline": 17322,
+                "hesitation-count": 3,
+                "hesitation-percentage": 36.43343724743101,
+                "hesitation-time": 6311,
+                "mobile-sdk-version-less-than-minimum-count": 0,
+                "request-spoof-attempts": 0,
+                "shortcut-copies": 0,
+                "shortcut-pastes": 0,
+                "user-agent-spoof-attempts": 0
+            },
+            "tags": [],
+            "creator": "API",
+            "reviewer-comment": null,
+            "updated-at": "2025-10-06T20:41:41.000Z",
+            "created-at": "2025-10-06T20:40:12.000Z",
+            "started-at": "2025-10-06T20:41:39.000Z",
+            "expires-at": null,
+            "completed-at": "2025-10-06T20:41:40.000Z",
+            "failed-at": null,
+            "marked-for-review-at": null,
+            "decisioned-at": "2025-10-06T20:41:41.000Z",
+            "expired-at": null,
+            "redacted-at": null,
+            "previous-step-name": "gov_id_9bbbe5_verification",
+            "next-step-name": "success_cbf9f5",
+            "name-first": "ALEXANDER J",
+            "name-middle": null,
+            "name-last": "SAMPLE",
+            "birthdate": "1977-07-17",
+            "address-street-1": "600 CALIFORNIA STREET",
+            "address-street-2": null,
+            "address-city": "SAN FRANCISCO",
+            "address-subdivision": "California",
+            "address-subdivision-abbr": "CA",
+            "address-postal-code": "941090000",
+            "address-postal-code-abbr": "94109",
+            "social-security-number": null,
+            "identification-number": "I1234562",
+            "email-address": null,
+            "phone-number": null,
+            "fields": {
+                "current-government-id": {
+                    "type": "government_id",
+                    "value": {
+                        "id": "doc_bAzcYTzPLy4j3KqorgArUTufMaZd",
+                        "type": "Document::GovernmentId"
+                    }
+                },
+                "selected-country-code": {
+                    "type": "string",
+                    "value": "US"
+                },
+                "selected-id-class": {
+                    "type": "string",
+                    "value": "dl"
+                },
+                "address-street-1": {
+                    "type": "string",
+                    "value": "600 CALIFORNIA STREET"
+                },
+                "address-street-2": {
+                    "type": "string",
+                    "value": null
+                },
+                "address-city": {
+                    "type": "string",
+                    "value": "SAN FRANCISCO"
+                },
+                "address-subdivision": {
+                    "type": "string",
+                    "value": "CA"
+                },
+                "address-postal-code": {
+                    "type": "string",
+                    "value": "94109"
+                },
+                "address-country-code": {
+                    "type": "string",
+                    "value": "US"
+                },
+                "birthdate": {
+                    "type": "date",
+                    "value": "1977-07-17"
+                },
+                "expiration-date": {
+                    "type": "date",
+                    "value": "2030-10-06"
+                },
+                "email-address": {
+                    "type": "string",
+                    "value": null
+                },
+                "identification-class": {
+                    "type": "string",
+                    "value": "dl"
+                },
+                "identification-number": {
+                    "type": "string",
+                    "value": "I1234562"
+                },
+                "name-first": {
+                    "type": "string",
+                    "value": "ALEXANDER J"
+                },
+                "name-middle": {
+                    "type": "string",
+                    "value": null
+                },
+                "name-last": {
+                    "type": "string",
+                    "value": "SAMPLE"
+                },
+                "phone-number": {
+                    "type": "string",
+                    "value": null
+                },
+                "card-access-number": {
+                    "type": "string",
+                    "value": null
+                },
+                "issue-date": {
+                    "type": "date",
+                    "value": "2024-10-06"
+                },
+                "issuing-authority": {
+                    "type": "string",
+                    "value": "CA"
+                },
+                "government-identification-number-map": {
+                    "type": "json",
+                    "value": null
+                }
+            }
+        },
+        "relationships": {
+            "account": {
+                "data": {
+                    "type": "account",
+                    "id": "act_dXko1rYu5FRH35jzG6Akc9nrAXzN"
+                }
+            },
+            "template": {
+                "data": null
+            },
+            "inquiry-template": {
+                "data": {
+                    "type": "inquiry-template",
+                    "id": "itmpl_L1hjy2W2R1s7CS4VgF3YowyteVAx"
+                }
+            },
+            "inquiry-template-version": {
+                "data": {
+                    "type": "inquiry-template-version",
+                    "id": "itmplv_kcgyPHixBU3yPjHgR8VNAmtHY7aL"
+                }
+            },
+            "transaction": {
+                "data": null
+            },
+            "reviewer": {
+                "data": {
+                    "type": "workflow-run",
+                    "id": "wfr_UBzPHezvQP1bojv49nztyZ1rzKPZ"
+                }
+            },
+            "reports": {
+                "data": []
+            },
+            "verifications": {
+                "data": [
+                    {
+                        "type": "verification/government-id",
+                        "id": "ver_BuQt3e6SULAKFCxSYkMsEwHr6DrB"
+                    }
+                ]
+            },
+            "sessions": {
+                "data": [
+                    {
+                        "type": "inquiry-session",
+                        "id": "iqse_n3ddmsyK8WB2bNp4M8u3YaDePunq"
+                    }
+                ]
+            },
+            "documents": {
+                "data": [
+                    {
+                        "type": "document/government-id",
+                        "id": "doc_bAzcYTzPLy4j3KqorgArUTufMaZd"
+                    }
+                ]
+            },
+            "selfies": {
+                "data": []
+            }
+        }
+    },
+    "included": [
+        {
+            "type": "verification/government-id",
+            "id": "ver_BuQt3e6SULAKFCxSYkMsEwHr6DrB",
+            "attributes": {
+                "status": "passed",
+                "created-at": "2025-10-06T20:41:36.000Z",
+                "created-at-ts": 1759783296,
+                "submitted-at": "2025-10-06T20:41:36.000Z",
+                "submitted-at-ts": 1759783296,
+                "completed-at": "2025-10-06T20:41:38.000Z",
+                "completed-at-ts": 1759783298,
+                "redacted-at": null,
+                "country-code": "US",
+                "tags": [],
+                "entity-confidence-score": 100.0,
+                "entity-confidence-reasons": [
+                    "generic"
+                ],
+                "front-photo-url": "https://files.withpersona.com/photo1.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYzk1MnVyZjdqa250MjVndHhmd2VraWV5NDR0IiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6IjRiMmM1YWNmLTFlODktNDg0Zi1iMGQzLTM3NWI1YjQ1N2IwMCIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoicHJvY2Vzc2VkIiwiZXhwIjoxNzYwNDEzMTUxfQ.R1E1to28uAmN7jGK-ccTxBcDOT17CF-7kU-6Dg828p0",
+                "back-photo-url": null,
+                "photo-urls": [
+                    {
+                        "page": "front",
+                        "url": "https://files.withpersona.com/photo1.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYzk1MnVyZjdqa250MjVndHhmd2VraWV5NDR0IiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6ImE3MmMwZTY1LTc4OTUtNDlkMS05ZGVmLWE5M2Y5ZmU4NDg3ZiIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoicHJvY2Vzc2VkIiwiZXhwIjoxNzYwNDEzMTUxfQ.rg4LARMC9kNtBY6vN8njhvFp0Y7380UiV8fiqtgkEdE",
+                        "normalized-url": "https://files.withpersona.com/photo1.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZXNva2xqYXU1eWVrb3I2eWZ0dm8zbm94MmQzIiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6ImIyZGYzM2M1LTkzZjctNGViMi05ZWJiLWEzZGUyNjU2NzI0NiIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoibm9ybWFsaXplZCIsImV4cCI6MTc2MDQxMzE1MX0.Qcq3a8v41TS4iBg9hKvTS3N-8_rJZgAstoqzA8IzXCw",
+                        "original-urls": [
+                            "https://files.withpersona.com/photo1.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0c3VlYzRmdWFyb3NsZHhhM3ZuamNraTUyYjN1IiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6IjkzYWYwNzg4LTBkODktNDg4NS1iMWU2LWRhNmE4MTg3M2JkMCIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoib3JpZ2luYWxzIiwiZXhwIjoxNzYwNDEzMTUxfQ.mpPRSkETq1nZ7vVrpBt_yUv4ZhFAYYXi3TT1BqLUDCM"
+                        ],
+                        "byte-size": 335550
+                    }
+                ],
+                "selfie-photo": {
+                    "url": "https://files.withpersona.com/selfie_photo.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmd2J1ZDkza2h2Z3NidWpzdnVsam9ibW80Y2ZsIiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6ImQwMjZjOGZjLTMzZTYtNDQzMi05NjRkLWU4ODZkMTdhNWM2YSIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoic2VsZmllX3Bob3RvIiwiZXhwIjoxNzYwNDEzMTUxfQ.4WW2uYvZO_9h4JP0yj2X6f2u5OnbZ3-3kaXI2_748mY",
+                    "byte-size": 335550
+                },
+                "selfie-photo-url": "https://files.withpersona.com/selfie_photo.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmd2J1ZDkza2h2Z3NidWpzdnVsam9ibW80Y2ZsIiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6IjVmZDdjNDAyLTdmMmUtNGY0NC1iMmVlLWY3MTU1ODQyMTY3YyIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoic2VsZmllX3Bob3RvIiwiZXhwIjoxNzYwNDEzMTUxfQ.qO9ncB3VZl5Z64Fm57RZ50RZ3ltBmPRY59QcadAhBMU",
+                "video-url": null,
+                "id-class": "dl",
+                "capture-method": "manual",
+                "name-first": "ALEXANDER J",
+                "name-middle": null,
+                "name-last": "SAMPLE",
+                "name-suffix": null,
+                "birthdate": "1977-07-17",
+                "address-street-1": "600 CALIFORNIA STREET",
+                "address-street-2": null,
+                "address-city": "SAN FRANCISCO",
+                "address-subdivision": "CA",
+                "address-postal-code": "94109",
+                "issuing-authority": "CA",
+                "issuing-subdivision": "CA",
+                "nationality": null,
+                "document-number": null,
+                "visa-status": null,
+                "issue-date": "2024-10-06",
+                "expiration-date": "2030-10-06",
+                "designations": null,
+                "birthplace": null,
+                "endorsements": null,
+                "height": null,
+                "sex": "Male",
+                "restrictions": null,
+                "vehicle-class": null,
+                "identification-number": "I1234562",
+                "from-reusable-persona": false,
+                "checks": [
+                    {
+                        "name": "id_aamva_database_lookup",
+                        "status": "not_applicable",
+                        "reasons": [
+                            "disabled_by_check_config"
+                        ],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_account_comparison",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_age_comparison",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_age_inconsistency_detection",
+                        "status": "not_applicable",
+                        "reasons": [
+                            "disabled_by_check_config"
+                        ],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_attribute_comparison",
+                        "status": "not_applicable",
+                        "reasons": [
+                            "disabled_by_check_config"
+                        ],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_barcode_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_barcode_inconsistency_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_blur_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_color_inconsistency_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_compromised_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_damaged_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_disallowed_country_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {
+                            "country-code": null,
+                            "selected-country-code": null
+                        }
+                    },
+                    {
+                        "name": "id_disallowed_type_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {
+                            "country-code": null,
+                            "detected-id-class": null,
+                            "detected-id-designations": null,
+                            "disallowed-id-designations": null,
+                            "selected-id-classes": null
+                        }
+                    },
+                    {
+                        "name": "id_double_side_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_electronic_replica_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_entity_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_experimental_model_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_expired_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_extracted_properties_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_extraction_inconsistency_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {
+                            "check-requirements": []
+                        }
+                    },
+                    {
+                        "name": "id_fabrication_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_glare_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_handwriting_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_inconsistent_repeat_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_inquiry_comparison",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_mrz_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_mrz_inconsistency_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_number_format_inconsistency_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_paper_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_physical_tamper_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_po_box_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_portrait_clarity_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_portrait_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_public_figure_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_real_id_detection",
+                        "status": "not_applicable",
+                        "reasons": [
+                            "disabled_by_check_config"
+                        ],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_repeat_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_selfie_comparison",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_tamper_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_unprocessable_submission_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_valid_dates_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    },
+                    {
+                        "name": "id_video_quality_detection",
+                        "status": "passed",
+                        "reasons": [],
+                        "requirement": "not_required",
+                        "metadata": {}
+                    }
+                ]
+            },
+            "relationships": {
+                "inquiry": {
+                    "data": {
+                        "type": "inquiry",
+                        "id": "inq_xRZrQFKg7rqZ5UZGLhnvb2ympshE"
+                    }
+                },
+                "template": {
+                    "data": null
+                },
+                "inquiry-template-version": {
+                    "data": {
+                        "type": "inquiry-template-version",
+                        "id": "itmplv_kcgyPHixBU3yPjHgR8VNAmtHY7aL"
+                    }
+                },
+                "inquiry-template": {
+                    "data": {
+                        "type": "inquiry-template",
+                        "id": "itmpl_L1hjy2W2R1s7CS4VgF3YowyteVAx"
+                    }
+                },
+                "verification-template": {
+                    "data": {
+                        "type": "verification-template/government-id",
+                        "id": "vtmpl_zLQGPUp9AoQWfDRU95bsDP9orU4Q"
+                    }
+                },
+                "verification-template-version": {
+                    "data": {
+                        "type": "verification-template-version/government-id",
+                        "id": "vtmplv_GkgkC42kNmssR6iqvvUfRYhnigim"
+                    }
+                },
+                "transaction": {
+                    "data": null
+                },
+                "document": {
+                    "data": {
+                        "type": "document/government-id",
+                        "id": "doc_bAzcYTzPLy4j3KqorgArUTufMaZd"
+                    }
+                },
+                "accounts": {
+                    "data": [
+                        {
+                            "type": "account",
+                            "id": "act_dXko1rYu5FRH35jzG6Akc9nrAXzN"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "inquiry-session",
+            "id": "iqse_n3ddmsyK8WB2bNp4M8u3YaDePunq",
+            "attributes": {
+                "status": "expired",
+                "created-at": "2025-10-06T20:40:12.000Z",
+                "started-at": "2025-10-06T20:40:12.000Z",
+                "expired-at": "2025-10-07T20:41:04.000Z",
+                "ip-address": "76.144.22.203",
+                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+                "os-name": "Mac",
+                "os-full-version": "15.5.0",
+                "device-type": "desktop",
+                "device-name": null,
+                "browser-name": "Chrome",
+                "browser-full-version": "140.0.7339.214",
+                "mobile-sdk-name": null,
+                "mobile-sdk-full-version": null,
+                "device-handoff-method": null,
+                "is-proxy": false,
+                "is-tor": false,
+                "is-datacenter": false,
+                "is-vpn": false,
+                "threat-level": "low",
+                "country-code": "US",
+                "country-name": "United States",
+                "region-code": "CA",
+                "region-name": "California",
+                "latitude": 37.751,
+                "longitude": -97.822,
+                "gps-latitude": 37.751,
+                "gps-longitude": -97.822,
+                "gps-precision": null,
+                "ip-connection-type": "residential",
+                "ip-isp": "Service Provider",
+                "network-organization": "Digital Ocean"
+            },
+            "relationships": {
+                "inquiry": {
+                    "data": {
+                        "type": "inquiry",
+                        "id": "inq_xRZrQFKg7rqZ5UZGLhnvb2ympshE"
+                    }
+                },
+                "device": {
+                    "data": {
+                        "type": "device",
+                        "id": "dev_aoyf51ZaykLCcDJp8EKNMoQ22a7Q"
+                    }
+                },
+                "network": {
+                    "data": {
+                        "type": "network",
+                        "id": "net_vWyGhwWzxWojcVPtzAoVofNEmBL4"
+                    }
+                }
+            }
+        },
+        {
+            "type": "document/government-id",
+            "id": "doc_bAzcYTzPLy4j3KqorgArUTufMaZd",
+            "attributes": {
+                "status": "processed",
+                "created-at": "2025-10-06T20:41:35.000Z",
+                "processed-at": "2025-10-06T20:41:38.000Z",
+                "processed-at-ts": 1759783298,
+                "front-photo": {
+                    "filename": "photo1.jpg",
+                    "url": "https://files.withpersona.com/photo1.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYzk1MnVyZjdqa250MjVndHhmd2VraWV5NDR0IiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6Ijg3OTNkNDRhLTI5NTUtNGQ5Ny05MjI1LWNkMDI0YTZhN2Q0OCIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoicHJvY2Vzc2VkIiwiZXhwIjoxNzYwNDEzMTUxfQ.1HaTS4Z0D3NmJGgY30uKoPvLSMb3oc6jK3r4f_Mq1p0",
+                    "byte-size": 335550
+                },
+                "back-photo": null,
+                "selfie-photo": {
+                    "filename": "selfie_photo.jpg",
+                    "url": "https://files.withpersona.com/selfie_photo.jpg?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmd2J1ZDkza2h2Z3NidWpzdnVsam9ibW80Y2ZsIiwiYXVkIjoiZmlsZXMud2l0aHBlcnNvbmEuY29tIiwiaXNzIjoid2l0aHBlcnNvbmEuY29tIiwiaWF0IjoxNzYwMzkxNTUxLCJuYmYiOjE3NjAzOTE1NTEsImp0aSI6IjdlMWRkMjEzLWE1ZjktNGY1Ni04OTczLTJkM2MwMDlkYTFjMSIsImdjc19idWNrZXQiOiJwZXJzb25hLXdlYiIsImZpbGVfZW5jcnlwdGVkIjp0cnVlLCJmaWxlX3NhbHQiOiJnb3Zlcm5tZW50X2lkX2ZpbGVzIiwiZmlsZV9pbmZvIjoic2VsZmllX3Bob3RvIiwiZXhwIjoxNzYwNDEzMTUxfQ.vFkdcVQeT9EFcDyA5yv3vfZ1uUkBM1QHtbxMbXBt2wI",
+                    "byte-size": 335550
+                },
+                "id-class": "dl",
+                "name-first": "ALEXANDER J",
+                "name-middle": null,
+                "name-last": "SAMPLE",
+                "name-suffix": null,
+                "birthdate": "1977-07-17",
+                "address-street-1": "600 CALIFORNIA STREET",
+                "address-street-2": null,
+                "address-city": "SAN FRANCISCO",
+                "address-subdivision": "CA",
+                "address-postal-code": "94109",
+                "issuing-authority": "CA",
+                "issuing-subdivision": "CA",
+                "nationality": null,
+                "document-number": null,
+                "visa-status": null,
+                "issue-date": "2024-10-06",
+                "expiration-date": "2030-10-06",
+                "designations": null,
+                "birthplace": null,
+                "height": null,
+                "sex": "Male",
+                "endorsements": null,
+                "restrictions": null,
+                "vehicle-class": null,
+                "identification-number": "I1234562"
+            },
+            "relationships": {
+                "inquiry": {
+                    "data": {
+                        "type": "inquiry",
+                        "id": "inq_xRZrQFKg7rqZ5UZGLhnvb2ympshE"
+                    }
+                },
+                "transaction": {
+                    "data": null
+                },
+                "template": {
+                    "data": null
+                },
+                "inquiry-template-version": {
+                    "data": {
+                        "type": "inquiry-template-version",
+                        "id": "itmplv_kcgyPHixBU3yPjHgR8VNAmtHY7aL"
+                    }
+                },
+                "inquiry-template": {
+                    "data": {
+                        "type": "inquiry-template",
+                        "id": "itmpl_L1hjy2W2R1s7CS4VgF3YowyteVAx"
+                    }
+                },
+                "document-files": {
+                    "data": []
+                }
+            }
+        },
+        {
+            "type": "inquiry-template",
+            "id": "itmpl_L1hjy2W2R1s7CS4VgF3YowyteVAx",
+            "attributes": {
+                "status": "active",
+                "name": "Age verification: GovID",
+                "embedded-flow-domain-allowlist": [],
+                "hosted-flow-subdomains": [],
+                "hosted-flow-redirect-uri-schemes": []
+            },
+            "relationships": {
+                "latest-published-version": {
+                    "data": {
+                        "type": "inquiry-template-version",
+                        "id": "itmplv_kcgyPHixBU3yPjHgR8VNAmtHY7aL"
+                    }
+                }
+            }
+        }
+    ]
+}
