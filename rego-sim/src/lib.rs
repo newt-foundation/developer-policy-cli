@@ -185,7 +185,7 @@ pub fn serialize_sol_value(value: &DynSolValue) -> serde_json::Value {
         DynSolValue::Tuple(t) => serde_json::Value::Array(t.iter().map(serialize_sol_value).collect()),
     }
 }
-pub fn generate_local_policy_input_data(
+pub fn generate_local_policy_input(
 	_policy_path: &str,
 	params_path: &str,
 	intent_path: &str,
@@ -204,7 +204,7 @@ pub fn generate_local_policy_input_data(
 	let data_json_path = format!("{}/data.json", intermediary_dir);
 	let mut data_obj = serde_json::Map::new();
 	data_obj.insert("params".to_string(), params.clone());
-	// Optionally merge wasm_data.json if present
+	// Merge with wasm_data.json
 	let wasm_data_path = format!("{}/wasm_data.json", intermediary_dir);
 	if let Ok(wasm_data_str) = fs::read_to_string(&wasm_data_path) {
 		if let Ok(wasm_data_json) = serde_json::from_str::<Value>(&wasm_data_str) {
