@@ -148,7 +148,12 @@ After that, you can deploy the policy client:
 make deploy-client
 ```
 
-It will ask you for the policy address created in the first step and also prompt you to confirm the chainID.
+It prompt for the following pieces of input
+  - `policy` address created in the first step
+  - `chainID`.
+  - JSON string of the policy `config` params you wish to initialize with the policyClient. ie. `{"foo": "bar"}`
+    - This schema is defined by `params_schema.json`
+  - `expireAfter` of the params in seconds. ie `86400` for 1 day
 
 ### Additional Commands
 
