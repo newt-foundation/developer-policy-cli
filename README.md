@@ -151,7 +151,8 @@ make deploy-client
 It prompts for the following pieces of input
   - `policy` address created in the first step
   - `chainID`.
-  - JSON string of the policy `config` params you wish to initialize with the policyClient. ie. `{"foo": "bar"}`
+  - JSON string of the policy `config` params you wish to initialize with the policyClient. Must be un-escaped JSON string.
+    - ie. `{"foo": 123, "bar": "baz"}`
     - This schema is defined by `params_schema.json`
   - `expireAfter` of the params in seconds. ie `86400` for 1 day
 
