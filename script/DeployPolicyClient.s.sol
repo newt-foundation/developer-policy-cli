@@ -43,6 +43,9 @@ contract ClientDeployer is Script {
             policyParams: policyParams,
             expireAfter: expireAfter
         });
+
+        // Here we can directly call the setPolicy function since the deployer is the owner
+        // This makes this script agnostic of how the policyClient is implemented
         client.setPolicy(config);
 
         vm.stopBroadcast();
