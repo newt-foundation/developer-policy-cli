@@ -148,7 +148,7 @@ After that, you can deploy the policy client:
 make deploy-client
 ```
 
-It prompt for the following pieces of input
+It prompts for the following pieces of input
   - `policy` address created in the first step
   - `chainID`.
   - JSON string of the policy `config` params you wish to initialize with the policyClient. ie. `{"foo": "bar"}`
