@@ -36,7 +36,7 @@ contract ClientDeployer is Script {
         client.initialize(newtonProverTaskManager, _policy, msg.sender);
 
         string memory policyParamsJson = vm.envString("POLICY_PARAMS");
-        uint32 expireAfter = uint32(vm.envUint("EXPIRE_AFTER"));        // Encode the JSON string to bytes (hex)
+        uint32 expireAfter = uint32(vm.envUint("EXPIRE_AFTER"));
         bytes memory policyParams = bytes(policyParamsJson);
 
         INewtonPolicy.PolicyConfig memory config = INewtonPolicy.PolicyConfig({
