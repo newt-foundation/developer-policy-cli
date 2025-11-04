@@ -6,7 +6,7 @@ import {stdJson} from "forge-std/StdJson.sol";
 
 import {YourPolicyClient} from "../contracts/YourPolicyClient.sol";
 
-contract ClientParamsSetter is Script {
+contract ClientDeployer is Script {
     using stdJson for *;
 
     address internal _deployer;
