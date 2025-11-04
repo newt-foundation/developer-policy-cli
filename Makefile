@@ -5,6 +5,7 @@ help:
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
 	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
 	@echo "  deploy-client                    - Deploy the PolicyClient contract"
+	@echo "  set-client-policy-params         - Set the policy parameters for a deployed PolicyClient"
 	@echo "  deploy-client-factory            - Deploy a factory for deploying individual PolicyClients"
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
 	@echo "  create-policy-cids-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_cids.json for deployment"
