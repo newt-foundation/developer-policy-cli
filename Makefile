@@ -5,6 +5,7 @@ help:
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
 	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
 	@echo "  deploy-client                    - Deploy the PolicyClient contract"
+	@echo "  set-client-policy-params         - Set the policy parameters for a deployed PolicyClient"
 	@echo "  deploy-client-factory            - Deploy a factory for deploying individual PolicyClients"
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
 	@echo "  create-policy-cids-json          - Upload all policy files in ./policy-files/ to Pinata IPFS and create policy_cids.json for deployment"
@@ -235,6 +236,19 @@ deploy-client:
 		exit 1; \
 	fi; \
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+
+POLICY_CLIENT ?= $(shell read -p "Input Your Policy Client address: " policy_client; echo $$policy_client)
+POLICY_PARAMS ?= $(shell read -p "Input Policy params JSON string (un-escaped): " params; echo $$params)
+EXPIRE_AFTER ?= $(shell read -p "Input expireAfter (uint): " expire; echo $$expire)
+
+set-client-policy-params: 
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	POLICY_CLIENT=$(POLICY_CLIENT) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:ClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 submit-task-evaluation:
 	@if [ -z "$(TASK_JSON_FILE)" ]; then \
