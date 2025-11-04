@@ -235,3 +235,7 @@ deploy-client:
 		exit 1; \
 	fi; \
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+
+hello-world:
+	@echo "Running Rust hello world script..."
+	@cd script/rust && cargo run --bin hello
