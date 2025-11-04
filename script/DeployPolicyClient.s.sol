@@ -3,11 +3,10 @@ pragma solidity ^0.8.27;
 
 import {Script} from "forge-std/Script.sol";
 import {stdJson} from "forge-std/StdJson.sol";
-import {INewtonPolicy} from "@newton/contracts/src/interfaces/INewtonPolicy.sol";
 
 import {YourPolicyClient} from "../contracts/YourPolicyClient.sol";
 
-contract ClientDeployer is Script {
+contract ClientParamsSetter is Script {
     using stdJson for *;
 
     address internal _deployer;
@@ -34,19 +33,6 @@ contract ClientDeployer is Script {
         client = new YourPolicyClient();
 
         client.initialize(newtonProverTaskManager, _policy, msg.sender);
-
-        string memory policyParamsJson = vm.envString("POLICY_PARAMS");
-        uint32 expireAfter = uint32(vm.envUint("EXPIRE_AFTER"));
-        bytes memory policyParams = bytes(policyParamsJson);
-
-        INewtonPolicy.PolicyConfig memory config = INewtonPolicy.PolicyConfig({
-            policyParams: policyParams,
-            expireAfter: expireAfter
-        });
-
-        // Here we can directly call the setPolicy function since the deployer is the owner
-        // This makes this script agnostic of how the policyClient is implemented
-        client.setPolicy(config);
 
         vm.stopBroadcast();
     }

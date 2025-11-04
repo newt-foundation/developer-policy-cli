@@ -226,8 +226,6 @@ deploy-client-factory:
 	DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployClientFactory.s.sol:ClientFactoryDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 POLICY ?= $(shell read -p "Input Policy address: " policy; echo $$policy)
-POLICY_PARAMS ?= $(shell read -p "Input Policy params JSON string: " params; echo $$params)
-EXPIRE_AFTER ?= $(shell read -p "Input expireAfter (uint): " expire; echo $$expire)
 
 deploy-client: 
 	@source .env; \
@@ -236,4 +234,17 @@ deploy-client:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi; \
-	POLICY=$(POLICY) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+
+POLICY_CLIENT ?= $(shell read -p "Input Your Policy Client address: " policy_client; echo $$policy_client)
+POLICY_PARAMS ?= $(shell read -p "Input Policy params JSON string: " params; echo $$params)
+EXPIRE_AFTER ?= $(shell read -p "Input expireAfter (uint): " expire; echo $$expire)
+
+set-client-policy-params: 
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	POLICY_CLIENT=$(POLICY_CLIENT) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:PolicyClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
