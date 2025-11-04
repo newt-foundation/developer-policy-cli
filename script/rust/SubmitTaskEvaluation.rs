@@ -82,10 +82,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let task_json_file_path = &args[1];
 
     let contents = fs::read_to_string(task_json_file_path)?;
-    let json: serde_json::Value = serde_json::from_str(&contents)?;    
-    println!("{}", serde_json::to_string_pretty(&json)?);
+    let task: serde_json::Value = serde_json::from_str(&contents)?;    
+    println!("{}", serde_json::to_string_pretty(&task)?);
 
-    let normalized_intent = normalize_intent(&json)?;
+    let intent = task.get("intent").ok_or_else(|| "Missing 'intent' field in task")?;
+    let normalized_intent = normalize_intent(intent)?;
     println!("Normalized intent: {}", serde_json::to_string_pretty(&normalized_intent)?);
     Ok(())
 }
