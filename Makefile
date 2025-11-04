@@ -237,13 +237,13 @@ deploy-client:
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 submit-task-evaluation:
-	@if [ -z "$(INTENT_JSON_FILE)" ]; then \
-		read -p "Input intent JSON file path: " intent_json_file && \
-		INTENT_JSON_FILE=$$intent_json_file; \
+	@if [ -z "$(TASK_JSON_FILE)" ]; then \
+		read -p "Input task JSON file path: " task_json_file && \
+		TASK_JSON_FILE=$$task_json_file; \
 	fi; \
-	if [ -z "$$INTENT_JSON_FILE" ]; then \
-		echo "Error: INTENT_JSON_FILE is required. Usage: make submit-task-evaluation INTENT_JSON_FILE=sample_intent.json"; \
+	if [ -z "$$TASK_JSON_FILE" ]; then \
+		echo "Error: TASK_JSON_FILE is required. Usage: make submit-task-evaluation TASK_JSON_FILE=sample_task.json"; \
 		exit 1; \
 	fi; \
-	echo "Submitting task evaluation with file: $$INTENT_JSON_FILE"; \
-	cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$INTENT_JSON_FILE
+	echo "Submitting task evaluation with file: $$TASK_JSON_FILE"; \
+	cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_JSON_FILE

@@ -11,3 +11,5 @@ path = "SubmitTaskEvaluation.rs"
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1.0", features = ["full"] }
 serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+alloy-primitives = "0.4"
