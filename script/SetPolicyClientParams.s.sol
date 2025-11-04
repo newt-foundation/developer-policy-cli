@@ -7,7 +7,7 @@ import {INewtonPolicy} from "@newton/contracts/src/interfaces/INewtonPolicy.sol"
 
 import {YourPolicyClient} from "../contracts/YourPolicyClient.sol";
 
-contract PolicyClientParamsSetter is Script {
+contract ClientParamsSetter is Script {
     using stdJson for *;
 
     address internal _deployer;

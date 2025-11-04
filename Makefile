@@ -247,4 +247,4 @@ set-client-policy-params:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi; \
-	POLICY_CLIENT=$(POLICY_CLIENT) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:PolicyClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	POLICY_CLIENT=$(POLICY_CLIENT) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:ClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
