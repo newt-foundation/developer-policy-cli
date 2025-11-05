@@ -4,9 +4,11 @@ use std::sync::atomic::{AtomicU64, Ordering};
 mod libs {
     pub mod utils;
     pub mod intent_parsing;
+    pub mod signature;
 }
 use libs::intent_parsing::{normalize_intent, sanitize_intent_for_request, remove_hex_prefix};
-use libs::utils::{sign_hash, http_post, get_prover_avs_url, get_evaluation_request_hash};
+use libs::utils::{http_post, get_prover_avs_url};
+use libs::signature::{sign_hash, get_evaluation_request_hash};
 // Static counter for JSON-RPC request IDs
 static NEXT_ID: AtomicU64 = AtomicU64::new(0);
 
