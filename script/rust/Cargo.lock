@@ -7,6 +7,7 @@ name = "SubmitTaskEvaluation"
 version = "0.1.0"
 dependencies = [
  "alloy-primitives",
+ "hex",
  "reqwest",
  "serde",
  "serde_json",

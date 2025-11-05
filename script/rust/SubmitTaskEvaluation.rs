@@ -190,12 +190,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let normalized_intent = normalize_intent(intent)?;
     println!("Normalized intent: {}", serde_json::to_string_pretty(&normalized_intent)?);
 
+
     let task_with_normalized_intent = serde_json::json!({
         "policyClient": task.get("policyClient"),
         "intent": normalized_intent,
-        "quorumNumber": task.get("quorumNumber"),
-        "quorumThresholdPercentage": task.get("quorumThresholdPercentage"),
-        "wasmArgs": task.get("wasmArgs"),
+        "quorumNumber": task.get("quorumNumber").cloned()
+            .unwrap_or_else(|| serde_json::Value::String("0x".to_string())),
+        "quorumThresholdPercentage": task.get("quorumThresholdPercentage").cloned()
+            .unwrap_or_else(|| serde_json::Value::Number(0.into())),
+        "wasmArgs": task.get("wasmArgs").cloned()
+            .unwrap_or_else(|| serde_json::Value::String("0x".to_string())),
         "timeout": task.get("timeout"),
     });
 
