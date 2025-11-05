@@ -2,7 +2,6 @@ use std::env;
 use std::fs;
 
 use alloy_primitives::{Address, Bytes, U256, keccak256};
-// use alloy_encode_packed::encode_packed;
 use serde_json::Value;
 
 fn encode_packed(values: &[&[u8]]) -> Vec<u8> {
