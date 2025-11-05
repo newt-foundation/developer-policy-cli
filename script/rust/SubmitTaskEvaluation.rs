@@ -303,6 +303,19 @@ pub fn sanitize_intent_for_request(intent: &serde_json::Value) -> Result<serde_j
     }))
 }
 
+fn get_prover_avs_url(chain_id: &str, deployment_env: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let chain_id_num: u64 = chain_id.parse()
+        .map_err(|_| format!("Invalid CHAIN_ID: {}", chain_id))?;
+    
+    match (deployment_env, chain_id_num) {
+        ("stagef", 11155111) => Ok("https://prover-avs.stagef.sepolia.newt.foundation".to_string()),
+        ("stagef", 1) => Ok("https://prover-avs.stagef.newt.foundation".to_string()),
+        ("prod", 11155111) => Ok("https://prover-avs.sepolia.newt.foundation".to_string()),
+        ("prod", 1) => Ok("https://prover-avs.newt.foundation".to_string()),
+        _ => Err(format!("Unsupported combination: DEPLOYMENT_ENV={}, CHAIN_ID={}", deployment_env, chain_id).into()),
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
@@ -326,7 +339,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let intent = task.get("intent").ok_or_else(|| "Missing 'intent' field in task")?;
     let normalized_intent = normalize_intent(intent)?;
     println!("Normalized intent: {}", serde_json::to_string_pretty(&normalized_intent)?);
-
 
     let task_with_normalized_intent = serde_json::json!({
         "policyClient": task.get("policyClient"),
@@ -382,5 +394,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         request_body
     );
     println!("Payload: {}", serde_json::to_string_pretty(&payload)?);
+
+    let chain_id = std::env::var("CHAIN_ID")
+        .map_err(|_| "CHAIN_ID not found. Set CHAIN_ID environment variable")?;
+    let deployment_env = std::env::var("DEPLOYMENT_ENV")
+        .map_err(|_| "DEPLOYMENT_ENV not found. Set DEPLOYMENT_ENV environment variable")?;
+        
+    let prover_avs_url = get_prover_avs_url(&chain_id, &deployment_env)?;
+    println!("Prover AVS URL: {}", prover_avs_url);
     Ok(())
 }

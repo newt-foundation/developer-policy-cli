@@ -260,4 +260,4 @@ submit-task-evaluation:
 		exit 1; \
 	fi; \
 	echo "Submitting task evaluation with file: $$TASK_JSON_FILE"; \
-	cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_JSON_FILE
+	CHAIN_ID=$(CHAIN_ID) cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_JSON_FILE
