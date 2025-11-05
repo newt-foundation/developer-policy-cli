@@ -3,8 +3,26 @@ use std::fs;
 use alloy_primitives::{Address, Bytes, U256, keccak256};
 use k256::ecdsa::{SigningKey, signature::hazmat::PrehashSigner, VerifyingKey};
 use k256::SecretKey;
-
 use serde_json::Value;
+use std::sync::atomic::{AtomicU64, Ordering};
+// Static counter for JSON-RPC request IDs
+static NEXT_ID: AtomicU64 = AtomicU64::new(0);
+
+fn get_next_id() -> u64 {
+    NEXT_ID.fetch_add(1, Ordering::Relaxed) + 1
+}
+
+pub fn create_json_rpc_request_payload(
+    method: &str,
+    params: serde_json::Value,
+) -> serde_json::Value {
+    serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": get_next_id(),
+        "method": method,
+        "params": params,
+    })
+}
 
 fn sign_hash(hash: [u8; 32], private_key: &str) -> Result<(u8, [u8; 32], [u8; 32]), Box<dyn std::error::Error>> {
     // Parse private key (remove 0x prefix if present)
@@ -358,5 +376,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "signature": format!("0x{}", signature_hex),
     });
     println!("Request body: {}", serde_json::to_string_pretty(&request_body)?);
+    
+    let payload = create_json_rpc_request_payload(
+        "newton_createTaskAndWait",
+        request_body
+    );
+    println!("Payload: {}", serde_json::to_string_pretty(&payload)?);
     Ok(())
 }
