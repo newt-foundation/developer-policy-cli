@@ -170,7 +170,7 @@ It prompts for the following pieces of input
 make submit-evaluation-request
 ```
 
-This command will prompt you to confirm the network your policy client is deployed on as well as a `.JSON` file with task you wish to be evaluated against the policy. Use `sample_task.json` as a reference.
+This command will prompt you to confirm the network your policy client is deployed on as well as a `.JSON` file with the task you wish to be evaluated against the policy. Use `sample_task.json` as a reference.
 
 ### Additional Commands
 
