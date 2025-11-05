@@ -33,7 +33,6 @@ pub fn normalize_intent(intent: &serde_json::Value) -> Result<serde_json::Value,
         let normalized_chain_id = normalize_to_u256(chain_id)?;
         normalized["chainId"] = serde_json::Value::String(format!("0x{:x}", normalized_chain_id));
     }
-    println!("Normalized intent: {}", serde_json::to_string_pretty(&normalized)?);
     Ok(normalized)
 }
 
