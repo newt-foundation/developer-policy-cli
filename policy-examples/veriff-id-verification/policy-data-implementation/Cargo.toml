@@ -1,0 +1,18 @@
+[package]
+name = "newton-poc-veriff"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]  # Required for WASM components
+
+[dependencies]
+wit-bindgen = "0.36"     # WIT bindings generator
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[package.metadata.component]
+package = "newton:provider"
+
+[package.metadata.component.dependencies]
+# Add any WIT dependencies here
