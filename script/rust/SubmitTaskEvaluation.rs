@@ -316,29 +316,42 @@ fn get_prover_avs_url(chain_id: &str, deployment_env: &str) -> Result<String, Bo
     }
 }
 
+async fn http_post(url: &str, body: &serde_json::Value) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    
+    let response = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .json(body)
+        .send()
+        .await?;
+    
+    let status = response.status();
+    
+    if !status.is_success() {
+        let error_text = response.text().await?;
+        return Err(format!("HTTP error {}: {}", status, error_text).into());
+    }
+    
+    let response_json: serde_json::Value = response.json().await?;
+    Ok(response_json)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
-    /*let response = reqwest::get("https://httpbin.org/get").await?;
-    let body = response.text().await?;
-    println!("Response: {}", body);*/
-
     let args: Vec<String> = env::args().collect();
-
     if args.len() < 2 {
         eprintln!("Usage: {} <task_json_file_path>", args[0]);
         std::process::exit(1);
     }
 
     let task_json_file_path = &args[1];
-
     let contents = fs::read_to_string(task_json_file_path)?;
     let task: serde_json::Value = serde_json::from_str(&contents)?;    
-    println!("{}", serde_json::to_string_pretty(&task)?);
-
     let intent = task.get("intent").ok_or_else(|| "Missing 'intent' field in task")?;
+
     let normalized_intent = normalize_intent(intent)?;
-    println!("Normalized intent: {}", serde_json::to_string_pretty(&normalized_intent)?);
 
     let task_with_normalized_intent = serde_json::json!({
         "policyClient": task.get("policyClient"),
@@ -353,8 +366,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     let evaluation_request_hash = get_evaluation_request_hash(&task_with_normalized_intent)?;
-    println!("Evaluation request hash: {}", hex::encode(evaluation_request_hash));
-
     let private_key = std::env::var("PRIVATE_KEY").map_err(|_| "PRIVATE_KEY not found in .env file")?;
     let (v, r, s) = sign_hash(evaluation_request_hash, &private_key)?;
     
@@ -363,14 +374,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     sig_bytes.extend_from_slice(&s);
     sig_bytes.push(v);
     let signature_hex = hex::encode(sig_bytes);
-    println!("Signature (65 bytes): 0x{}", signature_hex);
 
-    let sanitized = sanitize_intent_for_request(intent)?;
-    println!("Sanitized intent: {}", serde_json::to_string_pretty(&sanitized)?);
+    let sanitized_intent = sanitize_intent_for_request(intent)?;
     
     let request_body = serde_json::json!({
         "policy_client": task.get("policyClient"),
-        "intent": sanitized,
+        "intent": sanitized_intent,
         "quorum_number": task.get("quorumNumber")
             .and_then(|v| v.as_str())
             .map(|s| remove_hex_prefix(s))
@@ -387,13 +396,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "timeout": task.get("timeout"),
         "signature": format!("0x{}", signature_hex),
     });
-    println!("Request body: {}", serde_json::to_string_pretty(&request_body)?);
     
     let payload = create_json_rpc_request_payload(
         "newton_createTaskAndWait",
         request_body
     );
-    println!("Payload: {}", serde_json::to_string_pretty(&payload)?);
 
     let chain_id = std::env::var("CHAIN_ID")
         .map_err(|_| "CHAIN_ID not found. Set CHAIN_ID environment variable")?;
@@ -401,6 +408,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|_| "DEPLOYMENT_ENV not found. Set DEPLOYMENT_ENV environment variable")?;
         
     let prover_avs_url = get_prover_avs_url(&chain_id, &deployment_env)?;
-    println!("Prover AVS URL: {}", prover_avs_url);
+
+    let response = http_post(&prover_avs_url, &payload).await?;
+    println!("Response: {}", serde_json::to_string_pretty(&response)?);
     Ok(())
 }
