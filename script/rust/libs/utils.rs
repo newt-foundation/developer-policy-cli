@@ -164,7 +164,7 @@ pub fn get_evaluation_request_hash(task: &serde_json::Value) -> Result<[u8; 32],
     Ok(hash.0)
 }
 
-pub fn sign_hash(hash: [u8; 32], private_key: &str) -> Result<(u8, [u8; 32], [u8; 32]), Box<dyn std::error::Error>> {
+pub fn sign_hash(hash: [u8; 32], private_key: &str) -> Result<String, Box<dyn std::error::Error>> {
     // Parse private key (remove 0x prefix if present)
     let private_key = private_key.strip_prefix("0x").unwrap_or(private_key);
     
@@ -209,7 +209,14 @@ pub fn sign_hash(hash: [u8; 32], private_key: &str) -> Result<(u8, [u8; 32], [u8
         28u8  // Try recovery_id = 1
     };
     
-    Ok((v, r_bytes, s_bytes))
+    // Concatenate r, s, v into a single byte array (65 bytes total)
+    let mut sig_bytes = Vec::new();
+    sig_bytes.extend_from_slice(&r_bytes);
+    sig_bytes.extend_from_slice(&s_bytes);
+    sig_bytes.push(v);
+    
+    // Encode to hex and add 0x prefix
+    Ok(format!("0x{}", hex::encode(sig_bytes)))
 }
 
 // Helper to convert value/chainId to hex string (similar to normalize but simpler)

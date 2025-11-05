@@ -55,13 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let evaluation_request_hash = get_evaluation_request_hash(&task_with_normalized_intent)?;
     let private_key = std::env::var("PRIVATE_KEY").map_err(|_| "PRIVATE_KEY not found in .env file")?;
-    let (v, r, s) = sign_hash(evaluation_request_hash, &private_key)?;
-    
-    let mut sig_bytes = Vec::new();
-    sig_bytes.extend_from_slice(&r);
-    sig_bytes.extend_from_slice(&s);
-    sig_bytes.push(v);
-    let signature_hex = hex::encode(sig_bytes);
+    let signature = sign_hash(evaluation_request_hash, &private_key)?;
 
     let sanitized_intent = sanitize_intent_for_request(intent)?;
     
@@ -82,7 +76,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .map(|s| serde_json::Value::String(s))
             .unwrap_or(serde_json::Value::Null),
         "timeout": task.get("timeout"),
-        "signature": format!("0x{}", signature_hex),
+        "signature": signature,
     });
     
     let payload = create_json_rpc_request_payload(
