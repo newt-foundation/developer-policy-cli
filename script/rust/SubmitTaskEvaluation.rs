@@ -1,32 +1,14 @@
 use std::env;
 use std::fs;
-use std::sync::atomic::{AtomicU64, Ordering};
+
 mod libs {
     pub mod utils;
     pub mod intent_parsing;
     pub mod signature;
 }
 use libs::intent_parsing::{normalize_intent, sanitize_intent_for_request, remove_hex_prefix};
-use libs::utils::{http_post, get_prover_avs_url};
+use libs::utils::{http_post, get_prover_avs_url, create_json_rpc_request_payload};
 use libs::signature::{sign_hash, get_evaluation_request_hash};
-// Static counter for JSON-RPC request IDs
-static NEXT_ID: AtomicU64 = AtomicU64::new(0);
-
-fn get_next_id() -> u64 {
-    NEXT_ID.fetch_add(1, Ordering::Relaxed) + 1
-}
-
-pub fn create_json_rpc_request_payload(
-    method: &str,
-    params: serde_json::Value,
-) -> serde_json::Value {
-    serde_json::json!({
-        "jsonrpc": "2.0",
-        "id": get_next_id(),
-        "method": method,
-        "params": params,
-    })
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -42,6 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let task: serde_json::Value = serde_json::from_str(&contents)?;
     let intent = task.get("intent").ok_or_else(|| "Missing 'intent' field in task")?;
 
+    // Normalize intent.value, intent.chainId, quorumNumber, wasmArgs to hex strings.
     let normalized_intent = normalize_intent(intent)?;
     let normalized_task = serde_json::json!({
         "policyClient": task.get("policyClient"),
@@ -55,14 +38,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "timeout": task.get("timeout"),
     });
 
+    // Sign the normalized task.
     let evaluation_request_hash = get_evaluation_request_hash(&normalized_task)?;
     let private_key = std::env::var("PRIVATE_KEY").map_err(|_| "PRIVATE_KEY not found in .env file")?;
     let signature = sign_hash(evaluation_request_hash, &private_key)?;
 
-    // Snake case the keys of the intent, remove the prefix 0x from certain fields.
+    // Snake case the keys of the task + intent, remove the prefix 0x from certain fields.
     let sanitized_intent = sanitize_intent_for_request(intent)?;
-    // Snake case the keys of the request body, remove the prefix 0x from certain fields.
-    let request_body = serde_json::json!({
+    let sanitized_task = serde_json::json!({
         "policy_client": task.get("policyClient"),
         "intent": sanitized_intent,
         "quorum_number": task.get("quorumNumber")
@@ -82,16 +65,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "signature": signature,
     });
     
-    let payload = create_json_rpc_request_payload(
-        "newton_createTaskAndWait",
-        request_body
-    );
+    let payload = create_json_rpc_request_payload("newton_createTaskAndWait", sanitized_task);
 
-    let chain_id = std::env::var("CHAIN_ID")
-        .map_err(|_| "CHAIN_ID not found. Set CHAIN_ID environment variable")?;
-    let deployment_env = std::env::var("DEPLOYMENT_ENV")
-        .map_err(|_| "DEPLOYMENT_ENV not found. Set DEPLOYMENT_ENV environment variable")?;
-        
+    let chain_id = std::env::var("CHAIN_ID").map_err(|_| "CHAIN_ID env var not found")?;
+    let deployment_env = std::env::var("DEPLOYMENT_ENV").map_err(|_| "DEPLOYMENT_ENV env var not found")?;
     let prover_avs_url = get_prover_avs_url(&chain_id, &deployment_env)?;
 
     let response = http_post(&prover_avs_url, &payload).await?;

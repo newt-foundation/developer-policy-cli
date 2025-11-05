@@ -1,4 +1,24 @@
 use alloy_primitives::{U256};
+use std::sync::atomic::{AtomicU64, Ordering};
+
+// Static counter for JSON-RPC request IDs
+static NEXT_ID: AtomicU64 = AtomicU64::new(0);
+
+fn get_next_id() -> u64 {
+    NEXT_ID.fetch_add(1, Ordering::Relaxed) + 1
+}
+
+pub fn create_json_rpc_request_payload(
+    method: &str,
+    params: serde_json::Value,
+) -> serde_json::Value {
+    serde_json::json!({
+        "jsonrpc": "2.0",
+        "id": get_next_id(),
+        "method": method,
+        "params": params,
+    })
+}
 
 // Helper function to convert hex string to U256
 pub fn hex_to_u256(hex_str: &str) -> Result<U256, Box<dyn std::error::Error>> {
