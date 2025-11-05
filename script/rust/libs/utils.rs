@@ -3,15 +3,24 @@ use serde_json::Value;
 use k256::ecdsa::{SigningKey, signature::hazmat::PrehashSigner, VerifyingKey};
 use k256::SecretKey;
 
+// Helper function to convert hex string to U256
+pub fn hex_to_u256(hex_str: &str) -> Result<U256, Box<dyn std::error::Error>> {
+    // Remove "0x" prefix if present
+    let hex_str = hex_str.strip_prefix("0x").unwrap_or(hex_str);
+    
+    // U256 can parse hex strings directly
+    U256::from_str_radix(hex_str, 16)
+        .map_err(|e| format!("Failed to parse hex string '{}': {}", hex_str, e).into())
+}
 // Helper to convert hex string to Bytes
-pub fn hex_to_bytes(hex_str: &str) -> Result<Bytes, Box<dyn std::error::Error>> {
+fn hex_to_bytes(hex_str: &str) -> Result<Bytes, Box<dyn std::error::Error>> {
     let hex_str = hex_str.strip_prefix("0x").unwrap_or(hex_str);
     let bytes = hex::decode(hex_str)
         .map_err(|e| format!("Failed to decode hex: {}", e))?;
     Ok(Bytes::copy_from_slice(&bytes))
 }
 
-pub fn encode_packed(values: &[&[u8]]) -> Vec<u8> {
+fn encode_packed(values: &[&[u8]]) -> Vec<u8> {
     let mut result = Vec::new();
     for value in values {
         result.extend_from_slice(value);
@@ -38,7 +47,7 @@ fn get_bytes(value: &Value) -> Result<Bytes, Box<dyn std::error::Error>> {
     }
 }
 
-fn get_u256(value: &Value) -> Result<U256, Box<dyn std::error::Error>> {
+pub fn get_u256(value: &Value) -> Result<U256, Box<dyn std::error::Error>> {
     if let Some(s) = value.as_str() {
         hex_to_u256(s)
     } else if let Some(n) = value.as_u64() {
@@ -46,69 +55,6 @@ fn get_u256(value: &Value) -> Result<U256, Box<dyn std::error::Error>> {
     } else {
         Err("Expected string or number for U256".into())
     }
-}
-
-// Helper function to convert hex string to U256
-fn hex_to_u256(hex_str: &str) -> Result<U256, Box<dyn std::error::Error>> {
-    // Remove "0x" prefix if present
-    let hex_str = hex_str.strip_prefix("0x").unwrap_or(hex_str);
-    
-    // U256 can parse hex strings directly
-    U256::from_str_radix(hex_str, 16)
-        .map_err(|e| format!("Failed to parse hex string '{}': {}", hex_str, e).into())
-}
-
-// Normalize intent value - handles bigint, number, or hex string
-fn normalize_value(value: &serde_json::Value) -> Result<U256, Box<dyn std::error::Error>> {
-    match value {
-        serde_json::Value::String(s) => {
-            // Try parsing as hex string
-            hex_to_u256(s)
-        }
-        serde_json::Value::Number(n) => {
-            // Parse as u64 first, then convert to U256
-            let num = n.as_u64()
-                .ok_or_else(|| "Number too large for u64".to_string())?;
-            Ok(U256::from(num))
-        }
-        _ => Err("Invalid value type: expected string or number".into()),
-    }
-}
-
-// Normalize intent chainId - handles bigint, number, or hex string
-fn normalize_chain_id(chain_id: &serde_json::Value) -> Result<U256, Box<dyn std::error::Error>> {
-    match chain_id {
-        serde_json::Value::String(s) => {
-            // Try parsing as hex string
-            hex_to_u256(s)
-        }
-        serde_json::Value::Number(n) => {
-            // Parse as u64 first, then convert to U256
-            let num = n.as_u64()
-                .ok_or_else(|| "Number too large for u64".to_string())?;
-            Ok(U256::from(num))
-        }
-        _ => Err("Invalid chainId type: expected string or number".into()),
-    }
-}
-
-// Main normalize function - takes a JSON intent and returns normalized version
-pub fn normalize_intent(intent: &serde_json::Value) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
-    let mut normalized = intent.clone();
-    
-    // Normalize value
-    if let Some(value) = normalized.get("value") {
-        let normalized_value = normalize_value(value)?;
-        normalized["value"] = serde_json::Value::String(format!("0x{:x}", normalized_value));
-    }
-    
-    // Normalize chainId
-    if let Some(chain_id) = normalized.get("chainId") {
-        let normalized_chain_id = normalize_chain_id(chain_id)?;
-        normalized["chainId"] = serde_json::Value::String(format!("0x{:x}", normalized_chain_id));
-    }
-    
-    Ok(normalized)
 }
 
 pub fn get_evaluation_request_hash(task: &serde_json::Value) -> Result<[u8; 32], Box<dyn std::error::Error>> {

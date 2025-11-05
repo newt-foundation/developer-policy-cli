@@ -3,8 +3,10 @@ use std::fs;
 use std::sync::atomic::{AtomicU64, Ordering};
 mod libs {
     pub mod utils;
+    pub mod intent_parsing;
 }
-use libs::utils::{get_evaluation_request_hash, normalize_intent, sanitize_intent_for_request};
+use libs::utils::{get_evaluation_request_hash, sanitize_intent_for_request};
+use libs::intent_parsing::{normalize_intent};
 use libs::utils::{remove_hex_prefix, sign_hash, http_post, get_prover_avs_url};
 // Static counter for JSON-RPC request IDs
 static NEXT_ID: AtomicU64 = AtomicU64::new(0);
@@ -36,12 +38,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let task_json_file_path = &args[1];
     let contents = fs::read_to_string(task_json_file_path)?;
-    let task: serde_json::Value = serde_json::from_str(&contents)?;    
+    let task: serde_json::Value = serde_json::from_str(&contents)?;
     let intent = task.get("intent").ok_or_else(|| "Missing 'intent' field in task")?;
 
     let normalized_intent = normalize_intent(intent)?;
-
-    let task_with_normalized_intent = serde_json::json!({
+    let normalized_task = serde_json::json!({
         "policyClient": task.get("policyClient"),
         "intent": normalized_intent,
         "quorumNumber": task.get("quorumNumber").cloned()
@@ -53,12 +54,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "timeout": task.get("timeout"),
     });
 
-    let evaluation_request_hash = get_evaluation_request_hash(&task_with_normalized_intent)?;
+    let evaluation_request_hash = get_evaluation_request_hash(&normalized_task)?;
     let private_key = std::env::var("PRIVATE_KEY").map_err(|_| "PRIVATE_KEY not found in .env file")?;
     let signature = sign_hash(evaluation_request_hash, &private_key)?;
 
+    // Snake case the keys of the intent, remove the prefix 0x from certain fields.
     let sanitized_intent = sanitize_intent_for_request(intent)?;
-    
+    // Snake case the keys of the request body, remove the prefix 0x from certain fields.
     let request_body = serde_json::json!({
         "policy_client": task.get("policyClient"),
         "intent": sanitized_intent,
