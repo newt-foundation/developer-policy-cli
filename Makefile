@@ -15,7 +15,6 @@ help:
 	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
 	@echo "  upload-policy-metadata-ipfs      - Upload policy_metadata.json to Pinata IPFS"
 	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
-	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
 	@echo "  submit-evaluation-request           - Submit a task evaluation request to the AVS"
 	@echo "  help                             - Show this help message"
 	@echo ""
