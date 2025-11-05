@@ -338,5 +338,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sanitized = sanitize_intent_for_request(intent)?;
     println!("Sanitized intent: {}", serde_json::to_string_pretty(&sanitized)?);
     
+    let request_body = serde_json::json!({
+        "policy_client": task.get("policyClient"),
+        "intent": sanitized,
+        "quorum_number": task.get("quorumNumber")
+            .and_then(|v| v.as_str())
+            .map(|s| remove_hex_prefix(s))
+            .map(|s| serde_json::Value::String(s))
+            .unwrap_or(serde_json::Value::Null),
+        "quorum_threshold_percentage": task.get("quorumThresholdPercentage")
+            .cloned()
+            .unwrap_or(serde_json::Value::Null),
+        "wasm_args": task.get("wasmArgs")
+            .and_then(|v| v.as_str())
+            .map(|s| remove_hex_prefix(s))
+            .map(|s| serde_json::Value::String(s))
+            .unwrap_or(serde_json::Value::Null),
+        "timeout": task.get("timeout"),
+        "signature": format!("0x{}", signature_hex),
+    });
+    println!("Request body: {}", serde_json::to_string_pretty(&request_body)?);
     Ok(())
 }
