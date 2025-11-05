@@ -1,8 +1,58 @@
 use std::env;
 use std::fs;
-
 use alloy_primitives::{Address, Bytes, U256, keccak256};
+use k256::ecdsa::{SigningKey, signature::hazmat::PrehashSigner, VerifyingKey};
+use k256::SecretKey;
+
 use serde_json::Value;
+
+fn sign_hash(hash: [u8; 32], private_key: &str) -> Result<(u8, [u8; 32], [u8; 32]), Box<dyn std::error::Error>> {
+    // Parse private key (remove 0x prefix if present)
+    let private_key = private_key.strip_prefix("0x").unwrap_or(private_key);
+    
+    // Decode hex string to bytes
+    let private_key_bytes = hex::decode(private_key)
+        .map_err(|e| format!("Failed to decode private key: {}", e))?;
+    
+    // Ensure it's exactly 32 bytes
+    if private_key_bytes.len() != 32 {
+        return Err("Private key must be 32 bytes".into());
+    }
+    
+    // Convert to fixed-size array
+    let mut key_array = [0u8; 32];
+    key_array.copy_from_slice(&private_key_bytes);
+    
+    // Create SecretKey from fixed-size array
+    let secret_key = SecretKey::from_bytes(&key_array.into())
+        .map_err(|e| format!("Invalid private key: {}", e))?;
+    
+    // Create SigningKey from SecretKey
+    let signing_key = SigningKey::from(&secret_key);
+    
+    // Sign the hash
+    let signature: k256::ecdsa::Signature = signing_key.sign_prehash(&hash)?;
+    
+    // Extract r and s
+    let (r, s) = signature.split_bytes();
+    let r_bytes: [u8; 32] = r.into();
+    let s_bytes: [u8; 32] = s.into();
+    
+    // Get verifying key for recovery
+    let verifying_key = signing_key.verifying_key();
+    
+    // Try to recover with v = 27 (recovery_id = 0)
+    let recovery_id_0 = k256::ecdsa::RecoveryId::try_from(0u8)?;
+    let v = if VerifyingKey::recover_from_prehash(&hash, &signature, recovery_id_0)
+        .map(|key| key == *verifying_key)
+        .unwrap_or(false) {
+        27u8
+    } else {
+        28u8  // Try recovery_id = 1
+    };
+    
+    Ok((v, r_bytes, s_bytes))
+}
 
 fn encode_packed(values: &[&[u8]]) -> Vec<u8> {
     let mut result = Vec::new();
@@ -168,6 +218,7 @@ pub fn normalize_intent(intent: &serde_json::Value) -> Result<serde_json::Value,
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenv::dotenv().ok();
     /*let response = reqwest::get("https://httpbin.org/get").await?;
     let body = response.text().await?;
     println!("Response: {}", body);*/
@@ -205,5 +256,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let evaluation_request_hash = get_evaluation_request_hash(&task_with_normalized_intent)?;
     println!("Evaluation request hash: {}", hex::encode(evaluation_request_hash));
 
+    let private_key = std::env::var("PRIVATE_KEY").map_err(|_| "PRIVATE_KEY not found in .env file")?;
+    let (v, r, s) = sign_hash(evaluation_request_hash, &private_key)?;
+    
+    let mut sig_bytes = Vec::new();
+    sig_bytes.extend_from_slice(&r);
+    sig_bytes.extend_from_slice(&s);
+    sig_bytes.push(v);
+    let signature_hex = hex::encode(sig_bytes);
+    println!("Signature (65 bytes): 0x{}", signature_hex);
+    
     Ok(())
 }
