@@ -15,7 +15,7 @@ help:
 	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
 	@echo "  upload-policy-metadata-ipfs      - Upload policy_metadata.json to Pinata IPFS"
 	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
-	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
+	@echo "  submit-evaluation-request           - Submit a task evaluation request to the AVS"
 	@echo "  help                             - Show this help message"
 	@echo ""
 	@echo "See README.md for help on configuration"
@@ -249,3 +249,15 @@ set-client-policy-params:
 		exit 1; \
 	fi; \
 	POLICY_CLIENT=$(POLICY_CLIENT) POLICY_PARAMS=$(POLICY_PARAMS) EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:ClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+
+submit-evaluation-request:
+	@if [ -z "$(TASK_JSON_FILE)" ]; then \
+		read -p "Input task JSON file path: " task_json_file && \
+		TASK_JSON_FILE=$$task_json_file; \
+	fi; \
+	if [ -z "$$TASK_JSON_FILE" ]; then \
+		echo "Error: TASK_JSON_FILE is required. Usage: make submit-evaluation-request TASK_JSON_FILE=sample_task.json"; \
+		exit 1; \
+	fi; \
+	echo "Submitting task evaluation with file: $$TASK_JSON_FILE"; \
+	CHAIN_ID=$(CHAIN_ID) cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_JSON_FILE

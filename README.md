@@ -164,6 +164,14 @@ It prompts for the following pieces of input
     - This schema of the expected data is defined by `params_schema.json`
   - `expireAfter` of the params in seconds. ie `86400` for 1 day
 
+### Submit a task evaluation request to the avs-prover
+
+```bash
+make submit-evaluation-request
+```
+
+This command will prompt you to confirm the network your policy client is deployed on as well as a `.JSON` file with the task you wish to be evaluated against the policy. Use `sample_task.json` as a reference.
+
 ### Additional Commands
 
 #### Upload individual Policy Files to IPFS

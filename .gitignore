@@ -17,3 +17,5 @@ pinata-auth.expect
 # Opsim debug, target and output files
 op-sim/debug/
 op-sim/target/
+
+script/rust/target
