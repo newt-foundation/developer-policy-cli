@@ -1,16 +1,31 @@
 use alloy_dyn_abi::JsonAbiExt;
 use alloy_dyn_abi::DynSolValue;
 use alloy_json_abi::Function;
-use alloy_primitives::{Address, Bytes, ChainId, U256};
+use alloy_primitives::{Address, Bytes, U256};
 use eyre::Result;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use serde_json::Value;
 use std::fs;
+
+// Custom serializer for U256 to serialize as JSON number if it fits in u64, otherwise as string
+fn serialize_u256_as_decimal<S>(value: &U256, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    // Try to convert to u64 and serialize as number (like chain_id)
+    if let Ok(num) = u64::try_from(*value) {
+        serializer.serialize_u64(num)
+    } else {
+        // If too large for u64, serialize as decimal string
+        serializer.serialize_str(&value.to_string())
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParsedIntent {
 	pub from: Address,
 	pub to: Address,
+	#[serde(serialize_with = "serialize_u256_as_decimal")]
 	pub value: U256,
 	pub data: Option<Bytes>,
 	pub chain_id: Option<u64>,
@@ -47,7 +62,7 @@ pub fn parse_intent(value: serde_json::Value) -> anyhow::Result<ParsedIntent> {
             if let Some(hex_str) = s.strip_prefix("0x") {
                 u64::from_str_radix(hex_str, 16).ok()
             } else {
-                s.parse::<ChainId>().ok()
+                s.parse::<u64>().ok()
             }
         })
     });
