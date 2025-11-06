@@ -26,7 +26,12 @@ contract ClientParamsSetter is Script {
         // Attach to the already deployed client contract
         YourPolicyClient client = YourPolicyClient(_policyClient);
 
-        string memory policyParamsJson = vm.envString("POLICY_PARAMS");
+        string memory policyParamsJson;
+        string memory paramsFilePath = vm.envOr("PARAMS_FILE", string(""));
+        if (bytes(paramsFilePath).length > 0) {
+            require(vm.exists(paramsFilePath), DeploymentFileDoesNotExist());
+            policyParamsJson = vm.readFile(paramsFilePath);
+        }
         uint32 expireAfter = uint32(vm.envUint("EXPIRE_AFTER"));
         bytes memory policyParams = bytes(policyParamsJson);
 
