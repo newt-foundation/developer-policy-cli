@@ -1,3 +1,5 @@
+package example_policy
+
 default allow := false
 
 allow if {
