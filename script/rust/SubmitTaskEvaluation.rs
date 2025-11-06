@@ -65,7 +65,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "signature": signature,
     });
     
-    let payload = create_json_rpc_request_payload("newton_createTaskAndWait", sanitized_task);
+    let payload = create_json_rpc_request_payload(
+        "newton_createTaskAndWait",
+        serde_json::Value::Array(vec![sanitized_task])
+    );
 
     let chain_id = std::env::var("CHAIN_ID").map_err(|_| "CHAIN_ID env var not found")?;
     let deployment_env = std::env::var("DEPLOYMENT_ENV").map_err(|_| "DEPLOYMENT_ENV env var not found")?;
