@@ -15,7 +15,8 @@ help:
 	@echo "  upload-params-schema-ipfs        - Upload params_schema.json to Pinata IPFS"
 	@echo "  upload-policy-metadata-ipfs      - Upload policy_metadata.json to Pinata IPFS"
 	@echo "  upload-policy-data-metadata-ipfs - Upload policy_data_metadata.json to Pinata IPFS"
-	@echo "  submit-evaluation-request           - Submit a task evaluation request to the AVS"
+	@echo "  submit-evaluation-request        - Submit a task evaluation request to the AVS"
+	@echo "  spend-attestation                - Spend an attestation for a given policy client"
 	@echo "  help                             - Show this help message"
 	@echo ""
 	@echo "See README.md for help on configuration"
@@ -238,7 +239,7 @@ deploy-client:
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 POLICY_CLIENT ?= $(shell read -p "Input Policy Client address: " policy_client; echo $$policy_client)
-PARAMS_FILE ?= $(shell read -p "Input Policy params JSON file path (use sample_client_params.json as a reference): " params_file; echo $$params_file)
+PARAMS_FILE ?= $(shell read -p "Input Policy params file path (use sample_client_params.json as a reference): " params_file; echo $$params_file)
 EXPIRE_AFTER ?= $(shell read -p "Input expireAfter (uint): " expire; echo $$expire)
 
 set-client-policy-params: 
@@ -251,13 +252,31 @@ set-client-policy-params:
 	POLICY_CLIENT=$(POLICY_CLIENT) PARAMS_FILE="$(PARAMS_FILE)" EXPIRE_AFTER=$(EXPIRE_AFTER) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SetPolicyClientParams.s.sol:ClientParamsSetter --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 submit-evaluation-request:
-	@if [ -z "$(TASK_JSON_FILE)" ]; then \
-		read -p "Input task JSON file path: " task_json_file && \
-		TASK_JSON_FILE=$$task_json_file; \
+	@if [ -z "$(TASK_FILE)" ]; then \
+		read -p "Input task file path: " task_file && \
+		TASK_FILE=$$task_file; \
 	fi; \
-	if [ -z "$$TASK_JSON_FILE" ]; then \
-		echo "Error: TASK_JSON_FILE is required. Usage: make submit-evaluation-request TASK_JSON_FILE=sample_task.json"; \
+	if [ -z "$$TASK_FILE" ]; then \
+		echo "Error: TASK_FILE is required. Usage: make submit-evaluation-request TASK_FILE=sample_task.json"; \
 		exit 1; \
 	fi; \
-	echo "Submitting task evaluation with file: $$TASK_JSON_FILE"; \
-	CHAIN_ID=$(CHAIN_ID) cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_JSON_FILE
+	echo "Submitting task evaluation in file: $$TASK_FILE"; \
+	CHAIN_ID=$(CHAIN_ID) cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_FILE
+
+spend-attestation:
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(ATTESTATION_FILE)" ]; then \
+		read -p "Input attestation file path: " attestation_file && \
+		ATTESTATION_FILE=$$attestation_file; \
+	fi; \
+	if [ -z "$$ATTESTATION_FILE" ]; then \
+		echo "Error: ATTESTATION_FILE is required. Usage: make spend-attestation ATTESTATION_FILE=sample_attestation.json"; \
+		exit 1; \
+	fi; \
+	echo "Spending attestation in file: $$ATTESTATION_FILE"; \
+	POLICY_CLIENT=$(POLICY_CLIENT) ATTESTATION_FILE="$$ATTESTATION_FILE" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SpendAttestation.s.sol:ClientAttestationSpender --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast

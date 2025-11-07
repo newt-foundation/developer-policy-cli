@@ -173,6 +173,14 @@ make submit-evaluation-request
 
 This command will prompt you to confirm the network your policy client is deployed on as well as a `.JSON` file with the task you wish to be evaluated against the policy. Use `sample_task.json` as a reference.
 
+### Spend attestation
+
+```bash
+make spend-attestation
+```
+
+This command will prompt you to confirm the network your policy client is deployed on as well as a `.JSON` file with the attestation you wish to spend on the policy client. Use `sample_attestation.json` as a reference.
+
 ### Additional Commands
 
 #### Upload individual Policy Files to IPFS

@@ -13,7 +13,7 @@ contract ClientParamsSetter is Script {
     address internal _deployer;
     address internal _policyClient;
 
-    error DeploymentFileDoesNotExist();
+    error ParamsFileDoesNotExist();
 
     function setUp() public virtual {
         _deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
@@ -29,7 +29,7 @@ contract ClientParamsSetter is Script {
         string memory policyParamsJson;
         string memory paramsFilePath = vm.envOr("PARAMS_FILE", string(""));
         if (bytes(paramsFilePath).length > 0) {
-            require(vm.exists(paramsFilePath), DeploymentFileDoesNotExist());
+            require(vm.exists(paramsFilePath), ParamsFileDoesNotExist());
             policyParamsJson = vm.readFile(paramsFilePath);
         }
         uint32 expireAfter = uint32(vm.envUint("EXPIRE_AFTER"));
