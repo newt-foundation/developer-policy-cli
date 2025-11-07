@@ -33,9 +33,37 @@ contract ClientAttestationSpender is Script {
             revert("ATTESTATION_FILE must be set");
         }
 
-        // Parse the JSON into the Attestation struct
-        bytes memory attestationData = attestationJson.parseRaw("$");
-        NewtonMessage.Attestation memory attestation = abi.decode(attestationData, (NewtonMessage.Attestation));
+        // Parse individual fields from JSON
+        bytes32 taskId = bytes32(attestationJson.parseRaw(".taskId"));
+        bytes32 policyId = bytes32(attestationJson.parseRaw(".policyId"));
+        address policyClient = attestationJson.readAddress(".policyClient");
+        uint32 expiration = uint32(attestationJson.readUint(".expiration"));
+        
+        // Parse nested Intent struct
+        address intentFrom = attestationJson.readAddress(".intent.from");
+        address intentTo = attestationJson.readAddress(".intent.to");
+        uint256 intentValue = attestationJson.readUint(".intent.value");
+        bytes memory intentData = attestationJson.parseRaw(".intent.data");
+        uint256 intentChainId = attestationJson.readUint(".intent.chainId");
+        bytes memory intentFunctionSignature = attestationJson.parseRaw(".intent.functionSignature");
+        
+        NewtonMessage.Intent memory intent = NewtonMessage.Intent({
+            from: intentFrom,
+            to: intentTo,
+            value: intentValue,
+            data: intentData,
+            chainId: intentChainId,
+            functionSignature: intentFunctionSignature
+        });
+        
+        // Construct the Attestation struct
+        NewtonMessage.Attestation memory attestation = NewtonMessage.Attestation({
+            taskId: taskId,
+            policyId: policyId,
+            policyClient: policyClient,
+            intent: intent,
+            expiration: expiration
+        });
 
         // Call the swap function with the parsed attestation
         client.swap(attestation);

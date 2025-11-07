@@ -263,7 +263,13 @@ submit-evaluation-request:
 	CHAIN_ID=$(CHAIN_ID) cargo run --manifest-path script/rust/Cargo.toml --bin SubmitTaskEvaluation -- $$TASK_FILE
 
 spend-attestation:
-	@if [ -z "$(ATTESTATION_FILE)" ]; then \
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(ATTESTATION_FILE)" ]; then \
 		read -p "Input attestation file path: " attestation_file && \
 		ATTESTATION_FILE=$$attestation_file; \
 	fi; \
@@ -272,4 +278,4 @@ spend-attestation:
 		exit 1; \
 	fi; \
 	echo "Spending attestation in file: $$ATTESTATION_FILE"; \
-	POLICY_CLIENT=$(POLICY_CLIENT) ATTESTATION_FILE="$(ATTESTATION_FILE)" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SpendAttestation.s.sol:ClientAttestationSpender --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	POLICY_CLIENT=$(POLICY_CLIENT) ATTESTATION_FILE="$$ATTESTATION_FILE" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/SpendAttestation.s.sol:ClientAttestationSpender --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
