@@ -25,12 +25,10 @@ contract ClientAttestationSpender is Script {
         YourPolicyClient client = YourPolicyClient(_policyClient);
 
         string memory attestationJson;
-        string memory paramsFilePath = vm.envOr("ATTESTATION_FILE", string(""));
-        if (bytes(paramsFilePath).length > 0) {
-            require(vm.exists(paramsFilePath), AttestationFileDoesNotExist());
-            attestationJson = vm.readFile(paramsFilePath);
-        } else {
-            revert("ATTESTATION_FILE must be set");
+        string memory attestationFilePath = vm.envOr("ATTESTATION_FILE", string(""));
+        if (bytes(attestationFilePath).length > 0) {
+            require(vm.exists(attestationFilePath), AttestationFileDoesNotExist());
+            attestationJson = vm.readFile(attestationFilePath);
         }
 
         // Parse individual fields from JSON
