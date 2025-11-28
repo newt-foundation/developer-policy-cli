@@ -249,17 +249,17 @@ deploy-erc20-client:
 		echo "Error: Chain ID does not match RPC_URL"; \
 		exit 1; \
 	fi; \
-	if [ -z "$(POLICY)" ]; then \
-		read -p "Input Policy address: " policy && \
-		POLICY=$$policy; \
+	POLICY_VAR="$(POLICY)"; \
+	if [ -z "$$POLICY_VAR" ]; then \
+		read -p "Input Policy address: " POLICY_VAR; \
 	fi; \
-	if [ -z "$$POLICY" ]; then \
+	if [ -z "$$POLICY_VAR" ]; then \
 		echo "Error: POLICY is required. Usage: make deploy-erc20-client POLICY=0x... [TOKEN_NAME='Token Name'] [TOKEN_SYMBOL='SYMBOL']"; \
 		exit 1; \
 	fi; \
 	TOKEN_NAME_VAR="$(TOKEN_NAME)"; \
 	TOKEN_SYMBOL_VAR="$(TOKEN_SYMBOL)"; \
-	POLICY=$$POLICY TOKEN_NAME="$$TOKEN_NAME_VAR" TOKEN_SYMBOL="$$TOKEN_SYMBOL_VAR" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployNewtonErc20PolicyClient.s.sol:DeployNewtonErc20PolicyClient --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	POLICY=$$POLICY_VAR TOKEN_NAME="$$TOKEN_NAME_VAR" TOKEN_SYMBOL="$$TOKEN_SYMBOL_VAR" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployNewtonErc20PolicyClient.s.sol:DeployNewtonErc20PolicyClient --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 POLICY_CLIENT ?= $(shell read -p "Input Policy Client address: " policy_client; echo $$policy_client)
 PARAMS_FILE ?= $(shell read -p "Input Policy params file path (use sample_client_params.json as a reference): " params_file; echo $$params_file)
