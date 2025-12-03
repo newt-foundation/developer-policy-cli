@@ -239,8 +239,8 @@ deploy-client:
 	fi; \
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
-TOKEN_NAME ?= 
-TOKEN_SYMBOL ?= 
+TOKEN_NAME ?= "Newton Standard Token"
+TOKEN_SYMBOL ?= "NST"
 
 deploy-erc20-client: 
 	@source .env; \
