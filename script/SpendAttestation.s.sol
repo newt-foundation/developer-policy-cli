@@ -44,6 +44,7 @@ contract ClientAttestationSpender is Script {
         bytes memory intentData = attestationJson.parseRaw(".intent.data");
         uint256 intentChainId = attestationJson.readUint(".intent.chainId");
         bytes memory intentFunctionSignature = attestationJson.parseRaw(".intent.functionSignature");
+        bytes memory intentSignature = attestationJson.parseRaw(".intentSignature");
         
         NewtonMessage.Intent memory intent = NewtonMessage.Intent({
             from: intentFrom,
@@ -60,7 +61,8 @@ contract ClientAttestationSpender is Script {
             policyId: policyId,
             policyClient: policyClient,
             intent: intent,
-            expiration: expiration
+            expiration: expiration,
+            intentSignature: intentSignature
         });
 
         // Call the swap function with the parsed attestation

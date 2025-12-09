@@ -1,4 +1,3 @@
-
 # Chainalysis Sanctions Policy
 # --------------------------------
 
@@ -18,6 +17,6 @@ is_sanctioned := data.data.sanctioned
 # Allow the action if the `to` address is not sanctioned
 allow if {
     api_call_status == 200
-    checked_address == to_address
+    lower(checked_address) == lower(to_address)
     not is_sanctioned
 }

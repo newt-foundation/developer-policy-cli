@@ -1,10 +1,11 @@
-.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-params-schema-ipfs help
+.PHONY: upload-and-deploy-policy deploy-policy deploy-client deploy-client-factory deploy-erc20-client upload-all-ipfs create-policy-cids-json upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-params-schema-ipfs help
 
 help:
 	@echo "Available Make Targets:"
 	@echo "  upload-and-deploy-policy         - Upload all policy files in ./policy-files/ to Pinata IPFS and deploy the Policy contract"
 	@echo "  deploy-policy                    - Deploy the policy given an existing policy_cids.json file"
 	@echo "  deploy-client                    - Deploy the PolicyClient contract"
+	@echo "  deploy-erc20-client              - Deploy the NewtonErc20 PolicyClient contract"
 	@echo "  set-client-policy-params         - Set the policy parameters for a deployed PolicyClient"
 	@echo "  deploy-client-factory            - Deploy a factory for deploying individual PolicyClients"
 	@echo "  upload-all-ipfs                  - Upload all policy files in ./policy-files/ to Pinata IPFS"
@@ -237,6 +238,28 @@ deploy-client:
 		exit 1; \
 	fi; \
 	POLICY=$(POLICY) DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployPolicyClient.s.sol:ClientDeployer --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+
+TOKEN_NAME ?= "Newton Standard Token"
+TOKEN_SYMBOL ?= "NST"
+
+deploy-erc20-client: 
+	@source .env; \
+	export TEMP_CHAIN_ID=$(CHAIN_ID); \
+	if [ $$(cast chain-id -r $$RPC_URL) != $$TEMP_CHAIN_ID ]; then \
+		echo "Error: Chain ID does not match RPC_URL"; \
+		exit 1; \
+	fi; \
+	POLICY_VAR="$(POLICY)"; \
+	if [ -z "$$POLICY_VAR" ]; then \
+		read -p "Input Policy address: " POLICY_VAR; \
+	fi; \
+	if [ -z "$$POLICY_VAR" ]; then \
+		echo "Error: POLICY is required. Usage: make deploy-erc20-client POLICY=0x... [TOKEN_NAME='Token Name'] [TOKEN_SYMBOL='SYMBOL']"; \
+		exit 1; \
+	fi; \
+	TOKEN_NAME_VAR="$(TOKEN_NAME)"; \
+	TOKEN_SYMBOL_VAR="$(TOKEN_SYMBOL)"; \
+	POLICY=$$POLICY_VAR TOKEN_NAME="$$TOKEN_NAME_VAR" TOKEN_SYMBOL="$$TOKEN_SYMBOL_VAR" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/DeployNewtonErc20PolicyClient.s.sol:DeployNewtonErc20PolicyClient --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 POLICY_CLIENT ?= $(shell read -p "Input Policy Client address: " policy_client; echo $$policy_client)
 PARAMS_FILE ?= $(shell read -p "Input Policy params file path (use sample_client_params.json as a reference): " params_file; echo $$params_file)
