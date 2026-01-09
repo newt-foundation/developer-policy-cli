@@ -48,21 +48,21 @@ upload-wasm-ipfs:
 		cat /tmp/pinata_wasm_upload.log; \
 	fi
 
-# Upload wasm_args.json to IPFS via Pinata
-upload-wasm-args-ipfs:
-	@rm -f /tmp/pinata_args_upload.log
+# Upload secrets_schema.json to IPFS via Pinata
+upload-secrets-schema-ipfs:
+	@rm -f /tmp/pinata_secrets_schema_upload.log
 	@echo "================================================"
-	@echo "========== Upload wasm_args.json ==========="
+	@echo "========== Upload secrets_schema.json ==========="
 	@echo "================================================"
-	@if [ ! -f policy-files/wasm_args.json ]; then \
-		echo "Error: wasm_args.json file not found in policy-files directory"; \
+	@if [ ! -f policy-files/secrets_schema.json ]; then \
+		echo "Error: secrets_schema.json file not found in policy-files directory"; \
 		exit 1; \
 	fi
-	@echo "Uploading wasm_args.json to Pinata IPFS..."
-	@source .env && ~/.local/share/pinata/pinata upload policy-files/wasm_args.json | tee /tmp/pinata_args_upload.log
+	@echo "Uploading secrets_schema.json to Pinata IPFS..."
+	@source .env && ~/.local/share/pinata/pinata upload policy-files/secrets_schema.json | tee /tmp/pinata_secrets_schema_upload.log
 	@echo ""
 	@echo "=== IPFS Upload Results ==="
-	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_args_upload.log | head -1); \
+	@IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_secrets_schema_upload.log | head -1); \
 	if [ -n "$$IPFS_HASH" ]; then \
 		echo "IPFS Hash: $$IPFS_HASH"; \
 		echo "Getting gateway link..."; \
@@ -71,7 +71,7 @@ upload-wasm-args-ipfs:
 		echo "Public IPFS Link: https://ipfs.io/ipfs/$$IPFS_HASH"; \
 	else \
 		echo "Warning: Could not extract IPFS hash from upload output"; \
-		cat /tmp/pinata_args_upload.log; \
+		cat /tmp/pinata_secrets_schema_upload.log; \
 	fi
 
 # Upload policy.rego to IPFS via Pinata
@@ -178,7 +178,7 @@ upload-policy-data-metadata-ipfs:
 		cat /tmp/pinata_data_metadata_upload.log; \
 	fi
 
-upload-all-ipfs: upload-wasm-ipfs upload-wasm-args-ipfs upload-policy-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
+upload-all-ipfs: upload-wasm-ipfs upload-secrets-schema-ipfs upload-policy-ipfs upload-params-schema-ipfs upload-policy-metadata-ipfs upload-policy-data-metadata-ipfs
 	@echo "================================================================================"
 	@echo ""
 
@@ -189,12 +189,12 @@ create-policy-cids-json: upload-all-ipfs
 	@touch policy-files/policy_cids.json
 	@source .env; \
 	WASM_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_wasm_upload.log | head -1); \
-	WASM_ARGS_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_args_upload.log | head -1); \
 	POLICY_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_policy_upload.log | head -1); \
 	SCHEMA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_schema_upload.log | head -1); \
+	SECRETS_SCHEMA_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_secrets_schema_upload.log | head -1); \
 	METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_metadata_upload.log | head -1); \
 	DATA_METADATA_IPFS_HASH=$$(grep -o 'Qm[A-Za-z0-9]\{44\}\|baf[A-Za-z0-9]\{55,\}' /tmp/pinata_data_metadata_upload.log | head -1); \
-	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"wasmArgs\": \"$$WASM_ARGS_IPFS_HASH\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"attester\": \"0x4883282094755C01cd0d15dFE74753c9E189d194\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
+	echo "{\"wasmCid\": \"$$WASM_IPFS_HASH\",\"policyCid\": \"$$POLICY_IPFS_HASH\",\"schemaCid\": \"$$SCHEMA_IPFS_HASH\",\"secretsSchemaCid\": \"$$SECRETS_SCHEMA_HASH\",\"attester\": \"0x4883282094755C01cd0d15dFE74753c9E189d194\",\"entrypoint\": \"$(ENTRYPOINT)\",\"policyDataMetadataCid\": \"$$DATA_METADATA_IPFS_HASH\",\"policyMetadataCid\": \"$$METADATA_IPFS_HASH\"}" >> policy-files/policy_cids.json
 
 CHAIN_ID ?= $(shell read -p "Confirm Chain ID (e.g. mainnet = 1, sepolia = 11155111): " chainid; echo $$chainid)
 
@@ -215,7 +215,7 @@ deploy-policy:
 	fi; \
 	DIRECTORY=$$(pwd); \
 	cd lib/newton-contracts; \
-	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
+	PRIVATE_KEY=$$PRIVATE_KEY ETHERSCAN_API_KEY=$$ETHERSCAN_API_KEY POLICY_CIDS_PATH="$$DIRECTORY/policy-files/policy_cids.json" TASK_GENERATORS_PATH="../../newton_prover_config.$$DEPLOYMENT_ENV.json" DEPLOYMENT_ENV=$$DEPLOYMENT_ENV forge script script/PolicyDeployer.s.sol --rpc-url $$RPC_URL --private-key $$PRIVATE_KEY --broadcast
 
 upload-and-deploy-policy: create-policy-cids-json deploy-policy
 
