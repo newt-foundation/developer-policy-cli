@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 import {NewtonPolicyClient} from "@newton/contracts/src/mixins/NewtonPolicyClient.sol";
 import {INewtonPolicy} from "@newton/contracts/src/interfaces/INewtonPolicy.sol";
 import {NewtonMessage} from "@newton/contracts/src/core/NewtonMessage.sol";
+import {INewtonProverTaskManager} from "@newton/contracts/src/interfaces/INewtonProverTaskManager.sol";
 
 contract YourPolicyClient is NewtonPolicyClient {
 	// Your contract's business logic goes here
@@ -11,7 +12,7 @@ contract YourPolicyClient is NewtonPolicyClient {
     event Success();
 
     error InvalidAttestation();
-	
+
     // since the factory is used to clone the client, the constructor doesn't need to do anything
     constructor() {}
 
@@ -29,13 +30,28 @@ contract YourPolicyClient is NewtonPolicyClient {
 	function setParameters(INewtonPolicy.PolicyConfig memory _config) external {
         _setPolicy(_config);
     }
-  
+
     // this is the policy guarded function
     function swap(NewtonMessage.Attestation memory attestation) external {
         require(_validateAttestation(attestation), InvalidAttestation());
 
         // Your function's business logic goes here
 
+        emit Success();
+    }
+
+    function _validateAttestationDirect(
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
+    ) internal returns (bool) {
+        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
+    }
+
+    // this is the policy guarded function
+    function swapValidateDirect(INewtonProverTaskManager.Task calldata task, INewtonProverTaskManager.TaskResponse calldata taskResponse, bytes calldata signatureData) external {
+        require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
+        // Your function's business logic goes here
         emit Success();
     }
 }

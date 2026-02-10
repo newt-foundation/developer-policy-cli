@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 import {NewtonPolicyClient} from "@newton/contracts/src/mixins/NewtonPolicyClient.sol";
 import {NewtonMessage} from "@newton/contracts/src/core/NewtonMessage.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {INewtonProverTaskManager} from "@newton/contracts/src/interfaces/INewtonProverTaskManager.sol";
 
 /**
  * @title NewtonErc20
@@ -12,6 +13,9 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     error InvalidAttestation();
     error AttestationRequired();
+    error InvalidMintIntent();
+
+    bytes4 private constant MINT_SELECTOR = bytes4(keccak256("mint(address,uint256)"));
 
     /**
      * @notice Constructor for NewtonErc20
@@ -34,19 +38,41 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
 
+    function _validateAttestationDirect(
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
+    ) internal returns (bool) {
+        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
+    }
+
     /**
-     * @notice Mints tokens to an address after validating the attestation
-     * @param to The address to mint tokens to
-     * @param amount The amount of tokens to mint
-     * @param attestation The attestation to validate
+     * @notice Mints tokens to an address after validating the attestation.
+     *         The recipient and amount are parsed from task.intent.data (must be ABI-encoded
+     *         with function signature "mint(address,uint256)") so they cannot be tampered with.
+     * @param task The prover task to validate
+     * @param taskResponse The task response
+     * @param signatureData BLS signature data for verification
      */
     function mint(
-        address to,
-        uint256 amount,
-        NewtonMessage.Attestation calldata attestation
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
     ) external {
-        require(_validateAttestation(attestation), InvalidAttestation());
+        require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
+        (address to, uint256 amount) = _decodeMintIntent(task.intent.data);
         _mint(to, amount);
+    }
+
+    /**
+     * @notice Decodes (to, amount) from intent data. Reverts if data is not ABI-encoded
+     *         with function signature "mint(address,uint256)".
+     */
+    function _decodeMintIntent(bytes calldata data) internal pure returns (address to, uint256 amount) {
+        if (data.length < 4) revert InvalidMintIntent();
+        if (bytes4(data[0:4]) != MINT_SELECTOR) revert InvalidMintIntent();
+        if (data.length != 4 + 64) revert InvalidMintIntent(); // selector + 32 bytes address + 32 bytes uint256
+        return abi.decode(data[4:], (address, uint256));
     }
 
     /**
