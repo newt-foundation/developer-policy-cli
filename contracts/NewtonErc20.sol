@@ -16,6 +16,7 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     error InvalidMintIntent();
 
     bytes4 private constant MINT_SELECTOR = bytes4(keccak256("mint(address,uint256)"));
+    bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
 
     /**
      * @notice Constructor for NewtonErc20
@@ -37,13 +38,34 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     ) external {
         _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
-
-    function _validateAttestationDirect(
+    
+    /**
+     * @notice Transfers tokens to an address after validating the attestation.
+     *         The recipient and amount are parsed from task.intent.data (must be ABI-encoded
+     *         with function signature "transfer(address,uint256)") so they cannot be tampered with.
+     * @param task The task generated to evaluate the intent
+     * @param taskResponse The task response returned by the prover 
+     * @param signatureData BLS signature data for verification
+     */
+    function transfer(
         INewtonProverTaskManager.Task calldata task,
         INewtonProverTaskManager.TaskResponse calldata taskResponse,
         bytes calldata signatureData
-    ) internal returns (bool) {
-        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
+    ) external {
+        require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
+        (address to, uint256 amount) = _decodeMintIntent(task.intent.data);
+        _transfer(to, amount);
+    }
+
+    /**
+     * @notice Decodes (to, amount) from intent data. Reverts if data is not ABI-encoded
+     *         with function signature "mint(address,uint256)".
+     */
+    function _decodeMintIntent(bytes calldata data) internal pure returns (address to, uint256 amount) {
+        if (data.length < 4) revert InvalidMintIntent();
+        if (bytes4(data[0:4]) != MINT_SELECTOR) revert InvalidMintIntent();
+        if (data.length != 4 + 64) revert InvalidMintIntent(); // selector + 32 bytes address + 32 bytes uint256
+        return abi.decode(data[4:], (address, uint256));
     }
 
     /**
@@ -65,17 +87,6 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     }
 
     /**
-     * @notice Decodes (to, amount) from intent data. Reverts if data is not ABI-encoded
-     *         with function signature "mint(address,uint256)".
-     */
-    function _decodeMintIntent(bytes calldata data) internal pure returns (address to, uint256 amount) {
-        if (data.length < 4) revert InvalidMintIntent();
-        if (bytes4(data[0:4]) != MINT_SELECTOR) revert InvalidMintIntent();
-        if (data.length != 4 + 64) revert InvalidMintIntent(); // selector + 32 bytes address + 32 bytes uint256
-        return abi.decode(data[4:], (address, uint256));
-    }
-
-    /**
      * @notice Override standard ERC20 transfer to require attestation
      * @dev This function is disabled - use transfer(address,uint256,Attestation) instead
      * @return success Always reverts - attestation required
@@ -85,6 +96,15 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         uint256 /* amount */
     ) public virtual override returns (bool) {
         revert AttestationRequired();
+    }
+
+
+    function _validateAttestationDirect(
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
+    ) internal returns (bool) {
+        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
     }
 
     /**
