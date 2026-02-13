@@ -36,7 +36,8 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         address policy, //refers to the policy template address
         address owner
     ) external {
-        _initNewtonPolicyClient(policyTaskManager, policy, owner);
+        _initNewtonPolicyClient(policyTaskManager, owner);
+        _setPolicyAddress(policy);
     }
     
     /**
@@ -96,15 +97,6 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         uint256 /* amount */
     ) public virtual override returns (bool) {
         revert AttestationRequired();
-    }
-
-
-    function _validateAttestationDirect(
-        INewtonProverTaskManager.Task calldata task,
-        INewtonProverTaskManager.TaskResponse calldata taskResponse,
-        bytes calldata signatureData
-    ) internal returns (bool) {
-        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
     }
 
     /**
