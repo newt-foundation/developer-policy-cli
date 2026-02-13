@@ -13,7 +13,7 @@ import {INewtonProverTaskManager} from "@newton/contracts/src/interfaces/INewton
 contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     error InvalidAttestation();
     error AttestationRequired();
-    error InvalidMintIntent();
+    error InvalidIntentData();
 
     bytes4 private constant MINT_SELECTOR = bytes4(keccak256("mint(address,uint256)"));
     bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
@@ -53,18 +53,20 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         bytes calldata signatureData
     ) external {
         require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
-        (address to, uint256 amount) = _decodeMintIntent(task.intent.data);
+        (address to, uint256 amount) = _decodeAddressAmountIntent(task.intent.data, TRANSFER_SELECTOR);
         _transfer(task.intent.from, to, amount);
     }
 
     /**
-     * @notice Decodes (to, amount) from intent data. Reverts if data is not ABI-encoded
-     *         with function signature "mint(address,uint256)".
+     * @notice Decodes (address, uint256) from intent data. Reverts if data is not ABI-encoded
+     *         with the expected function selector (e.g. "mint(address,uint256)" or "transfer(address,uint256)").
+     * @param data The ABI-encoded intent data (selector + address + uint256)
+     * @param expectedSelector The required 4-byte function selector (MINT_SELECTOR or TRANSFER_SELECTOR)
      */
-    function _decodeMintIntent(bytes calldata data) internal pure returns (address to, uint256 amount) {
-        if (data.length < 4) revert InvalidMintIntent();
-        if (bytes4(data[0:4]) != MINT_SELECTOR) revert InvalidMintIntent();
-        if (data.length != 4 + 64) revert InvalidMintIntent(); // selector + 32 bytes address + 32 bytes uint256
+    function _decodeAddressAmountIntent(bytes calldata data, bytes4 expectedSelector) internal pure returns (address to, uint256 amount) {
+        if (data.length < 4) revert InvalidIntentData();
+        if (bytes4(data[0:4]) != expectedSelector) revert InvalidIntentData();
+        if (data.length != 4 + 64) revert InvalidIntentData(); // selector + 32 bytes address + 32 bytes uint256
         return abi.decode(data[4:], (address, uint256));
     }
 
@@ -82,7 +84,7 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         bytes calldata signatureData
     ) external {
         require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
-        (address to, uint256 amount) = _decodeMintIntent(task.intent.data);
+        (address to, uint256 amount) = _decodeAddressAmountIntent(task.intent.data, MINT_SELECTOR);
         _mint(to, amount);
     }
 
