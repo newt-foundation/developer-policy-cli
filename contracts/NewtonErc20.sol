@@ -64,9 +64,7 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
      * @param expectedSelector The required 4-byte function selector (MINT_SELECTOR or TRANSFER_SELECTOR)
      */
     function _decodeAddressAmountIntent(bytes calldata data, bytes4 expectedSelector) internal pure returns (address to, uint256 amount) {
-        if (data.length < 4) revert InvalidIntentData();
-        if (bytes4(data[0:4]) != expectedSelector) revert InvalidIntentData();
-        if (data.length != 4 + 64) revert InvalidIntentData(); // selector + 32 bytes address + 32 bytes uint256
+        require(data.length == 4 + 64 && bytes4(data[0:4]) == expectedSelector, InvalidIntentData());
         return abi.decode(data[4:], (address, uint256));
     }
 
