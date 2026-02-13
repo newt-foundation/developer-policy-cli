@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 import {NewtonPolicyClient} from "@newton/contracts/src/mixins/NewtonPolicyClient.sol";
 import {NewtonMessage} from "@newton/contracts/src/core/NewtonMessage.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {INewtonProverTaskManager} from "@newton/contracts/src/interfaces/INewtonProverTaskManager.sol";
 
 /**
  * @title NewtonErc20
@@ -12,6 +13,10 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     error InvalidAttestation();
     error AttestationRequired();
+    error InvalidIntentData();
+
+    bytes4 private constant MINT_SELECTOR = bytes4(keccak256("mint(address,uint256)"));
+    bytes4 private constant TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
 
     /**
      * @notice Constructor for NewtonErc20
@@ -33,19 +38,51 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     ) external {
         _initNewtonPolicyClient(policyTaskManager, policy, owner);
     }
+    
+    /**
+     * @notice Transfers tokens to an address after validating the attestation.
+     *         The recipient and amount are parsed from task.intent.data (must be ABI-encoded
+     *         with function signature "transfer(address,uint256)") so they cannot be tampered with.
+     * @param task The task generated to evaluate the intent
+     * @param taskResponse The task response returned by the prover 
+     * @param signatureData BLS signature data for verification
+     */
+    function transfer(
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
+    ) external {
+        require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
+        (address to, uint256 amount) = _decodeAddressAmountIntent(task.intent.data, TRANSFER_SELECTOR);
+        _transfer(task.intent.from, to, amount);
+    }
 
     /**
-     * @notice Mints tokens to an address after validating the attestation
-     * @param to The address to mint tokens to
-     * @param amount The amount of tokens to mint
-     * @param attestation The attestation to validate
+     * @notice Decodes (address, uint256) from intent data. Reverts if data is not ABI-encoded
+     *         with the expected function selector (e.g. "mint(address,uint256)" or "transfer(address,uint256)").
+     * @param data The ABI-encoded intent data (selector + address + uint256)
+     * @param expectedSelector The required 4-byte function selector (MINT_SELECTOR or TRANSFER_SELECTOR)
+     */
+    function _decodeAddressAmountIntent(bytes calldata data, bytes4 expectedSelector) internal pure returns (address to, uint256 amount) {
+        require(data.length == 4 + 64 && bytes4(data[0:4]) == expectedSelector, InvalidIntentData());
+        return abi.decode(data[4:], (address, uint256));
+    }
+
+    /**
+     * @notice Mints tokens to an address after validating the attestation.
+     *         The recipient and amount are parsed from task.intent.data (must be ABI-encoded
+     *         with function signature "mint(address,uint256)") so they cannot be tampered with.
+     * @param task The prover task to validate
+     * @param taskResponse The task response
+     * @param signatureData BLS signature data for verification
      */
     function mint(
-        address to,
-        uint256 amount,
-        NewtonMessage.Attestation calldata attestation
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
     ) external {
-        require(_validateAttestation(attestation), InvalidAttestation());
+        require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
+        (address to, uint256 amount) = _decodeAddressAmountIntent(task.intent.data, MINT_SELECTOR);
         _mint(to, amount);
     }
 
@@ -59,6 +96,15 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
         uint256 /* amount */
     ) public virtual override returns (bool) {
         revert AttestationRequired();
+    }
+
+
+    function _validateAttestationDirect(
+        INewtonProverTaskManager.Task calldata task,
+        INewtonProverTaskManager.TaskResponse calldata taskResponse,
+        bytes calldata signatureData
+    ) internal returns (bool) {
+        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
     }
 
     /**

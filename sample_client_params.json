@@ -1,4 +1,5 @@
 {
-    "chain_id": 11155111,
-    "max_gas_price": 100
+  "check_ofac": true,
+  "check_kyc": true,
+  "check_fraud": false
 }
