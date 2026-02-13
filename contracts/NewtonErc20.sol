@@ -54,7 +54,7 @@ contract NewtonErc20 is NewtonPolicyClient, ERC20 {
     ) external {
         require(_validateAttestationDirect(task, taskResponse, signatureData), InvalidAttestation());
         (address to, uint256 amount) = _decodeMintIntent(task.intent.data);
-        _transfer(to, amount);
+        _transfer(task.intent.from, to, amount);
     }
 
     /**
