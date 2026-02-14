@@ -22,7 +22,8 @@ contract YourPolicyClient is NewtonPolicyClient {
         address policy, //refers to the policy template address
         address owner
     ) external {
-        _initNewtonPolicyClient(policyTaskManager, policy, owner);
+        _initNewtonPolicyClient(policyTaskManager, owner);
+        _setPolicyAddress(policy);
     }
 	
     // this function duplicates the functionality the base NewtonPolicyClient without permissioning
@@ -38,14 +39,6 @@ contract YourPolicyClient is NewtonPolicyClient {
         // Your function's business logic goes here
 
         emit Success();
-    }
-
-    function _validateAttestationDirect(
-        INewtonProverTaskManager.Task calldata task,
-        INewtonProverTaskManager.TaskResponse calldata taskResponse,
-        bytes calldata signatureData
-    ) internal returns (bool) {
-        return INewtonProverTaskManager(_getNewtonPolicyTaskManager()).validateAttestationDirect(task, taskResponse, signatureData);
     }
 
     // this is the policy guarded function
