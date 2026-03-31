@@ -3,6 +3,7 @@
 crates/*/Cargo.lock
 .env
 .DS_Store
+.venv
 
 cache/
 out/
